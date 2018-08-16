@@ -44,6 +44,7 @@ function trivial( test )
   function executable1( e )
   {
     executed1 = 1;
+    console.log( 'executable1' );
   }
 
   var Commands =

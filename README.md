@@ -8,3 +8,4 @@ Class aggregating several applications into single CLI. It can aggregate externa
 npm install
 node sample/Sample.s
 ```
+
