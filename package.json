@@ -23,7 +23,10 @@
   "dependencies": {
     "wTools": "",
     "wCopyable": "",
-    "wvocabulary": ""
+    "wvocabulary": "",
+    "wpathfundamentals": "",
+    "wexternalfundamentals" : "",
+    "wFiles": ""
   },
   "devDependencies": {
     "wTesting": "",

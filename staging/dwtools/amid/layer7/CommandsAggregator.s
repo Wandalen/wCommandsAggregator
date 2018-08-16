@@ -34,6 +34,9 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wCopyable' );
   _.include( 'wVocabulary' );
+  _.include( 'wPathFundamentals' );
+  _.include( 'wExternalFundamentals' );
+  _.include( 'wFiles' );
 
 }
 
