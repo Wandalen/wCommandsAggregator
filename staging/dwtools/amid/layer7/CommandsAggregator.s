@@ -84,7 +84,12 @@ function form()
     self.commands.help = { e : self._help.bind( self ), h : 'Get help' };
   }
 
-  self.vocabulary = _.Vocabulary();
+  self.vocabulary = _.Vocabulary
+  ({
+    addingDelimeter : self.addingDelimeter,
+    lookingDelimeter : self.lookingDelimeter,
+  });
+
   self.vocabulary.onDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
   self.vocabulary.phrasesAdd( self.commands );
 
@@ -110,24 +115,33 @@ function proceed( appArgs )
   _.assert( _.instanceIs( self ) );
   _.assert( !!self._formed );
 
-  let subjectDescriptor = self.vocabulary.subjectDescriptorFor
-  ({
-    subject : subjects[ 0 ],
-    delimeter : [ '.' ],
-    exact : 1,
-  });
+  let subjectDescriptors = self.vocabulary.subjectDescriptorFor( subjects[ 0 ] );
 
-  if( !subjectDescriptor )
-  throw _.errBriefly( 'Unknown subject ' + _.strQuote( appArgs.subject ) );
+  /* */
 
-  let executable = subjectDescriptor.phraseDescriptor.executable;
+  if( !subjectDescriptors.length )
+  {
+    let s = 'Unknown subject ' + _.strQuote( appArgs.subject );
+    if( self.vocabulary.descriptorMap[ 'help' ] )
+    s += '\nTry subject ".help"';
+    throw _.errBriefly( s );
+  }
+  else if( subjectDescriptors.length > 1 )
+  {
+    logger.log( _.toStr( self.vocabulary.helpForSubject( subjects[ 0 ] ), { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } ) );
+    return;
+  }
+
+  /* */
+
+  let executable = subjectDescriptors[ 0 ].phraseDescriptor.executable;
   if( _.routineIs( executable ) )
   {
     return executable
     ({
       subject : subjects[ 1 ],
       map : appArgs.map,
-      phrase : subjectDescriptor.phraseDescriptor.phrase,
+      phrase : subjectDescriptors[ 0 ].phraseDescriptor.phrase,
     });
   }
   else
@@ -200,6 +214,8 @@ let Composes =
 {
   basePath : null,
   commandPrefix : '',
+  addingDelimeter : _.define.own([ ' ' ]),
+  lookingDelimeter : _.define.own([ '.' ]),
   supplementingByHelp : 1,
 }
 

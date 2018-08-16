@@ -1,5 +1,6 @@
 
-let _ = require( 'wcommandsaggregator' );
+let _ = require( 'wTools' );
+require( 'wcommandsaggregator' );
 
 /**/
 
@@ -10,8 +11,8 @@ function executable1( e )
 
 var Commands =
 {
-  'action1' : { e : executable1, h : 'Some action' },
-  'action2' : 'Action2.s',
+  'action first' : { e : executable1, h : 'Some action' },
+  'action second' : 'Action2.s',
 }
 
 var ca = _.CommandsAggregator
