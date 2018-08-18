@@ -90,7 +90,7 @@ function form()
     lookingDelimeter : self.lookingDelimeter,
   });
 
-  self.vocabulary.onDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
+  self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
   self.vocabulary.phrasesAdd( self.commands );
 
   return self;
@@ -114,42 +114,54 @@ function proceed( appArgs )
 
   _.assert( _.instanceIs( self ) );
   _.assert( !!self._formed );
+  _.assert( arguments.length === 1 );
 
   let subjectDescriptors = self.vocabulary.subjectDescriptorFor( subjects[ 0 ] );
+  let filteredSubjectDescriptors;
 
   /* */
 
   if( !subjectDescriptors.length )
   {
-    let s = 'Unknown subject ' + _.strQuote( appArgs.subject );
+    let s = 'Unknown subject ' + _.strQuote( subjects[ 0 ] );
     if( self.vocabulary.descriptorMap[ 'help' ] )
     s += '\nTry subject ".help"';
     throw _.errBriefly( s );
   }
-  else if( subjectDescriptors.length > 1 )
+  else
   {
-    logger.log( _.toStr( self.vocabulary.helpForSubject( subjects[ 0 ] ), { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } ) );
+    filteredSubjectDescriptors = self.vocabulary.subjectsFilter( subjectDescriptors, { wholePhrase : subjects[ 0 ] } );
+    if( filteredSubjectDescriptors.length !== 1 )
+    {
+      logger.log( 'Ambiguity' );
+      logger.log( _.toStr( self.vocabulary.helpForSubject( subjects[ 0 ] ), { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } ) );
+      logger.log( '' );
+    }
+    if( filteredSubjectDescriptors.length !== 1 )
     return;
   }
 
   /* */
 
-  let executable = subjectDescriptors[ 0 ].phraseDescriptor.executable;
+  let executable = filteredSubjectDescriptors[ 0 ].phraseDescriptor.executable;
   if( _.routineIs( executable ) )
   {
     return executable
     ({
-      subject : subjects[ 1 ],
+      subject : subjects[ 2 ],
       map : appArgs.map,
-      phrase : subjectDescriptors[ 0 ].phraseDescriptor.phrase,
+      phrase : filteredSubjectDescriptors[ 0 ].phraseDescriptor.phrase,
     });
   }
   else
   {
     executable = _.path.nativize( executable );
     let mapStr = _.strJoinMap({ src : appArgs.map });
-    let shellStr = self.commandPrefix + executable + ' ' + mapStr + ' ' + subjects[ 1 ];
-    return _.shell( shellStr );
+    let shellStr = self.commandPrefix + executable + ' ' + subjects[ 2 ] + ' ' + mapStr;
+    let o2 = Object.create( null );
+    o2.outputGrayRegularOutput = 1;
+    o2.path = shellStr;
+    return _.shell( o2 );
   }
 
 }
@@ -174,14 +186,22 @@ function _help( e )
 function _onPhraseDescriptorMake( src )
 {
 
-  _.assert( _.arrayIs( src ) && src.length === 2 );
+  _.assert(  _.strIs( src ) || _.arrayIs( src ) );
   _.assert( arguments.length === 1 );
 
   let self = this;
-  let phrase = src[ 0 ];
-  let hint = phrase;
-  let executable = src[ 1 ];
   let result = Object.create( null );
+  let phrase = src;
+  let executable = null;
+
+  if( phrase )
+  {
+    _.assert( phrase.length === 2 );
+    executable = phrase[ 1 ];
+    phrase = phrase[ 0 ];
+  }
+
+  let hint = phrase;
 
   if( _.objectIs( executable ) )
   {
@@ -214,7 +234,7 @@ let Composes =
 {
   basePath : null,
   commandPrefix : '',
-  addingDelimeter : _.define.own([ ' ' ]),
+  addingDelimeter : ' ',
   lookingDelimeter : _.define.own([ '.' ]),
   supplementingByHelp : 1,
 }
@@ -288,7 +308,6 @@ _.classDeclare
 });
 
 _.Copyable.mixin( Self );
-// _.Verbal.mixin( Self );
 
 //
 
