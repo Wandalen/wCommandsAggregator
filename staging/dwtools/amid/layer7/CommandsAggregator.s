@@ -159,7 +159,7 @@ function proceed( appArgs )
     let mapStr = _.strJoinMap({ src : appArgs.map });
     let shellStr = self.commandPrefix + executable + ' ' + subjects[ 2 ] + ' ' + mapStr;
     let o2 = Object.create( null );
-    o2.outputGrayRegularOutput = 1;
+    // o2.outputGrayRegularOutput = 1;
     o2.path = shellStr;
     return _.shell( o2 );
   }
