@@ -134,7 +134,7 @@ function proceed( appArgs )
     if( filteredSubjectDescriptors.length !== 1 )
     {
       logger.log( 'Ambiguity' );
-      logger.log( _.toStr( self.vocabulary.helpForSubject( subjects[ 0 ] ), { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } ) );
+      logger.log( self.vocabulary.helpForSubjectAsString( subjects[ 0 ] ) );
       logger.log( '' );
     }
     if( filteredSubjectDescriptors.length !== 1 )
@@ -149,7 +149,9 @@ function proceed( appArgs )
     return executable
     ({
       subject : subjects[ 2 ],
-      map : appArgs.map,
+      // map : appArgs.map,
+      appArgs : appArgs,
+      commandsAggregator : self,
       phrase : filteredSubjectDescriptors[ 0 ].phraseDescriptor.phrase,
     });
   }
@@ -177,7 +179,7 @@ function _help( e )
 
   logger.log( ' Commands to use' );
   logger.log();
-  logger.log( _.toStr( self.vocabulary.helpForSubject( '' ), { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } ) );
+  logger.log( self.vocabulary.helpForSubjectAsString( '' ) );
 
 }
 
@@ -219,7 +221,7 @@ function _onPhraseDescriptorMake( src )
   }
   else
   {
-    result.executable = _.path.join( self.basePath, executable );
+    result.executable = _.path.resolve( self.basePath, executable );
     _.sure( !!_.fileProvider.fileStat( result.executable ), () => 'Application not found at ' + _.strQuote( result.executable ) );
   }
 
