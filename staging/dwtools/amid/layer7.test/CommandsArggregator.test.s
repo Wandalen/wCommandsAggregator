@@ -1,4 +1,4 @@
-( function _StringTools_test_s_() {
+( function _CommandsAggregator_test_s_() {
 
 'use strict';
 
