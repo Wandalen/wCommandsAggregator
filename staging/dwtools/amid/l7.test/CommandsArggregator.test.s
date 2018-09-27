@@ -26,7 +26,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  require( '../layer7/CommandsAggregator.s' );
+  require( '../l7/CommandsAggregator.s' );
 
 }
 

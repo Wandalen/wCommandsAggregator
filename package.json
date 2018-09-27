@@ -4,9 +4,9 @@
   "description": "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
   "author": "Kostiantyn Wandalen <wanalen@willbe.so>",
   "license": "MIT",
-  "main": "staging/dwtools/amid/layer7/CommandsAggregator.s",
+  "main": "staging/dwtools/amid/l7/CommandsAggregator.s",
   "files": [
-    "staging/dwtools/amid/layer7",
+    "staging/dwtools/amid/l7",
     "production"
   ],
   "scripts": {
