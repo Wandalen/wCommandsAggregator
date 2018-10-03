@@ -15,7 +15,7 @@ if( typeof module !== 'undefined' )
 
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
-    let toolsPath = '../../../dwtools/Base.s';
+    let toolsPath = '../../../../dwtools/Base.s';
     let toolsExternal = 0;
     try
     {
@@ -75,7 +75,7 @@ function form()
 
   _.assert( !self._formed );
   _.assert( _.objectIs( self.commands ) );
-  self._formed = 1;
+  _.assert( arguments.length === 0 );
 
   self.basePath = _.path.resolve( self.basePath );
 
@@ -84,21 +84,30 @@ function form()
     self.commands.help = { e : self._help.bind( self ), h : 'Get help' };
   }
 
-  self.vocabulary = _.Vocabulary
-  ({
-    addingDelimeter : self.addingDelimeter,
-    lookingDelimeter : self.lookingDelimeter,
-  });
+  self._formVocabulary();
 
   self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
-  self.vocabulary.phrasesAdd( self.commands );
 
+  self.commandsAdd( self.commands );
+
+  self._formed = 1;
   return self;
 }
 
 //
 
-function execThis()
+function _formVocabulary()
+{
+  let self = this;
+  _.assert( arguments.length === 0 );
+  self.vocabulary = self.vocabulary || _.Vocabulary();
+  self.vocabulary.addingDelimeter = self.addingDelimeter;
+  self.vocabulary.lookingDelimeter = self.lookingDelimeter;
+}
+
+//
+
+function exec()
 {
   let self = this;
   let appArgs = _.appArgs();
@@ -166,6 +175,22 @@ function proceed( appArgs )
     return _.shell( o2 );
   }
 
+}
+
+//
+
+function commandsAdd( commands )
+{
+  let self = this;
+
+  _.assert( !self._formed );
+  _.assert( arguments.length === 1 );
+
+  self._formVocabulary();
+
+  self.vocabulary.phrasesAdd( commands );
+
+  return self;
 }
 
 //
@@ -281,8 +306,11 @@ let Proto =
 
   init : init,
   form : form,
-  execThis : execThis,
+  _formVocabulary : _formVocabulary,
+  exec : exec,
   proceed : proceed,
+
+  commandsAdd : commandsAdd,
 
   _help : _help,
   _onPhraseDescriptorMake : _onPhraseDescriptorMake,
