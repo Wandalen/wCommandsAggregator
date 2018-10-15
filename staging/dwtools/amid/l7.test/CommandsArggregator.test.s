@@ -64,20 +64,20 @@ function trivial( test )
   var appArgs = Object.create( null );
   appArgs.subject = 'action1';
   appArgs.map = {};
-  ca.proceed( appArgs );
+  ca.proceedApplicationArguments({ appArgs : appArgs });
   test.identical( executed1,1 );
 
   var appArgs = Object.create( null );
   appArgs.subject = 'help';
   appArgs.map = {};
-  ca.proceed( appArgs );
+  ca.proceedApplicationArguments({ appArgs : appArgs });
   test.identical( executed1,1 );
 
   var appArgs = Object.create( null );
   appArgs.map = {};
   appArgs.subject = 'action2';
 
-  return ca.proceed( appArgs )
+  return ca.proceedApplicationArguments({ appArgs : appArgs })
   .doThen( function( err, arg )
   {
     test.is( !err );
@@ -85,7 +85,7 @@ function trivial( test )
     var appArgs = Object.create( null );
     appArgs.map = {};
     appArgs.subject = 'action3';
-    return ca.proceed( appArgs );
+    return ca.proceedApplicationArguments({ appArgs : appArgs });
   })
 
   return result;
