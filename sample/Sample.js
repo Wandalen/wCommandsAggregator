@@ -22,4 +22,4 @@ var ca = _.CommandsAggregator
   commandPrefix : 'node ',
 }).form();
 
-ca.execThis();
+ca.exec();
