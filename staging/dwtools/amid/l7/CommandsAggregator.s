@@ -137,7 +137,6 @@ function proceedApplicationArguments( o )
   if( !_.strBegins( o.appArgs.subject, '.' ) || _.strBegins( o.appArgs.subject, './' ) || _.strBegins( o.appArgs.subject, '.\\' ) )
   {
     self.logger.error( 'Illformed request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
-    // self.commandHelp({ commandsAggregator : ca });
     self.onGetHelp();
     return;
   }
@@ -157,53 +156,6 @@ function proceedApplicationArguments( o )
     subject : subjects[ 2 ],
     propertiesMap : o.appArgs.map,
   });
-
-  //
-  // /* */
-  //
-  // if( !subjectDescriptors.length )
-  // {
-  //   let s = 'Unknown subject ' + _.strQuote( subjects[ 0 ] );
-  //   if( self.vocabulary.descriptorMap[ 'help' ] )
-  //   s += '\nTry subject ".help"';
-  //   throw _.errBriefly( s );
-  // }
-  // else
-  // {
-  //   filteredSubjectDescriptors = self.vocabulary.subjectsFilter( subjectDescriptors, { wholePhrase : subjects[ 0 ] } );
-  //   if( filteredSubjectDescriptors.length !== 1 )
-  //   {
-  //     self.logger.log( 'Ambiguity' );
-  //     self.logger.log( self.vocabulary.helpForSubjectAsString( subjects[ 0 ] ) );
-  //     self.logger.log( '' );
-  //   }
-  //   if( filteredSubjectDescriptors.length !== 1 )
-  //   return;
-  // }
-  //
-  // /* */
-  //
-  // let executable = filteredSubjectDescriptors[ 0 ].phraseDescriptor.executable;
-  // if( _.routineIs( executable ) )
-  // {
-  //   return executable
-  //   ({
-  //     subject : subjects[ 2 ],
-  //     appArgs : o.appArgs,
-  //     commandsAggregator : self,
-  //     phrase : filteredSubjectDescriptors[ 0 ].phraseDescriptor.phrase,
-  //   });
-  // }
-  // else
-  // {
-  //   executable = _.path.nativize( executable );
-  //   let mapStr = _.strJoinMap({ src : o.appArgs.map });
-  //   let shellStr = self.commandPrefix + executable + ' ' + subjects[ 2 ] + ' ' + mapStr;
-  //   let o2 = Object.create( null );
-  //   // o2.outputGrayRegularOutput = 1;
-  //   o2.path = shellStr;
-  //   return _.shell( o2 );
-  // }
 
 }
 
@@ -311,14 +263,61 @@ function commandsAdd( commands )
 
 function _commandHelp( e )
 {
+  let self = this;
   let ca = e.ca;
+  let logger = self.logger || ca.logger || _global_.logger;
 
-  _.assert( arguments.length === 1 );
+  if( e.subject )
+  {
 
-  ca.logger.log( ' Commands to use' );
-  ca.onPrintCommands();
+    logger.log();
+    logger.log( e.ca.vocabulary.helpForSubjectAsString( e.subject ) );
+    logger.up();
 
+    let subjects = e.ca.vocabulary.subjectDescriptorForWithClause({ phrase : e.subject });
+
+    if( subjects.length === 0 )
+    {
+      logger.log( 'No command', e.subject );
+    }
+    else if( subjects.length === 1 )
+    {
+      let subject = subjects[ 0 ];
+      if( subject.phraseDescriptor.executable && subject.phraseDescriptor.executable.commandProperties )
+      {
+        let properties = subject.phraseDescriptor.executable.commandProperties;
+        logger.log( _.toStr( properties, { levels : 2, wrap : 0, multiline : 1 } ) );
+      }
+    }
+
+    logger.down();
+    logger.log();
+
+  }
+  else
+  {
+
+    logger.log();
+    logger.log( e.ca.vocabulary.helpForSubjectAsString( '' ) );
+    logger.log();
+
+    //logger.log( 'Use ' + logger.colorFormat( '"ts .help"', 'code' ) + ' to get help' );
+
+  }
+
+  return self;
 }
+
+// function _commandHelp( e )
+// {
+//   let ca = e.ca;
+//
+//   _.assert( arguments.length === 1 ); xxx
+//
+//   ca.logger.log( 'Commands to use' );
+//   ca.onPrintCommands();
+//
+// }
 
 //
 
