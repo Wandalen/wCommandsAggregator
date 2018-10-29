@@ -4,14 +4,13 @@
 
 if( typeof module !== 'undefined' )
 {
-
   if( typeof _global_ === 'undefined' || !_global_.wBase )
   {
-    var toolsPath = '../../../dwtools/Base.s';
-    var toolsExternal = 0;
+    let toolsPath = '../../../../dwtools/Base.s';
+    let toolsExternal = 0;
     try
     {
-      toolsPath = require.resolve( toolsPath );
+      require.resolve( toolsPath );
     }
     catch( err )
     {
@@ -26,7 +25,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  require( '../l7/CommandsAggregator.s' );
+  require( '../../l7/commands/CommandsAggregator.s' );
 
 }
 
@@ -64,20 +63,21 @@ function trivial( test )
   var appArgs = Object.create( null );
   appArgs.subject = 'action1';
   appArgs.map = {};
-  ca.proceedApplicationArguments({ appArgs : appArgs });
+  executed1 = 0;
+  ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
   test.identical( executed1,1 );
 
   var appArgs = Object.create( null );
   appArgs.subject = 'help';
   appArgs.map = {};
-  ca.proceedApplicationArguments({ appArgs : appArgs });
+  ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
   test.identical( executed1,1 );
 
   var appArgs = Object.create( null );
   appArgs.map = {};
   appArgs.subject = 'action2';
 
-  return ca.proceedApplicationArguments({ appArgs : appArgs })
+  return ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 })
   .doThen( function( err, arg )
   {
     test.is( !err );
