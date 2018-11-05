@@ -7,7 +7,7 @@
   "main": "proto/dwtools/amid/l7/CommandsAggregator.s",
   "files": [
     "proto/dwtools/amid/l7",
-    "production"
+    "proto/dwtools/Tools.s", "production"
   ],
   "scripts": {
     "test": "wtest staging",
