@@ -394,7 +394,7 @@ function _onPhraseDescriptorMake( src )
   else
   {
     result.executable = _.path.resolve( self.basePath, executable );
-    _.sure( !!_.fileProvider.fileStat( result.executable ), () => 'Application not found at ' + _.strQuote( result.executable ) );
+    _.sure( !!_.fileProvider.statResolvedRead( result.executable ), () => 'Application not found at ' + _.strQuote( result.executable ) );
   }
 
   return result;
