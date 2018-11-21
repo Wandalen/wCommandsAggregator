@@ -24,10 +24,11 @@
   "dependencies": {
     "wTools": "",
     "wCopyable": "",
+    "wFiles": "",
     "wvocabulary": "",
     "wpathfundamentals": "",
     "wexternalfundamentals": "",
-    "wFiles": ""
+    "wverbal": ""
   },
   "devDependencies": {
     "wTesting": "",

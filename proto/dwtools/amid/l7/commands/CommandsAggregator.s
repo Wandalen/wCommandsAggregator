@@ -10,33 +10,18 @@
  * @file CommandsAggregator.s.
  */
 
+
 if( typeof module !== 'undefined' )
 {
 
-  if( typeof _global_ === 'undefined' || !_global_.wBase )
-  {
-    let toolsPath = '../../../../dwtools/Base.s';
-    let toolsExternal = 0;
-    try
-    {
-      toolsPath = require.resolve( toolsPath );
-    }
-    catch( err )
-    {
-      toolsExternal = 1;
-      require( 'wTools' );
-    }
-    if( !toolsExternal )
-    require( toolsPath );
-  }
-
-  let _ = _global_.wTools;
+  let _ = require( '../../../Tools.s' );
 
   _.include( 'wCopyable' );
   _.include( 'wVocabulary' );
   _.include( 'wPathFundamentals' );
   _.include( 'wExternalFundamentals' );
   _.include( 'wFiles' );
+  _.include( 'wVerbal' );
 
 }
 
@@ -59,14 +44,16 @@ function init( o )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
+  self.logger = new _.Logger({ output : _global_.logger });
+
   _.instanceInit( self );
   Object.preventExtensions( self )
 
   if( o )
   self.copy( o );
 
-  if( self.logger === null )
-  self.logger = new _.Logger({ output : _global_.logger });
+  // if( self.logger === null )
+  // self.logger = new _.Logger({ output : _global_.logger });
 
 }
 
@@ -141,14 +128,18 @@ function proceedApplicationArguments( o )
     return;
   }
 
+  // debugger;
   if( o.printingEcho )
-  self.logger.log( 'Request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
+  {
+    self.logger.rbegin({ verbosity : -1 });
+    self.logger.log( 'Request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
+    self.logger.rend({ verbosity : -1 });
+  }
 
   /* */
 
   let subjects = _.strIsolateBeginOrAll( o.appArgs.subject.trim(), ' ' );
   let subjectDescriptors = self.vocabulary.subjectDescriptorFor( subjects[ 0 ] );
-  let filteredSubjectDescriptors;
 
   return self.proceedAct
   ({
@@ -206,7 +197,7 @@ function proceedAct( o )
       self.logger.log( '' );
     }
     if( filteredSubjectDescriptors.length !== 1 )
-    return;
+    return null;
   }
 
   /* */
@@ -257,6 +248,24 @@ function commandsAdd( commands )
   self.vocabulary.phrasesAdd( commands );
 
   return self;
+}
+
+//
+
+function isolateSecond( subject )
+{
+  let ca = this;
+  let result = Object.create( null );
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( subject ) );
+
+  // let secondCommand, secondSubject, del;
+
+  [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateBeginOrAll( subject, ' ' );
+  [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateBeginOrAll( result.secondCommand, ' ' );
+
+  return result;
 }
 
 //
@@ -463,7 +472,10 @@ let Proto =
 
   commandsAdd : commandsAdd,
 
+  isolateSecond : isolateSecond,
+
   _commandHelp : _commandHelp,
+
   onGetHelp : onGetHelp,
   onPrintCommands : onPrintCommands,
   _onPhraseDescriptorMake : _onPhraseDescriptorMake,
@@ -491,6 +503,7 @@ _.classDeclare
 });
 
 _.Copyable.mixin( Self );
+_.Verbal.mixin( Self );
 
 //
 
