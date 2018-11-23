@@ -63,7 +63,7 @@ function form()
 {
   let self = this;
 
-  _.assert( !self._formed );
+  _.assert( !self.formed );
   _.assert( _.objectIs( self.commands ) );
   _.assert( arguments.length === 0 );
 
@@ -80,7 +80,7 @@ function form()
 
   self.commandsAdd( self.commands );
 
-  self._formed = 1;
+  self.formed = 1;
   return self;
 }
 
@@ -111,7 +111,7 @@ function proceedApplicationArguments( o )
   let self = this;
 
   _.assert( _.instanceIs( self ) );
-  _.assert( !!self._formed );
+  _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
   _.routineOptions( proceedApplicationArguments, o );
 
@@ -128,7 +128,6 @@ function proceedApplicationArguments( o )
     return;
   }
 
-  // debugger;
   if( o.printingEcho )
   {
     self.logger.rbegin({ verbosity : -1 });
@@ -138,13 +137,9 @@ function proceedApplicationArguments( o )
 
   /* */
 
-  let subjects = _.strIsolateBeginOrAll( o.appArgs.subject.trim(), ' ' );
-  let subjectDescriptors = self.vocabulary.subjectDescriptorFor( subjects[ 0 ] );
-
-  return self.proceedAct
+  return self.proceedCommands
   ({
-    command : subjects[ 0 ],
-    subject : subjects[ 2 ],
+    commands : o.appArgs.subject,
     propertiesMap : o.appArgs.map,
   });
 
@@ -159,16 +154,65 @@ proceedApplicationArguments.defaults =
 
 //
 
-function proceedAct( o )
+function proceedCommands( o )
+{
+  let self = this;
+  let con = new _.Consequence().give( null );
+  let commands = [];
+
+  _.routineOptions( proceedCommands, o );
+  _.assert( _.strIs( o.commands ) || _.arrayIs( o.commands ) );
+  _.assert( !!self.formed );
+  _.assert( arguments.length === 1 );
+
+  o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
+
+  for( let c = 0 ; c < o.commands.length ; c++ )
+  {
+    let command = o.commands[ c ];
+    _.arrayAppendArray( commands, _.strSplitNonPreserving( command, ';' ) );
+  }
+
+  o.commands = _.arrayFlatten( null, commands );
+
+  _.assert( o.commands.length !== 0, 'not tested' );
+  // _.assert( o.commands.length === 1, 'not tested' );
+
+  for( let c = 0 ; c < o.commands.length ; c++ )
+  {
+    let command = o.commands[ c ];
+    _.assert( command.trim() === command );
+    let splits = _.strIsolateBeginOrAll( command, ' ' );
+    con.then( () => self.proceedCommand
+    ({
+      command : splits[ 0 ],
+      subject : splits[ 2 ],
+      propertiesMap : o.propertiesMap,
+    }));
+  }
+
+  // debugger;
+  return con.toResourceMaybe();
+}
+
+proceedCommands.defaults =
+{
+  commands : null,
+  propertiesMap : null,
+}
+
+//
+
+function proceedCommand( o )
 {
   let self = this;
 
-  _.routineOptions( proceedAct, o );
+  _.routineOptions( proceedCommand, o );
   _.assert( _.strIs( o.subject ) );
   _.assert( _.strIs( o.command ) );
   _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
   _.assert( _.instanceIs( self ) );
-  _.assert( !!self._formed );
+  _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
 
   o.propertiesMap = o.propertiesMap || Object.create( null );
@@ -227,7 +271,7 @@ function proceedAct( o )
 
 }
 
-proceedAct.defaults =
+proceedCommand.defaults =
 {
   command : null,
   subject : '',
@@ -240,7 +284,7 @@ function commandsAdd( commands )
 {
   let self = this;
 
-  _.assert( !self._formed );
+  _.assert( !self.formed );
   _.assert( arguments.length === 1 );
 
   self._formVocabulary();
@@ -341,7 +385,7 @@ function onGetHelp()
 
   if( self.vocabulary.subjectDescriptorFor( '.help' ).length )
   {
-    self.proceedAct({ command : '.help' });
+    self.proceedCommand({ command : '.help' });
   }
   else
   {
@@ -437,7 +481,7 @@ let Associates =
 
 let Restricts =
 {
-  _formed : 0,
+  formed : 0,
 }
 
 let Statics =
@@ -460,15 +504,17 @@ let Medials =
 // prototype
 // --
 
-let Proto =
+let Extend =
 {
 
   init : init,
   form : form,
   _formVocabulary : _formVocabulary,
   exec : exec,
+
   proceedApplicationArguments : proceedApplicationArguments,
-  proceedAct : proceedAct,
+  proceedCommands : proceedCommands,
+  proceedCommand : proceedCommand,
 
   commandsAdd : commandsAdd,
 
@@ -499,7 +545,7 @@ _.classDeclare
 ({
   cls : Self,
   parent : Parent,
-  extend : Proto,
+  extend : Extend,
 });
 
 _.Copyable.mixin( Self );
