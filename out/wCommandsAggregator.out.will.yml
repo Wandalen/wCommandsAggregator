@@ -169,8 +169,8 @@ reflector:
       ./dwtools/amid/l7.test/Action3.s: true
       ./dwtools/amid/l7.test/CommandsArggregator.test.s: true
     srcFilter:
-      basePath: ./proto
-      prefixPath: .
+      basePath: .
+      prefixPath: proto
     dstFilter:
       basePath: .
       prefixPath: .
