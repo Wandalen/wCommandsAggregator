@@ -206,6 +206,7 @@ proceedCommands.defaults =
 function proceedCommand( o )
 {
   let self = this;
+  let result;
 
   _.routineOptions( proceedCommand, o );
   _.assert( _.strIs( o.subject ) );
@@ -249,7 +250,7 @@ function proceedCommand( o )
   let executable = filteredSubjectDescriptors[ 0 ].phraseDescriptor.executable;
   if( _.routineIs( executable ) )
   {
-    return executable
+    result = executable
     ({
       command : o.command,
       subject : o.subject,
@@ -266,9 +267,13 @@ function proceedCommand( o )
     let shellStr = self.commandPrefix + executable + ' ' + o.subject + ' ' + mapStr;
     let o2 = Object.create( null );
     o2.path = shellStr;
-    return _.shell( o2 );
+    result = _.shell( o2 );
   }
 
+  if( result === undefined )
+  result = null;
+
+  return result;
 }
 
 proceedCommand.defaults =
