@@ -131,7 +131,7 @@ function proceedApplicationArguments( o )
   if( o.printingEcho )
   {
     self.logger.rbegin({ verbosity : -1 });
-    self.logger.log( 'Request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
+    self.logger.log( 'Request', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
     self.logger.rend({ verbosity : -1 });
   }
 
@@ -139,8 +139,8 @@ function proceedApplicationArguments( o )
 
   return self.proceedCommands
   ({
-    commands : o.appArgs.subject,
-    propertiesMap : o.appArgs.map,
+    commands : o.appArgs.subjects,
+    propertiesMaps : o.appArgs.maps,
   });
 
 }
@@ -166,6 +166,7 @@ function proceedCommands( o )
   _.assert( arguments.length === 1 );
 
   o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
+  o.propertiesMaps = _.arrayFlatten( null, _.arrayAs( o.propertiesMaps ) );
 
   for( let c = 0 ; c < o.commands.length ; c++ )
   {
@@ -175,6 +176,7 @@ function proceedCommands( o )
 
   o.commands = _.arrayFlatten( null, commands );
 
+  _.assert( o.commands.length === o.propertiesMaps.length );
   _.assert( o.commands.length !== 0, 'not tested' );
   // _.assert( o.commands.length === 1, 'not tested' );
 
@@ -187,7 +189,7 @@ function proceedCommands( o )
     ({
       command : splits[ 0 ],
       subject : splits[ 2 ],
-      propertiesMap : o.propertiesMap,
+      propertiesMap : o.propertiesMaps[ c ],
     }));
   }
 
@@ -198,7 +200,7 @@ function proceedCommands( o )
 proceedCommands.defaults =
 {
   commands : null,
-  propertiesMap : null,
+  propertiesMaps : null,
 }
 
 //
