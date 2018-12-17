@@ -157,7 +157,7 @@ proceedApplicationArguments.defaults =
 function proceedCommands( o )
 {
   let self = this;
-  let con = new _.Consequence().give( null );
+  let con = new _.Consequence().take( null );
   let commands = [];
 
   _.routineOptions( proceedCommands, o );
@@ -185,7 +185,7 @@ function proceedCommands( o )
     let command = o.commands[ c ];
     _.assert( command.trim() === command );
     let splits = _.strIsolateBeginOrAll( command, ' ' );
-    con.then( () => self.proceedCommand
+    con.keep( () => self.proceedCommand
     ({
       command : splits[ 0 ],
       subject : splits[ 2 ],

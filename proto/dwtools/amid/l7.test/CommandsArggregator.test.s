@@ -78,7 +78,7 @@ function trivial( test )
   appArgs.subject = 'action2';
 
   return ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 })
-  .doThen( function( err, arg )
+  .finally( function( err, arg )
   {
     test.is( !err );
     test.is( !!arg );
