@@ -25,7 +25,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  require( '../../l7/commands/CommandsAggregator.s' );
+  require( '../l7/commands/CommandsAggregator.s' );
 
 }
 
@@ -62,29 +62,37 @@ function trivial( test )
 
   var appArgs = Object.create( null );
   appArgs.subject = 'action1';
-  appArgs.map = {};
+  appArgs.map = { action1 : true };
+  appArgs.maps = [ appArgs.map ];
+  appArgs.subjects = [ 'action1' ];
   executed1 = 0;
   ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
   test.identical( executed1,1 );
 
   var appArgs = Object.create( null );
   appArgs.subject = 'help';
-  appArgs.map = {};
+  appArgs.map = { help : true };
+  appArgs.maps = [ appArgs.map ];
+  appArgs.subjects = [ 'help' ];
   ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
   test.identical( executed1,1 );
 
   var appArgs = Object.create( null );
-  appArgs.map = {};
+  appArgs.map = { action2 : true };
+  appArgs.maps = [ appArgs.map ];
   appArgs.subject = 'action2';
+  appArgs.subjects = [ 'action2' ];
 
   return ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 })
-  .doThen( function( err, arg )
+  .finally( function( err, arg )
   {
     test.is( !err );
     test.is( !!arg );
     var appArgs = Object.create( null );
-    appArgs.map = {};
-    appArgs.subject = 'action3';
+    appArgs.map = { '.action3' : true };
+    appArgs.maps = [ appArgs.map ];
+    appArgs.subject = '.action3';
+    appArgs.subjects = [ '.action3' ];
     return ca.proceedApplicationArguments({ appArgs : appArgs });
   })
 
@@ -110,6 +118,6 @@ var Self =
 
 Self = wTestSuite( Self );
 if( typeof module !== 'undefined' && !module.parent )
-_.Tester.test( Self.name );
+wTester.test( Self.name );
 
 })();
