@@ -10,33 +10,18 @@
  * @file CommandsAggregator.s.
  */
 
+
 if( typeof module !== 'undefined' )
 {
 
-  if( typeof _global_ === 'undefined' || !_global_.wBase )
-  {
-    let toolsPath = '../../../../dwtools/Base.s';
-    let toolsExternal = 0;
-    try
-    {
-      toolsPath = require.resolve( toolsPath );
-    }
-    catch( err )
-    {
-      toolsExternal = 1;
-      require( 'wTools' );
-    }
-    if( !toolsExternal )
-    require( toolsPath );
-  }
-
-  let _ = _global_.wTools;
+  let _ = require( '../../../Tools.s' );
 
   _.include( 'wCopyable' );
   _.include( 'wVocabulary' );
   _.include( 'wPathFundamentals' );
   _.include( 'wExternalFundamentals' );
   _.include( 'wFiles' );
+  _.include( 'wVerbal' );
 
 }
 
@@ -59,14 +44,16 @@ function init( o )
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
+  self.logger = new _.Logger({ output : _global_.logger });
+
   _.instanceInit( self );
   Object.preventExtensions( self )
 
   if( o )
   self.copy( o );
 
-  if( self.logger === null )
-  self.logger = new _.Logger({ output : _global_.logger });
+  // if( self.logger === null )
+  // self.logger = new _.Logger({ output : _global_.logger });
 
 }
 
@@ -76,7 +63,7 @@ function form()
 {
   let self = this;
 
-  _.assert( !self._formed );
+  _.assert( !self.formed );
   _.assert( _.objectIs( self.commands ) );
   _.assert( arguments.length === 0 );
 
@@ -93,7 +80,7 @@ function form()
 
   self.commandsAdd( self.commands );
 
-  self._formed = 1;
+  self.formed = 1;
   return self;
 }
 
@@ -124,7 +111,7 @@ function proceedApplicationArguments( o )
   let self = this;
 
   _.assert( _.instanceIs( self ) );
-  _.assert( !!self._formed );
+  _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
   _.routineOptions( proceedApplicationArguments, o );
 
@@ -142,19 +129,18 @@ function proceedApplicationArguments( o )
   }
 
   if( o.printingEcho )
-  self.logger.log( 'Request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
+  {
+    self.logger.rbegin({ verbosity : -1 });
+    self.logger.log( 'Request', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
+    self.logger.rend({ verbosity : -1 });
+  }
 
   /* */
 
-  let subjects = _.strIsolateBeginOrAll( o.appArgs.subject.trim(), ' ' );
-  let subjectDescriptors = self.vocabulary.subjectDescriptorFor( subjects[ 0 ] );
-  let filteredSubjectDescriptors;
-
-  return self.proceedAct
+  return self.proceedCommands
   ({
-    command : subjects[ 0 ],
-    subject : subjects[ 2 ],
-    propertiesMap : o.appArgs.map,
+    commands : o.appArgs.subjects,
+    propertiesMaps : o.appArgs.maps,
   });
 
 }
@@ -168,16 +154,68 @@ proceedApplicationArguments.defaults =
 
 //
 
-function proceedAct( o )
+function proceedCommands( o )
 {
   let self = this;
+  let con = new _.Consequence().take( null );
+  let commands = [];
 
-  _.routineOptions( proceedAct, o );
+  _.routineOptions( proceedCommands, o );
+  _.assert( _.strIs( o.commands ) || _.arrayIs( o.commands ) );
+  _.assert( !!self.formed );
+  _.assert( arguments.length === 1 );
+
+  o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
+  o.propertiesMaps = _.arrayFlatten( null, _.arrayAs( o.propertiesMaps ) );
+
+  for( let c = 0 ; c < o.commands.length ; c++ )
+  {
+    let command = o.commands[ c ];
+    _.arrayAppendArray( commands, _.strSplitNonPreserving( command, ';' ) );
+  }
+
+  o.commands = _.arrayFlatten( null, commands );
+
+  _.assert( o.commands.length === o.propertiesMaps.length );
+  _.assert( o.commands.length !== 0, 'not tested' );
+  // _.assert( o.commands.length === 1, 'not tested' );
+
+  for( let c = 0 ; c < o.commands.length ; c++ )
+  {
+    let command = o.commands[ c ];
+    _.assert( command.trim() === command );
+    let splits = _.strIsolateBeginOrAll( command, ' ' );
+    con.keep( () => self.proceedCommand
+    ({
+      command : splits[ 0 ],
+      subject : splits[ 2 ],
+      propertiesMap : o.propertiesMaps[ c ],
+    }));
+  }
+
+  // debugger;
+  return con.toResourceMaybe();
+}
+
+proceedCommands.defaults =
+{
+  commands : null,
+  propertiesMaps : null,
+}
+
+//
+
+function proceedCommand( o )
+{
+  let self = this;
+  let result;
+
+  _.routineOptions( proceedCommand, o );
   _.assert( _.strIs( o.subject ) );
   _.assert( _.strIs( o.command ) );
   _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
   _.assert( _.instanceIs( self ) );
-  _.assert( !!self._formed );
+  _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
 
   o.propertiesMap = o.propertiesMap || Object.create( null );
@@ -206,7 +244,7 @@ function proceedAct( o )
       self.logger.log( '' );
     }
     if( filteredSubjectDescriptors.length !== 1 )
-    return;
+    return null;
   }
 
   /* */
@@ -214,7 +252,7 @@ function proceedAct( o )
   let executable = filteredSubjectDescriptors[ 0 ].phraseDescriptor.executable;
   if( _.routineIs( executable ) )
   {
-    return executable
+    result = executable
     ({
       command : o.command,
       subject : o.subject,
@@ -231,12 +269,16 @@ function proceedAct( o )
     let shellStr = self.commandPrefix + executable + ' ' + o.subject + ' ' + mapStr;
     let o2 = Object.create( null );
     o2.path = shellStr;
-    return _.shell( o2 );
+    result = _.shell( o2 );
   }
 
+  if( result === undefined )
+  result = null;
+
+  return result;
 }
 
-proceedAct.defaults =
+proceedCommand.defaults =
 {
   command : null,
   subject : '',
@@ -249,7 +291,7 @@ function commandsAdd( commands )
 {
   let self = this;
 
-  _.assert( !self._formed );
+  _.assert( !self.formed );
   _.assert( arguments.length === 1 );
 
   self._formVocabulary();
@@ -257,6 +299,24 @@ function commandsAdd( commands )
   self.vocabulary.phrasesAdd( commands );
 
   return self;
+}
+
+//
+
+function isolateSecond( subject )
+{
+  let ca = this;
+  let result = Object.create( null );
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( subject ) );
+
+  // let secondCommand, secondSubject, del;
+
+  [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateBeginOrAll( subject, ' ' );
+  [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateBeginOrAll( result.secondCommand, ' ' );
+
+  return result;
 }
 
 //
@@ -332,7 +392,7 @@ function onGetHelp()
 
   if( self.vocabulary.subjectDescriptorFor( '.help' ).length )
   {
-    self.proceedAct({ command : '.help' });
+    self.proceedCommand({ command : '.help' });
   }
   else
   {
@@ -394,7 +454,7 @@ function _onPhraseDescriptorMake( src )
   else
   {
     result.executable = _.path.resolve( self.basePath, executable );
-    _.sure( !!_.fileProvider.fileStat( result.executable ), () => 'Application not found at ' + _.strQuote( result.executable ) );
+    _.sure( !!_.fileProvider.statResolvedRead( result.executable ), () => 'Application not found at ' + _.strQuote( result.executable ) );
   }
 
   return result;
@@ -428,7 +488,7 @@ let Associates =
 
 let Restricts =
 {
-  _formed : 0,
+  formed : 0,
 }
 
 let Statics =
@@ -451,19 +511,24 @@ let Medials =
 // prototype
 // --
 
-let Proto =
+let Extend =
 {
 
   init : init,
   form : form,
   _formVocabulary : _formVocabulary,
   exec : exec,
+
   proceedApplicationArguments : proceedApplicationArguments,
-  proceedAct : proceedAct,
+  proceedCommands : proceedCommands,
+  proceedCommand : proceedCommand,
 
   commandsAdd : commandsAdd,
 
+  isolateSecond : isolateSecond,
+
   _commandHelp : _commandHelp,
+
   onGetHelp : onGetHelp,
   onPrintCommands : onPrintCommands,
   _onPhraseDescriptorMake : _onPhraseDescriptorMake,
@@ -487,10 +552,11 @@ _.classDeclare
 ({
   cls : Self,
   parent : Parent,
-  extend : Proto,
+  extend : Extend,
 });
 
 _.Copyable.mixin( Self );
+_.Verbal.mixin( Self );
 
 //
 

@@ -1,17 +1,18 @@
 {
   "name": "wcommandsaggregator",
-  "version": "0.3.16",
+  "version": "0.3.44",
   "description": "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
   "author": "Kostiantyn Wandalen <wanalen@willbe.so>",
   "license": "MIT",
-  "main": "staging/dwtools/amid/l7/CommandsAggregator.s",
+  "main": "proto/dwtools/amid/l7/commands/CommandsAggregator.s",
   "files": [
-    "staging/dwtools/amid/l7",
+    "proto/dwtools/amid/l7",
+    "proto/dwtools/Tools.s",
     "production"
   ],
   "scripts": {
     "test": "wtest staging",
-    "make_doc": "./doc.sh"
+    "docgen": "wdocgen proto"
   },
   "repository": {
     "type": "git",
@@ -23,10 +24,11 @@
   "dependencies": {
     "wTools": "",
     "wCopyable": "",
+    "wFiles": "",
     "wvocabulary": "",
     "wpathfundamentals": "",
     "wexternalfundamentals": "",
-    "wFiles": ""
+    "wverbal": ""
   },
   "devDependencies": {
     "wTesting": "",
