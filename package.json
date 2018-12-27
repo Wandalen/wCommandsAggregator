@@ -31,8 +31,7 @@
     "wverbal": ""
   },
   "devDependencies": {
-    "wTesting": "",
-    "wcommandsaggregator": "."
+    "wTesting": ""
   },
   "keywords": [
     "wTools"
