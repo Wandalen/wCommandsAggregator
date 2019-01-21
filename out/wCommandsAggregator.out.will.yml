@@ -52,7 +52,6 @@ path:
       - .
       - ./dwtools
       - ./dwtools/Tools.s
-      - ./dwtools/abase
       - ./dwtools/amid
       - ./dwtools/amid/l7
       - ./dwtools/amid/l7/commands
@@ -61,7 +60,6 @@ path:
       - ./dwtools/amid/l7.test/Action2.s
       - ./dwtools/amid/l7.test/Action3.s
       - ./dwtools/amid/l7.test/CommandsArggregator.test.s
-      - ./dwtools/atop
     criterion:
       default: 1
       debug: 1
@@ -91,6 +89,8 @@ reflector:
     filePath:
       ./proto: ./out.release
     srcFilter:
+      filePath:
+        ./proto: ./out.release
       maskAll:
         excludeAny:
           - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
@@ -114,6 +114,8 @@ reflector:
     filePath:
       ./proto: ./out.debug
     srcFilter:
+      filePath:
+        ./proto: ./out.debug
       maskAll:
         excludeAny:
           - !<tag:yaml.org,2002:js/regexp> /(\W|^)node_modules(\W|$)/
@@ -153,6 +155,7 @@ reflector:
   exported.0:
     filePath: ./proto
     srcFilter:
+      filePath: ./proto
       prefixPath: .
     dstFilter:
       prefixPath: .
@@ -165,6 +168,12 @@ reflector:
       ./dwtools/amid/l7.test/Action3.s: true
       ./dwtools/amid/l7.test/CommandsArggregator.test.s: true
     srcFilter:
+      filePath:
+        ./dwtools/Tools.s: true
+        ./dwtools/amid/l7/commands/CommandsAggregator.s: true
+        ./dwtools/amid/l7.test/Action2.s: true
+        ./dwtools/amid/l7.test/Action3.s: true
+        ./dwtools/amid/l7.test/CommandsArggregator.test.s: true
       basePath: .
       prefixPath: proto
     dstFilter:
