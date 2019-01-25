@@ -52,6 +52,7 @@ path:
       - .
       - ./dwtools
       - ./dwtools/Tools.s
+      - ./dwtools/abase
       - ./dwtools/amid
       - ./dwtools/amid/l7
       - ./dwtools/amid/l7/commands
@@ -60,6 +61,7 @@ path:
       - ./dwtools/amid/l7.test/Action2.s
       - ./dwtools/amid/l7.test/Action3.s
       - ./dwtools/amid/l7.test/CommandsArggregator.test.s
+      - ./dwtools/atop
     criterion:
       default: 1
       debug: 1
