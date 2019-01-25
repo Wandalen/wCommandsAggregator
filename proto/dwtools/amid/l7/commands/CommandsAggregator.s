@@ -3,7 +3,8 @@
 'use strict';
 
 /**
-  @module Tools/mid/CommandsAggregator - Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.
+ * Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.
+  @module Tools/mid/CommandsAggregator
 */
 
 /**
