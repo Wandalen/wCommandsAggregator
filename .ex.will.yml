@@ -3,7 +3,7 @@ about :
 
   name : "wCommandsAggregator"
   description : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI."
-  version : "0.3.49"
+  version : "0.3.50"
   enabled : 1
   interpreters :
   - nodejs >= 6.0.0
