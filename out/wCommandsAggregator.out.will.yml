@@ -4,7 +4,7 @@ about:
   description: >-
     Class aggregating several applications into single CLI. It can aggregate
     external binary applications as well as JS functions. Use it to expose CLI.
-  version: 0.3.51
+  version: 0.3.52
   enabled: 1
   interpreters:
     - nodejs >= 6.0.0
@@ -289,7 +289,7 @@ build:
       - 'step::export.proto'
 exported:
   proto.export:
-    version: 0.3.51
+    version: 0.3.52
     criterion:
       default: 1
       debug: 1
