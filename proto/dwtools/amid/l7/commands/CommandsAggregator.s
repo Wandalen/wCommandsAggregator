@@ -102,19 +102,19 @@ function exec()
 {
   let self = this;
   let appArgs = _.appArgs();
-  return self.proceedApplicationArguments({ appArgs : appArgs });
+  return self.performApplicationArguments({ appArgs : appArgs });
 }
 
 //
 
-function proceedApplicationArguments( o )
+function performApplicationArguments( o )
 {
   let self = this;
 
   _.assert( _.instanceIs( self ) );
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
-  _.routineOptions( proceedApplicationArguments, o );
+  _.routineOptions( performApplicationArguments, o );
 
   if( o.appArgs === null )
   o.appArgs = _.appArgs();
@@ -138,7 +138,7 @@ function proceedApplicationArguments( o )
 
   /* */
 
-  return self.proceedCommands
+  return self.performCommands
   ({
     commands : o.appArgs.subjects,
     propertiesMaps : o.appArgs.maps,
@@ -146,7 +146,7 @@ function proceedApplicationArguments( o )
 
 }
 
-proceedApplicationArguments.defaults =
+performApplicationArguments.defaults =
 {
   printingEcho : 1,
   allowingDotless : 0,
@@ -155,13 +155,13 @@ proceedApplicationArguments.defaults =
 
 //
 
-function proceedCommands( o )
+function performCommands( o )
 {
   let self = this;
   let con = new _.Consequence().take( null );
   let commands = [];
 
-  _.routineOptions( proceedCommands, o );
+  _.routineOptions( performCommands, o );
   _.assert( _.strIs( o.commands ) || _.arrayIs( o.commands ) );
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
@@ -186,7 +186,7 @@ function proceedCommands( o )
     let command = o.commands[ c ];
     _.assert( command.trim() === command );
     let splits = _.strIsolateBeginOrAll( command, ' ' );
-    con.keep( () => self.proceedCommand
+    con.keep( () => self.performCommand
     ({
       command : splits[ 0 ],
       subject : splits[ 2 ],
@@ -198,7 +198,7 @@ function proceedCommands( o )
   return con.toResourceMaybe();
 }
 
-proceedCommands.defaults =
+performCommands.defaults =
 {
   commands : null,
   propertiesMaps : null,
@@ -206,12 +206,12 @@ proceedCommands.defaults =
 
 //
 
-function proceedCommand( o )
+function performCommand( o )
 {
   let self = this;
   let result;
 
-  _.routineOptions( proceedCommand, o );
+  _.routineOptions( performCommand, o );
   _.assert( _.strIs( o.subject ) );
   _.assert( _.strIs( o.command ) );
   _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
@@ -279,7 +279,7 @@ function proceedCommand( o )
   return result;
 }
 
-proceedCommand.defaults =
+performCommand.defaults =
 {
   command : null,
   subject : '',
@@ -393,7 +393,7 @@ function onGetHelp()
 
   if( self.vocabulary.subjectDescriptorFor( '.help' ).length )
   {
-    self.proceedCommand({ command : '.help' });
+    self.performCommand({ command : '.help' });
   }
   else
   {
@@ -520,9 +520,9 @@ let Extend =
   _formVocabulary : _formVocabulary,
   exec : exec,
 
-  proceedApplicationArguments : proceedApplicationArguments,
-  proceedCommands : proceedCommands,
-  proceedCommand : proceedCommand,
+  performApplicationArguments : performApplicationArguments,
+  performCommands : performCommands,
+  performCommand : performCommand,
 
   commandsAdd : commandsAdd,
 
