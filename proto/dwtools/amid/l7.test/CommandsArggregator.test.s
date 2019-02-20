@@ -99,6 +99,41 @@ function trivial( test )
   return result;
 }
 
+//
+
+function argumentWithSpace( test )
+{
+  function executableWith( e )
+  {
+    let ca = e.ca;
+    let isolated = ca.isolateSecond( e.subject );
+
+    test.will = 'argument for first command should have spaces'
+    test.identical( isolated.subject, 'path to dir' );
+    test.will = 'second command should be list'
+    test.identical( isolated.secondCommand, '.list' );
+    test.identical( isolated.secondSubject, '' );
+  }
+
+  var Commands =
+  {
+    'with' : { e : executableWith, h : 'Some action' },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    basePath : __dirname,
+    commands : Commands,
+  }).form();
+
+  var appArgs = Object.create( null );
+  appArgs.subject = '.with path to dir .list';
+  appArgs.map = {};
+  appArgs.maps = [ appArgs.map ];
+  appArgs.subjects = [ appArgs.subject  ];
+  ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
+}
+
 // --
 //
 // --
@@ -112,6 +147,8 @@ var Self =
   tests :
   {
     trivial : trivial,
+
+    argumentWithSpace : argumentWithSpace,
   }
 
 }
