@@ -4,24 +4,8 @@
 
 if( typeof module !== 'undefined' )
 {
-  if( typeof _global_ === 'undefined' || !_global_.wBase )
-  {
-    let toolsPath = '../../../../dwtools/Base.s';
-    let toolsExternal = 0;
-    try
-    {
-      require.resolve( toolsPath );
-    }
-    catch( err )
-    {
-      toolsExternal = 1;
-      require( 'wTools' );
-    }
-    if( !toolsExternal )
-    require( toolsPath );
-  }
 
-  var _ = _global_.wTools;
+  let _ = require( '../../../Tools.s' );
 
   _.include( 'wTesting' );
 
@@ -66,7 +50,7 @@ function trivial( test )
   appArgs.maps = [ appArgs.map ];
   appArgs.subjects = [ 'action1' ];
   executed1 = 0;
-  ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
+  ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
   test.identical( executed1,1 );
 
   var appArgs = Object.create( null );
@@ -74,7 +58,7 @@ function trivial( test )
   appArgs.map = { help : true };
   appArgs.maps = [ appArgs.map ];
   appArgs.subjects = [ 'help' ];
-  ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
+  ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
   test.identical( executed1,1 );
 
   var appArgs = Object.create( null );
@@ -83,7 +67,7 @@ function trivial( test )
   appArgs.subject = 'action2';
   appArgs.subjects = [ 'action2' ];
 
-  return ca.proceedApplicationArguments({ appArgs : appArgs, allowingDotless : 1 })
+  return ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 })
   .finally( function( err, arg )
   {
     test.is( !err );
@@ -93,7 +77,7 @@ function trivial( test )
     appArgs.maps = [ appArgs.map ];
     appArgs.subject = '.action3';
     appArgs.subjects = [ '.action3' ];
-    return ca.proceedApplicationArguments({ appArgs : appArgs });
+    return ca.performApplicationArguments({ appArgs : appArgs });
   })
 
   return result;
