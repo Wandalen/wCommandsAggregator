@@ -138,6 +138,7 @@ function performApplicationArguments( o )
 
   /* */
 
+  // debugger;
   return self.performCommands
   ({
     commands : o.appArgs.subjects,
@@ -219,6 +220,8 @@ function performCommand( o )
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
 
+  debugger;
+
   o.propertiesMap = o.propertiesMap || Object.create( null );
 
   /* */
@@ -267,9 +270,9 @@ function performCommand( o )
   {
     executable = _.path.nativize( executable );
     let mapStr = _.strJoinMap({ src : o.propertiesMap });
-    let shellStr = self.commandPrefix + executable + ' ' + o.subject + ' ' + mapStr;
+    let execPath = self.commandPrefix + executable + ' ' + o.subject + ' ' + mapStr;
     let o2 = Object.create( null );
-    o2.path = shellStr;
+    o2.path = execPath;
     result = _.shell( o2 );
   }
 
@@ -304,7 +307,7 @@ function commandsAdd( commands )
 
 //
 
-function isolateSecond( subject )
+function nextCommandIsolate( subject )
 {
   let ca = this;
   let result = Object.create( null );
@@ -312,7 +315,22 @@ function isolateSecond( subject )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( subject ) );
 
-  // let secondCommand, secondSubject, del;
+  debugger;
+  [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateEndOrAll( subject, /\.\w[^ ]*/ );
+  debugger;
+  [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateBeginOrAll( result.secondCommand, ' ' );
+
+  return result;
+}
+
+//
+
+function isolateSecond2( subject )
+{
+  let ca = this;
+  let result = Object.create( null );
+
+  _.assert( arguments.length === 1 );
 
   [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateBeginOrAll( subject, ' ' );
   [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateBeginOrAll( result.secondCommand, ' ' );
@@ -515,35 +533,36 @@ let Medials =
 let Extend =
 {
 
-  init : init,
-  form : form,
-  _formVocabulary : _formVocabulary,
-  exec : exec,
+  init,
+  form,
+  _formVocabulary,
+  exec,
 
-  performApplicationArguments : performApplicationArguments,
-  performCommands : performCommands,
-  performCommand : performCommand,
+  performApplicationArguments,
+  performCommands,
+  performCommand,
 
-  commandsAdd : commandsAdd,
+  commandsAdd,
 
-  isolateSecond : isolateSecond,
+  nextCommandIsolate,
+  isolateSecond2,
 
-  _commandHelp : _commandHelp,
+  _commandHelp,
 
-  onGetHelp : onGetHelp,
-  onPrintCommands : onPrintCommands,
-  _onPhraseDescriptorMake : _onPhraseDescriptorMake,
+  onGetHelp,
+  onPrintCommands,
+  _onPhraseDescriptorMake,
 
   //
 
-  Composes : Composes,
-  Aggregates : Aggregates,
-  Associates : Associates,
-  Restricts : Restricts,
-  Medials : Medials,
-  Statics : Statics,
-  Forbids : Forbids,
-  Accessors : Accessors,
+  Composes,
+  Aggregates,
+  Associates,
+  Restricts,
+  Medials,
+  Statics,
+  Forbids,
+  Accessors,
 
 }
 

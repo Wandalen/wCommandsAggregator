@@ -9,7 +9,7 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wTesting' );
 
-  require( '../l7/commands/CommandsAggregator.s' );
+  require( '../../l7/commands/CommandsAggregator.s' );
 
 }
 
@@ -87,21 +87,30 @@ function trivial( test )
 
 function argumentWithSpace( test )
 {
-  function executableWith( e )
+
+  function execWith( e )
   {
     let ca = e.ca;
-    let isolated = ca.isolateSecond( e.subject );
+    debugger;
+    let isolated = ca.nextCommandIsolate( e.subject );
 
-    test.will = 'argument for first command should have spaces'
+    test.will = 'argument for first command should have spaces';
     test.identical( isolated.subject, 'path to dir' );
     test.will = 'second command should be list'
     test.identical( isolated.secondCommand, '.list' );
     test.identical( isolated.secondSubject, '' );
   }
 
+  function execList( e )
+  {
+    debugger;
+    let ca = e.ca;
+  }
+
   var Commands =
   {
-    'with' : { e : executableWith, h : 'Some action' },
+    'with' : { e : execWith, h : 'With' },
+    'list' : { e : execList, h : 'List' },
   }
 
   var ca = _.CommandsAggregator
@@ -115,6 +124,11 @@ function argumentWithSpace( test )
   appArgs.map = {};
   appArgs.maps = [ appArgs.map ];
   appArgs.subjects = [ appArgs.subject  ];
+
+  // ca.performCommands({ commands : appArgs, propertiesMaps : appArgs.map });
+  // commands : null,
+  // propertiesMaps : null,
+
   ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
 }
 
@@ -130,9 +144,10 @@ var Self =
 
   tests :
   {
-    trivial : trivial,
 
-    argumentWithSpace : argumentWithSpace,
+    trivial,
+    argumentWithSpace,
+
   }
 
 }
