@@ -102,22 +102,63 @@ function exec()
 {
   let self = this;
   let appArgs = _.appArgs();
-  return self.performApplicationArguments({ appArgs : appArgs });
+  return self.appArgsPerform({ appArgs : appArgs });
 }
 
 //
 
-function performApplicationArguments( o )
+function appArgsNormalize( appArgs )
+{
+  let self = this;
+
+  _.mapSupplement( appArgs, appArgsNormalize.defaults );
+  _.assertMapHasOnly( appArgs, appArgsNormalize.defaults );
+
+  appArgs.map = appArgs.map || Object.create( null );
+
+  if( !appArgs.subjects )
+  appArgs.subjects = _.strIs( appArgs.subject ) ? [ appArgs.subject ] : [];
+
+  if( !appArgs.maps )
+  appArgs.maps = _.mapIs( appArgs.map ) ? [ appArgs.map ] : [];
+
+  return appArgs;
+}
+
+appArgsNormalize.defaults =
+{
+  subject : null,
+  subjects : null,
+  map : null,
+  maps : null,
+  interpreterPath : null,
+  mainPath : null,
+  interpreterArgs : null,
+  scriptArgs : null,
+  scriptString : null,
+
+  keyValDelimeter : null,
+  subjectsDelimeter : null,
+
+}
+
+//
+
+function appArgsPerform( o )
 {
   let self = this;
 
   _.assert( _.instanceIs( self ) );
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
-  _.routineOptions( performApplicationArguments, o );
+  _.routineOptions( appArgsPerform, o );
 
   if( o.appArgs === null )
   o.appArgs = _.appArgs();
+  o.appArgs = self.appArgsNormalize( o.appArgs );
+
+  _.assert( _.arrayIs( o.appArgs.subjects ) );
+  _.assert( _.arrayIs( o.appArgs.maps ) );
 
   /* */
 
@@ -138,8 +179,7 @@ function performApplicationArguments( o )
 
   /* */
 
-  // debugger;
-  return self.performCommands
+  return self.commandsPerform
   ({
     commands : o.appArgs.subjects,
     propertiesMaps : o.appArgs.maps,
@@ -147,7 +187,7 @@ function performApplicationArguments( o )
 
 }
 
-performApplicationArguments.defaults =
+appArgsPerform.defaults =
 {
   printingEcho : 1,
   allowingDotless : 0,
@@ -156,19 +196,30 @@ performApplicationArguments.defaults =
 
 //
 
-function performCommands( o )
+function commandsPerform( o )
 {
   let self = this;
   let con = new _.Consequence().take( null );
   let commands = [];
 
-  _.routineOptions( performCommands, o );
+  if( _.strIs( o ) || _.arrayIs( o ) )
+  o = { commands : o };
+
+  _.routineOptions( commandsPerform, o );
   _.assert( _.strIs( o.commands ) || _.arrayIs( o.commands ) );
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
 
   o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
-  o.propertiesMaps = _.arrayFlatten( null, _.arrayAs( o.propertiesMaps ) );
+
+  if( o.propertiesMaps === null || o.propertiesMaps.length === 0 )
+  {
+    o.propertiesMaps = _.dup( Object.create( null ), o.commands.length );
+  }
+  else
+  {
+    o.propertiesMaps = _.arrayFlatten( null, _.arrayAs( o.propertiesMaps ) );
+  }
 
   for( let c = 0 ; c < o.commands.length ; c++ )
   {
@@ -180,17 +231,18 @@ function performCommands( o )
 
   _.assert( o.commands.length === o.propertiesMaps.length );
   _.assert( o.commands.length !== 0, 'not tested' );
-  // _.assert( o.commands.length === 1, 'not tested' );
 
   for( let c = 0 ; c < o.commands.length ; c++ )
   {
     let command = o.commands[ c ];
     _.assert( command.trim() === command );
-    let splits = _.strIsolateBeginOrAll( command, ' ' );
-    con.keep( () => self.performCommand
+    // let splits = _.strIsolateLeftOrAll( command, ' ' );
+    // debugger;
+    con.keep( () => self.commandPerform
     ({
-      command : splits[ 0 ],
-      subject : splits[ 2 ],
+      command : command,
+      // command : splits[ 0 ],
+      // subject : splits[ 2 ],
       propertiesMap : o.propertiesMaps[ c ],
     }));
   }
@@ -199,7 +251,7 @@ function performCommands( o )
   return con.toResourceMaybe();
 }
 
-performCommands.defaults =
+commandsPerform.defaults =
 {
   commands : null,
   propertiesMaps : null,
@@ -207,44 +259,102 @@ performCommands.defaults =
 
 //
 
-function performCommand( o )
+function commandPerform( o )
 {
   let self = this;
-  let result;
 
-  _.routineOptions( performCommand, o );
-  _.assert( _.strIs( o.subject ) );
+  if( _.strIs( o ) || _.arrayIs( o ) )
+  o = { command : o };
+
+  _.routineOptions( commandPerform, o );
   _.assert( _.strIs( o.command ) );
-  _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
-  _.assert( _.instanceIs( self ) );
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
 
-  debugger;
+  let splits = _.strIsolateLeftOrAll( o.command, ' ' );
+  let subject = splits[ 0 ];
+  let argument = splits[ 2 ];
+
+  // let secondCommand = null;
+  // let secondSubject = null;
+  // let secondArgument = null;
+  //
+  // debugger;
+  // if( self.complexSyntax )
+  // {
+  //   let second = self.commandIsolateSecondFromArgument( argument );
+  //   if( second )
+  //   {
+  //     argument = second.argument;
+  //     secondCommand = second.secondCommand;
+  //     secondSubject = second.secondSubject;
+  //     secondArgument = second.secondArgument;
+  //   }
+  // }
 
   o.propertiesMap = o.propertiesMap || Object.create( null );
 
   /* */
 
-  let subjectDescriptors = self.vocabulary.subjectDescriptorFor( o.command );
+  let result = self.commandPerformParsed
+  ({
+    command : o.command,
+    subject : subject,
+    argument : argument,
+    // secondCommand : secondCommand,
+    // secondSubject : secondSubject,
+    // secondArgument : secondArgument,
+    propertiesMap : o.propertiesMap,
+  });
+
+  return result;
+}
+
+commandPerform.defaults =
+{
+  command : null,
+  propertiesMap : null,
+}
+
+//
+
+function commandPerformParsed( o )
+{
+  let self = this;
+  let result;
+
+  _.routineOptions( commandPerformParsed, o );
+  _.assert( _.strIs( o.command ) );
+  _.assert( _.strIs( o.subject ) );
+  _.assert( _.strIs( o.argument ) );
+  _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
+  _.assert( _.instanceIs( self ) );
+  _.assert( !!self.formed );
+  _.assert( arguments.length === 1 );
+
+  o.propertiesMap = o.propertiesMap || Object.create( null );
+
+  /* */
+
+  let subjectDescriptors = self.vocabulary.subjectDescriptorFor( o.subject );
   let filteredSubjectDescriptors;
 
   /* */
 
   if( !subjectDescriptors.length )
   {
-    let s = 'Unknown subject ' + _.strQuote( o.command );
+    let s = 'Unknown subject ' + _.strQuote( o.subject );
     if( self.vocabulary.descriptorMap[ 'help' ] )
-    s += '\nTry subject ".help"';
+    s += '\nTry ".help"';
     throw _.errBriefly( s );
   }
   else
   {
-    filteredSubjectDescriptors = self.vocabulary.subjectsFilter( subjectDescriptors, { wholePhrase : o.command } );
+    filteredSubjectDescriptors = self.vocabulary.subjectsFilter( subjectDescriptors, { wholePhrase : o.subject } );
     if( filteredSubjectDescriptors.length !== 1 )
     {
       self.logger.log( 'Ambiguity' );
-      self.logger.log( self.vocabulary.helpForSubjectAsString( o.command ) );
+      self.logger.log( self.vocabulary.helpForSubjectAsString( o.subject ) );
       self.logger.log( '' );
     }
     if( filteredSubjectDescriptors.length !== 1 )
@@ -253,21 +363,29 @@ function performCommand( o )
 
   /* */
 
-  let executable = filteredSubjectDescriptors[ 0 ].phraseDescriptor.executable;
+  let subjectDescriptor = filteredSubjectDescriptors[ 0 ];
+  let executable = subjectDescriptor.phraseDescriptor.executable;
   if( _.routineIs( executable ) )
   {
+    // debugger;
     result = executable
     ({
       command : o.command,
       subject : o.subject,
+      argument : o.argument,
+
+      // secondCommand : o.secondCommand,
+      // secondSubject : o.secondSubject,
+      // secondArgument : o.secondArgument,
+
       propertiesMap : o.propertiesMap,
-      // appArgs : o.appArgs,
       ca : self,
-      phrase : filteredSubjectDescriptors[ 0 ].phraseDescriptor.phrase,
+      subjectDescriptor : subjectDescriptor,
     });
   }
   else
   {
+    // _.assert( !o.secondCommand, 'not implemented' );
     executable = _.path.nativize( executable );
     let mapStr = _.strJoinMap({ src : o.propertiesMap });
     let execPath = self.commandPrefix + executable + ' ' + o.subject + ' ' + mapStr;
@@ -282,11 +400,19 @@ function performCommand( o )
   return result;
 }
 
-performCommand.defaults =
+commandPerformParsed.defaults =
 {
+
   command : null,
-  subject : '',
+  subject : null,
+  argument : null,
+
+  // secondCommand : null,
+  // secondSubject : null,
+  // secondArgument : null,
+
   propertiesMap : null,
+
 }
 
 //
@@ -307,33 +433,36 @@ function commandsAdd( commands )
 
 //
 
-function nextCommandIsolate( subject )
+function commandIsolateSecondFromArgument( command )
 {
   let ca = this;
   let result = Object.create( null );
 
   _.assert( arguments.length === 1 );
-  _.assert( _.strIs( subject ) );
+  _.assert( _.strIs( command ) );
 
-  debugger;
-  [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateEndOrAll( subject, /\.\w[^ ]*/ );
-  debugger;
-  [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateBeginOrAll( result.secondCommand, ' ' );
+  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
+
+  if( !result.secondSubject )
+  return null;
+
+  result.secondSubject = result.secondSubject.trim();
+  result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
 
   return result;
 }
 
 //
 
-function isolateSecond2( subject )
+function commandIsolateSecondFromArgumentDeprecated( subject )
 {
   let ca = this;
   let result = Object.create( null );
 
   _.assert( arguments.length === 1 );
 
-  [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateBeginOrAll( subject, ' ' );
-  [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateBeginOrAll( result.secondCommand, ' ' );
+  [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateLeftOrAll( subject, ' ' );
+  [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateLeftOrAll( result.secondCommand, ' ' );
 
   return result;
 }
@@ -411,7 +540,7 @@ function onGetHelp()
 
   if( self.vocabulary.subjectDescriptorFor( '.help' ).length )
   {
-    self.performCommand({ command : '.help' });
+    self.commandPerform({ command : '.help' });
   }
   else
   {
@@ -487,8 +616,9 @@ let Composes =
 {
   basePath : null,
   commandPrefix : '',
-  addingDelimeter : ' ',
-  lookingDelimeter : _.define.own([ '.' ]),
+  addingDelimeter : ' ', // xxx
+  lookingDelimeter : _.define.own([ '.' ]), // xxx
+  complexSyntax : 0,
   supplementingByHelp : 1,
 }
 
@@ -538,14 +668,17 @@ let Extend =
   _formVocabulary,
   exec,
 
-  performApplicationArguments,
-  performCommands,
-  performCommand,
+  appArgsNormalize,
+  appArgsPerform,
+
+  commandsPerform,
+  commandPerform,
+  commandPerformParsed,
 
   commandsAdd,
 
-  nextCommandIsolate,
-  isolateSecond2,
+  commandIsolateSecondFromArgument,
+  commandIsolateSecondFromArgumentDeprecated,
 
   _commandHelp,
 

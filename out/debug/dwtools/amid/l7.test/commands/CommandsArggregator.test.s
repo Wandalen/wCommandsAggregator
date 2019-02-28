@@ -23,16 +23,16 @@ var _ = _global_.wTools;
 function trivial( test )
 {
 
-  var executed1 = 0;
-  function executable1( e )
+  var done = 0;
+  function execCommand1( e )
   {
-    executed1 = 1;
-    console.log( 'Executable1' );
+    done = 1;
+    console.log( 'execCommand1' );
   }
 
   var Commands =
   {
-    'action1' : { e : executable1, h : 'Some action' },
+    'action1' : { e : execCommand1, h : 'Some action' },
     'action2' : 'Action2.s',
     'action3' : 'Action3.s',
   }
@@ -49,17 +49,17 @@ function trivial( test )
   appArgs.map = { action1 : true };
   appArgs.maps = [ appArgs.map ];
   appArgs.subjects = [ 'action1' ];
-  executed1 = 0;
-  ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
-  test.identical( executed1,1 );
+  done = 0;
+  ca.appArgsPerform({ appArgs : appArgs, allowingDotless : 1 });
+  test.identical( done, 1 );
 
   var appArgs = Object.create( null );
   appArgs.subject = 'help';
   appArgs.map = { help : true };
   appArgs.maps = [ appArgs.map ];
   appArgs.subjects = [ 'help' ];
-  ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
-  test.identical( executed1,1 );
+  ca.appArgsPerform({ appArgs : appArgs, allowingDotless : 1 });
+  test.identical( done, 1 );
 
   var appArgs = Object.create( null );
   appArgs.map = { action2 : true };
@@ -67,7 +67,7 @@ function trivial( test )
   appArgs.subject = 'action2';
   appArgs.subjects = [ 'action2' ];
 
-  return ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 })
+  return ca.appArgsPerform({ appArgs : appArgs, allowingDotless : 1 })
   .finally( function( err, arg )
   {
     test.is( !err );
@@ -77,7 +77,7 @@ function trivial( test )
     appArgs.maps = [ appArgs.map ];
     appArgs.subject = '.action3';
     appArgs.subjects = [ '.action3' ];
-    return ca.performApplicationArguments({ appArgs : appArgs });
+    return ca.appArgsPerform({ appArgs : appArgs });
   })
 
   return result;
@@ -85,51 +85,141 @@ function trivial( test )
 
 //
 
-function argumentWithSpace( test )
+function perform( test )
 {
 
-  function execWith( e )
+  function commandWith( e )
   {
-    let ca = e.ca;
-    debugger;
-    let isolated = ca.nextCommandIsolate( e.subject );
 
-    test.will = 'argument for first command should have spaces';
-    test.identical( isolated.subject, 'path to dir' );
-    test.will = 'second command should be list'
-    test.identical( isolated.secondCommand, '.list' );
-    test.identical( isolated.secondSubject, '' );
+    test.description = 'integrity of the first event';
+    test.identical( e.command, '.with path to dir .list all' );
+    test.identical( e.subject, '.with' );
+    test.identical( e.argument, 'path to dir .list all' );
+    test.is( e.ca === ca );
+    test.is( _.objectIs( e.subjectDescriptor ) );
+    test.identical( e.subjectDescriptor.wholePhrase, 'with' );
+
+    test.description = 'second command';
+    let isolated = ca.commandIsolateSecondFromArgument( e.argument );
+    test.identical( isolated.argument, 'path to dir' );
+    test.identical( isolated.secondCommand, '.list all' );
+    test.identical( isolated.secondSubject, '.list' );
+    test.identical( isolated.secondArgument, 'all' );
+
+    done = 1;
+
+    e.ca.commandPerform
+    ({
+      command : isolated.secondCommand,
+      propertiesMap : e.propertiesMap,
+    });
+
   }
 
-  function execList( e )
+  function commandList( e )
   {
-    debugger;
     let ca = e.ca;
+
+    test.description = 'integrity of the second event';
+    test.identical( e.command, '.list all' );
+    test.identical( e.subject, '.list' );
+    test.identical( e.argument, 'all' );
+    test.is( e.ca === ca );
+    test.is( _.objectIs( e.subjectDescriptor ) );
+    test.identical( e.subjectDescriptor.wholePhrase, 'list' );
+
+    done = 2;
   }
 
   var Commands =
   {
-    'with' : { e : execWith, h : 'With' },
-    'list' : { e : execList, h : 'List' },
+    'with' : { e : commandWith, h : 'With' },
+    'list' : { e : commandList, h : 'List' },
   }
 
   var ca = _.CommandsAggregator
   ({
-    basePath : __dirname,
     commands : Commands,
+    complexSyntax : 0,
   }).form();
 
+  /* */
+
+  test.case = 'appArgsPerform';
   var appArgs = Object.create( null );
-  appArgs.subject = '.with path to dir .list';
-  appArgs.map = {};
-  appArgs.maps = [ appArgs.map ];
-  appArgs.subjects = [ appArgs.subject  ];
+  appArgs.subject = '.with path to dir .list all';
+  done = 0;
+  ca.appArgsPerform({ appArgs : appArgs });
+  test.identical( done, 2 );
 
-  // ca.performCommands({ commands : appArgs, propertiesMaps : appArgs.map });
-  // commands : null,
-  // propertiesMaps : null,
+  /* */
 
-  ca.performApplicationArguments({ appArgs : appArgs, allowingDotless : 1 });
+  test.case = 'commandsPerform with empty propertiesMaps';
+  done = 0;
+  ca.commandsPerform
+  ({
+    commands : '.with path to dir .list all',
+    propertiesMaps : {},
+  });
+  test.identical( done, 2 );
+
+  /* */
+
+  test.case = 'commandsPerform without propertiesMaps';
+  done = 0;
+  ca.commandsPerform
+  ({
+    commands : '.with path to dir .list all',
+  });
+  test.identical( done, 2 );
+
+  /* */
+
+  test.case = 'commandsPerform with string';
+  done = 0;
+  ca.commandsPerform( '.with path to dir .list all' );
+  test.identical( done, 2 );
+
+  /* */
+
+  test.case = 'commandPerform with empty properties map';
+  var done = 0;
+  ca.commandPerform
+  ({
+    command : '.with path to dir .list all',
+    propertiesMap : Object.create( null ),
+  });
+  test.identical( done, 2 );
+
+  /* */
+
+  test.case = 'commandPerform without peroperties map';
+  var done = 0;
+  ca.commandPerform
+  ({
+    command : '.with path to dir .list all',
+  });
+  test.identical( done, 2 );
+
+  /* */
+
+  test.case = 'commandPerform with string';
+  var done = 0;
+  ca.commandPerform( '.with path to dir .list all' );
+  test.identical( done, 2 );
+
+  /* */
+
+  test.case = 'commandPerformParsed';
+  var done = 0;
+  ca.commandPerformParsed
+  ({
+    command : '.with path to dir .list all',
+    subject : '.with',
+    argument : 'path to dir .list all',
+  });
+  test.identical( done, 2 );
+
 }
 
 // --
@@ -146,7 +236,7 @@ var Self =
   {
 
     trivial,
-    argumentWithSpace,
+    perform,
 
   }
 
