@@ -390,7 +390,7 @@ function commandPerformParsed( o )
     let mapStr = _.strJoinMap({ src : o.propertiesMap });
     let execPath = self.commandPrefix + executable + ' ' + o.subject + ' ' + mapStr;
     let o2 = Object.create( null );
-    o2.path = execPath;
+    o2.execPath = execPath;
     result = _.shell( o2 );
   }
 
