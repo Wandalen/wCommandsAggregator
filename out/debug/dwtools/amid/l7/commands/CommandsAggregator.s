@@ -479,7 +479,7 @@ function _commandHelp( e )
   {
 
     logger.log();
-    logger.log( e.ca.vocabulary.helpForSubjectAsString( e.subject ) );
+    logger.log( e.ca.vocabulary.helpForSubjectAsString( e.argument ) );
     logger.up();
 
     let subjects = e.ca.vocabulary.subjectDescriptorForWithClause({ phrase : e.subject });
