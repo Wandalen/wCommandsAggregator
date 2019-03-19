@@ -222,6 +222,43 @@ function perform( test )
 
 }
 
+//
+
+function commandIsolateSecondFromArgument( test )
+{
+
+  var Commands =
+  {
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : Commands,
+  }).form();
+
+  test.case = 'with dot';
+  var expected =
+  {
+    'argument' : '.module',
+    'secondSubject' : '.shell',
+    'secondArgument' : 'git status',
+    'secondCommand' : '.shell git status',
+  }
+  var got = ca.commandIsolateSecondFromArgument( '.module .shell git status' );
+  test.identical( got, expected );
+
+  test.case = 'no second';
+  var expected = null;
+  var got = ca.commandIsolateSecondFromArgument( 'module git status' );
+  test.identical( got, expected );
+
+  test.case = 'quoted doted argument';
+  var expected = null;
+  var got = ca.commandIsolateSecondFromArgument( '".module" git status' );
+  test.identical( got, expected );
+
+}
+
 // --
 //
 // --
@@ -237,6 +274,7 @@ var Self =
 
     trivial,
     perform,
+    commandIsolateSecondFromArgument,
 
   }
 

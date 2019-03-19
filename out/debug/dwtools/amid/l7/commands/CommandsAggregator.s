@@ -353,7 +353,7 @@ function commandPerformParsed( o )
     filteredSubjectDescriptors = self.vocabulary.subjectsFilter( subjectDescriptors, { wholePhrase : o.subject } );
     if( filteredSubjectDescriptors.length !== 1 )
     {
-      self.logger.log( 'Ambiguity' );
+      self.logger.log( 'Ambiguity. Did you mean?' );
       self.logger.log( self.vocabulary.helpForSubjectAsString( o.subject ) );
       self.logger.log( '' );
     }
@@ -440,6 +440,10 @@ function commandIsolateSecondFromArgument( command )
 
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
+
+  // debugger;
+  // let splits = _.strSplit( command, /\s+\.\w[^ ]*\s*/ );
+  // debugger;
 
   [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
 
