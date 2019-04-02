@@ -138,7 +138,7 @@ appArgsNormalize.defaults =
   scriptString : null,
 
   keyValDelimeter : null,
-  subjectsDelimeter : null,
+  cmmandsDelimeter : null,
 
 }
 
@@ -173,7 +173,7 @@ function appArgsPerform( o )
   if( o.printingEcho )
   {
     self.logger.rbegin({ verbosity : -1 });
-    self.logger.log( 'Request', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
+    self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
     self.logger.rend({ verbosity : -1 });
   }
 
@@ -479,6 +479,8 @@ function _commandHelp( e )
   let ca = e.ca;
   let logger = self.logger || ca.logger || _global_.logger;
 
+  // debugger;
+
   if( e.subject )
   {
 
@@ -486,7 +488,7 @@ function _commandHelp( e )
     logger.log( e.ca.vocabulary.helpForSubjectAsString( e.argument ) );
     logger.up();
 
-    let subjects = e.ca.vocabulary.subjectDescriptorForWithClause({ phrase : e.subject });
+    let subjects = e.ca.vocabulary.subjectDescriptorForWithClause({ phrase : e.argument });
 
     if( subjects.length === 0 )
     {
@@ -494,11 +496,12 @@ function _commandHelp( e )
     }
     else if( subjects.length === 1 )
     {
+      debugger;
       let subject = subjects[ 0 ];
       if( subject.phraseDescriptor.executable && subject.phraseDescriptor.executable.commandProperties )
       {
         let properties = subject.phraseDescriptor.executable.commandProperties;
-        logger.log( _.toStr( properties, { levels : 2, wrap : 0, multiline : 1 } ) );
+        logger.log( _.toStr( properties, { levels : 2, wrap : 0, multiline : 1, wrap : 0, stringWrapper : '' } ) );
       }
     }
 
