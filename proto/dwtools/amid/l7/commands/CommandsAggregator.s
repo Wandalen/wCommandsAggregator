@@ -26,6 +26,12 @@ if( typeof module !== 'undefined' )
 
 }
 
+/**
+ * @classdesc Class aggregating several applications into single CLI.
+ * @class wCommandsAggregator
+ * @memberof module:Tools/mid/CommandsAggregator
+ */
+
 //
 
 let _ = _global_.wTools;
@@ -98,6 +104,12 @@ function _formVocabulary()
 
 //
 
+/**
+ * @summary Reads app arguments and performs specified commands. 
+ * @function exec 
+ * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ */
+
 function exec()
 {
   let self = this;
@@ -106,6 +118,16 @@ function exec()
 }
 
 //
+
+/**
+ * @summary Normalizes application arguments.
+ * @description 
+ * Checks if arguments object doesn't have redundant fields. 
+ * Supplements object with missing fields. 
+ * @param {Object} appArgs Application arguments.
+ * @function appArgsNormalize 
+ * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ */
 
 function appArgsNormalize( appArgs )
 {
@@ -143,6 +165,17 @@ appArgsNormalize.defaults =
 }
 
 //
+
+/**
+ * @summary Reads provided application arguments and performs specified commands. 
+ * @description Parses application arguments if they were not provided through options. 
+ * @param {Object} o Options map.
+ * @param {Object} o.appArgs Parsed arguments.
+ * @param {Boolean} [o.printingEcho=1] Print command before execution.
+ * @param {Boolean} [o.allowingDotless=0] Allows to provide command without dot at the beginning.
+ * @function appArgsPerform 
+ * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ */
 
 function appArgsPerform( o )
 {
@@ -195,6 +228,16 @@ appArgsPerform.defaults =
 }
 
 //
+
+/**
+ * @summary Perfroms requested command(s) one by one.
+ * @description Multiple commands in one string should be separated by semicolon.
+ * @param {Object} o Options map.
+ * @param {Array|String} o.commands Command(s) to execute.
+ * @param {Array} o.propertiesMaps Array of maps with options for commands.
+ * @function commandsPerform 
+ * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ */
 
 function commandsPerform( o )
 {
@@ -259,6 +302,15 @@ commandsPerform.defaults =
 
 //
 
+/**
+ * @summary Perfroms requested command.
+ * @param {Object} o Options map.
+ * @param {String} o.command Command to execute.
+ * @param {Array} o.propertiesMap Options for provided command.
+ * @function commandPerform 
+ * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ */
+
 function commandPerform( o )
 {
   let self = this;
@@ -317,6 +369,17 @@ commandPerform.defaults =
 }
 
 //
+
+/**
+ * @descriptionNeeded
+ * @param {Object} o Options map.
+ * @param {String} o.command Command to execute.
+ * @param {String} o.subject 
+ * @param {String} o.argument
+ * @param {Array} o.propertiesMap Options for provided command.
+ * @function commandPerformParsed 
+ * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ */
 
 function commandPerformParsed( o )
 {
@@ -417,6 +480,13 @@ commandPerformParsed.defaults =
 
 //
 
+/**
+ * @summary Adds commands to the vocabulary.
+ * @param {Array} commands Array with commands to add.
+ * @function commandsAdd 
+ * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+*/
+
 function commandsAdd( commands )
 {
   let self = this;
@@ -432,6 +502,13 @@ function commandsAdd( commands )
 }
 
 //
+
+/**
+ * @summary Separates second command from provided string.
+ * @param {String} command Commands string to parse.
+ * @function commandIsolateSecondFromArgument 
+ * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+*/
 
 function commandIsolateSecondFromArgument( command )
 {
