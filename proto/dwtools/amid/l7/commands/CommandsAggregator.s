@@ -550,6 +550,14 @@ function commandIsolateSecondFromArgumentDeprecated( subject )
 
 //
 
+/* 
+  .help - Prints list of available commands with description
+  .help subject 
+    - Exact match - Prints description of command and properties.
+    - Partial match - Prints list of commands that have provided subject.
+    - No match - Prints No command found.
+*/
+
 function _commandHelp( e )
 {
   let self = this;
@@ -558,23 +566,21 @@ function _commandHelp( e )
 
   // debugger;
 
-  if( e.subject )
+  if( e.argument )
   {
-
     logger.log();
     logger.log( e.ca.vocabulary.helpForSubjectAsString( e.argument ) );
     logger.up();
 
-    let subjects = e.ca.vocabulary.subjectDescriptorForWithClause({ phrase : e.argument });
-
-    if( subjects.length === 0 )
+    let subject = e.ca.vocabulary.subjectDescriptorFor({ phrase : e.argument, exact : 1 });
+       
+    if( !subject )
     {
-      logger.log( 'No command', e.subject );
+      logger.log( 'No command', e.argument );
     }
-    else if( subjects.length === 1 )
+    else
     {
       debugger;
-      let subject = subjects[ 0 ];
       if( subject.phraseDescriptor.executable && subject.phraseDescriptor.executable.commandProperties )
       {
         let properties = subject.phraseDescriptor.executable.commandProperties;
