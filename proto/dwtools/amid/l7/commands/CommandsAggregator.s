@@ -291,7 +291,7 @@ function commandsPerform( o )
   }
 
   // debugger;
-  return con.toResourceMaybe();
+  return con.syncMaybe();
 }
 
 commandsPerform.defaults =
