@@ -105,8 +105,8 @@ function _formVocabulary()
 //
 
 /**
- * @summary Reads app arguments and performs specified commands. 
- * @function exec 
+ * @summary Reads app arguments and performs specified commands.
+ * @function exec
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
  */
 
@@ -121,11 +121,11 @@ function exec()
 
 /**
  * @summary Normalizes application arguments.
- * @description 
- * Checks if arguments object doesn't have redundant fields. 
- * Supplements object with missing fields. 
+ * @description
+ * Checks if arguments object doesn't have redundant fields.
+ * Supplements object with missing fields.
  * @param {Object} appArgs Application arguments.
- * @function appArgsNormalize 
+ * @function appArgsNormalize
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
  */
 
@@ -167,13 +167,13 @@ appArgsNormalize.defaults =
 //
 
 /**
- * @summary Reads provided application arguments and performs specified commands. 
- * @description Parses application arguments if they were not provided through options. 
+ * @summary Reads provided application arguments and performs specified commands.
+ * @description Parses application arguments if they were not provided through options.
  * @param {Object} o Options map.
  * @param {Object} o.appArgs Parsed arguments.
  * @param {Boolean} [o.printingEcho=1] Print command before execution.
  * @param {Boolean} [o.allowingDotless=0] Allows to provide command without dot at the beginning.
- * @function appArgsPerform 
+ * @function appArgsPerform
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
  */
 
@@ -235,7 +235,7 @@ appArgsPerform.defaults =
  * @param {Object} o Options map.
  * @param {Array|String} o.commands Command(s) to execute.
  * @param {Array} o.propertiesMaps Array of maps with options for commands.
- * @function commandsPerform 
+ * @function commandsPerform
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
  */
 
@@ -281,7 +281,7 @@ function commandsPerform( o )
     _.assert( command.trim() === command );
     // let splits = _.strIsolateLeftOrAll( command, ' ' );
     // debugger;
-    con.keep( () => self.commandPerform
+    con.then( () => self.commandPerform
     ({
       command : command,
       // command : splits[ 0 ],
@@ -307,7 +307,7 @@ commandsPerform.defaults =
  * @param {Object} o Options map.
  * @param {String} o.command Command to execute.
  * @param {Array} o.propertiesMap Options for provided command.
- * @function commandPerform 
+ * @function commandPerform
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
  */
 
@@ -374,10 +374,10 @@ commandPerform.defaults =
  * @descriptionNeeded
  * @param {Object} o Options map.
  * @param {String} o.command Command to execute.
- * @param {String} o.subject 
+ * @param {String} o.subject
  * @param {String} o.argument
  * @param {Array} o.propertiesMap Options for provided command.
- * @function commandPerformParsed 
+ * @function commandPerformParsed
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
  */
 
@@ -483,7 +483,7 @@ commandPerformParsed.defaults =
 /**
  * @summary Adds commands to the vocabulary.
  * @param {Array} commands Array with commands to add.
- * @function commandsAdd 
+ * @function commandsAdd
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
 */
 
@@ -506,7 +506,7 @@ function commandsAdd( commands )
 /**
  * @summary Separates second command from provided string.
  * @param {String} command Commands string to parse.
- * @function commandIsolateSecondFromArgument 
+ * @function commandIsolateSecondFromArgument
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
 */
 
@@ -550,9 +550,9 @@ function commandIsolateSecondFromArgumentDeprecated( subject )
 
 //
 
-/* 
+/*
   .help - Prints list of available commands with description
-  .help subject 
+  .help subject
     - Exact match - Prints description of command and properties.
     - Partial match - Prints list of commands that have provided subject.
     - No match - Prints No command found.
@@ -573,7 +573,7 @@ function _commandHelp( e )
     logger.up();
 
     let subject = e.ca.vocabulary.subjectDescriptorFor({ phrase : e.argument, exact : 1 });
-       
+
     if( !subject )
     {
       logger.log( 'No command', e.argument );
