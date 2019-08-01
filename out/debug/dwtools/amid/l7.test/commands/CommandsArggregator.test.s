@@ -262,24 +262,24 @@ function commandIsolateSecondFromArgument( test )
 //
 
 function help( test )
-{ 
+{
   let execCommand = () => {};
   let commandHelp = ( e ) => e.ca._commandHelp( e );
-  
+
   var Commands =
-  { 
+  {
     'help' : { e : commandHelp, h : 'Get help.' },
     'action' : { e : execCommand, h :'action' },
     'action first' : { e : execCommand, h :'action first' },
   }
-  
+
   let got = '';
-  
+
   function onTransformEnd( o )
-  { 
+  {
     got += o.outputForTerminal[ 0 ];
   };
-  
+
   let logger = new _.Logger({ output : console, onTransformEnd : onTransformEnd, outputRaw : 1 })
 
   var ca = _.CommandsAggregator
@@ -287,47 +287,47 @@ function help( test )
     commands : Commands,
     logger : logger,
   }).form();
-  
-  
+
+
   test.case = 'trivial help'
   got = '';
   ca.commandPerform({ command : '.help' });
-  var expected = 
-  `  .help - Get help. 
-  .action - action 
-  .action.first - action first` 
+  var expected =
+  `  .help - Get help.
+  .action - action
+  .action.first - action first`
   test.identical( got, expected );
-  
+
   test.case = 'exact dotless'
   got = '';
   ca.commandPerform({ command : '.help action' });
   var expected = '  .action - action';
   test.identical( got, expected );
-  
+
   test.case = 'exact with dot'
   got = '';
   ca.commandPerform({ command : '.help action' });
   var expected = '  .action - action';
   test.identical( got, expected );
-  
+
   test.case = 'exact, two words, dotless'
   got = '';
   ca.commandPerform({ command : '.help action first' });
   var expected = '  .action.first - action first';
   test.identical( got, expected );
-  
+
   test.case = 'exact, two words, with dot'
   got = '';
   ca.commandPerform({ command : '.help .action.first' });
   var expected = '  .action.first - action first';
   test.identical( got, expected );
-  
+
   test.case = 'part of phrase, dotless'
   got = '';
   ca.commandPerform({ command : '.help first' });
   var expected = '  .action.first - action first  No command first';
   test.identical( got, expected );
-  
+
   test.case = 'part of phrase, with dot'
   got = '';
   ca.commandPerform({ command : '.help .first' });
