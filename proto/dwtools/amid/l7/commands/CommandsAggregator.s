@@ -38,7 +38,7 @@ let _ = _global_.wTools;
 let Parent = null;
 let Self = function wCommandsAggregator()
 {
-  return _.instanceConstructor( Self, this, arguments );
+  return _.workpiece.construct( Self, this, arguments );
 }
 
 Self.shortName = 'CommandsAggregator';
@@ -53,7 +53,7 @@ function init( o )
 
   self.logger = new _.Logger({ output : _global_.logger });
 
-  _.instanceInit( self );
+  _.workpiece.initFields( self );
   Object.preventExtensions( self )
 
   if( o )
@@ -198,8 +198,9 @@ function appArgsPerform( o )
   if( !o.allowingDotless )
   if( !_.strBegins( o.appArgs.subject, '.' ) || _.strBegins( o.appArgs.subject, './' ) || _.strBegins( o.appArgs.subject, '.\\' ) )
   {
-    self.logger.error( 'Illformed request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
-    self.onGetHelp();
+    self.onSyntaxError( o );
+    // self.logger.error( 'Illformed request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
+    // self.onGetHelp();
     return;
   }
 
@@ -279,18 +280,13 @@ function commandsPerform( o )
   {
     let command = o.commands[ c ];
     _.assert( command.trim() === command );
-    // let splits = _.strIsolateLeftOrAll( command, ' ' );
-    // debugger;
     con.then( () => self.commandPerform
     ({
       command : command,
-      // command : splits[ 0 ],
-      // subject : splits[ 2 ],
       propertiesMap : o.propertiesMaps[ c ],
     }));
   }
 
-  // debugger;
   return con.syncMaybe();
 }
 
@@ -327,23 +323,6 @@ function commandPerform( o )
   let subject = splits[ 0 ];
   let argument = splits[ 2 ];
 
-  // let secondCommand = null;
-  // let secondSubject = null;
-  // let secondArgument = null;
-  //
-  // debugger;
-  // if( self.complexSyntax )
-  // {
-  //   let second = self.commandIsolateSecondFromArgument( argument );
-  //   if( second )
-  //   {
-  //     argument = second.argument;
-  //     secondCommand = second.secondCommand;
-  //     secondSubject = second.secondSubject;
-  //     secondArgument = second.secondArgument;
-  //   }
-  // }
-
   o.propertiesMap = o.propertiesMap || Object.create( null );
 
   /* */
@@ -353,9 +332,6 @@ function commandPerform( o )
     command : o.command,
     subject : subject,
     argument : argument,
-    // secondCommand : secondCommand,
-    // secondSubject : secondSubject,
-    // secondArgument : secondArgument,
     propertiesMap : o.propertiesMap,
   });
 
@@ -406,10 +382,12 @@ function commandPerformParsed( o )
 
   if( !subjectDescriptors.length )
   {
-    let s = 'Unknown subject ' + _.strQuote( o.subject );
-    if( self.vocabulary.descriptorMap[ 'help' ] )
-    s += '\nTry ".help"';
-    throw _.errBriefly( s );
+    self.onUnknownCommandError( o );
+    // let s = 'Unknown command ' + _.strQuote( o.subject );
+    // if( self.vocabulary.descriptorMap[ 'help' ] )
+    // s += '\nTry ".help"';
+    // throw _.errBriefly( s );
+    return null;
   }
   else
   {
@@ -430,17 +408,11 @@ function commandPerformParsed( o )
   let executable = subjectDescriptor.phraseDescriptor.executable;
   if( _.routineIs( executable ) )
   {
-    // debugger;
     result = executable
     ({
       command : o.command,
       subject : o.subject,
       argument : o.argument,
-
-      // secondCommand : o.secondCommand,
-      // secondSubject : o.secondSubject,
-      // secondArgument : o.secondArgument,
-
       propertiesMap : o.propertiesMap,
       ca : self,
       subjectDescriptor : subjectDescriptor,
@@ -448,7 +420,6 @@ function commandPerformParsed( o )
   }
   else
   {
-    // _.assert( !o.secondCommand, 'not implemented' );
     executable = _.path.nativize( executable );
     let mapStr = _.strJoinMap({ src : o.propertiesMap });
     let execPath = self.commandPrefix + executable + ' ' + o.subject + ' ' + mapStr;
@@ -469,11 +440,6 @@ commandPerformParsed.defaults =
   command : null,
   subject : null,
   argument : null,
-
-  // secondCommand : null,
-  // secondSubject : null,
-  // secondArgument : null,
-
   propertiesMap : null,
 
 }
@@ -518,10 +484,6 @@ function commandIsolateSecondFromArgument( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  // debugger;
-  // let splits = _.strSplit( command, /\s+\.\w[^ ]*\s*/ );
-  // debugger;
-
   [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
 
   if( !result.secondSubject )
@@ -564,8 +526,6 @@ function _commandHelp( e )
   let ca = e.ca;
   let logger = self.logger || ca.logger || _global_.logger;
 
-  // debugger;
-
   if( e.argument )
   {
     logger.log();
@@ -599,23 +559,34 @@ function _commandHelp( e )
     logger.log( e.ca.vocabulary.helpForSubjectAsString( '' ) );
     logger.log();
 
-    //logger.log( 'Use ' + logger.colorFormat( '"ts .help"', 'code' ) + ' to get help' );
-
   }
 
   return self;
 }
 
-// function _commandHelp( e )
-// {
-//   let ca = e.ca;
 //
-//   _.assert( arguments.length === 1 ); xxx
+
+function onSyntaxError( o )
+{
+  let self = this;
+  self.logger.error( 'Illformed request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
+  self.onGetHelp();
+}
+
+onSyntaxError.defaults = Object.create( appArgsPerform.defaults );
+
 //
-//   ca.logger.log( 'Commands to use' );
-//   ca.onPrintCommands();
-//
-// }
+
+function onUnknownCommandError( o )
+{
+  let self = this;
+  let s = 'Unknown command ' + _.strQuote( o.subject );
+  if( self.vocabulary.descriptorMap[ 'help' ] )
+  s += '\nTry ".help"';
+  throw _.errBriefly( s );
+}
+
+onUnknownCommandError.defaults = Object.create( commandPerformParsed.defaults );
 
 //
 
@@ -624,9 +595,6 @@ function onGetHelp()
   let self = this;
 
   _.assert( arguments.length === 0 );
-
-  // self.logger.log( self.vocabulary.helpForSubjectAsString( subjects[ 0 ] ) );
-  // self.logger.log( '' );
 
   if( self.vocabulary.subjectDescriptorFor( '.help' ).length )
   {
@@ -706,16 +674,18 @@ let Composes =
 {
   basePath : null,
   commandPrefix : '',
-  addingDelimeter : ' ', // xxx
-  lookingDelimeter : _.define.own([ '.' ]), // xxx
+  addingDelimeter : ' ',
+  lookingDelimeter : _.define.own([ '.' ]),
   complexSyntax : 0,
   supplementingByHelp : 1,
 }
 
 let Aggregates =
 {
-  onGetHelp : onGetHelp,
-  onPrintCommands : onPrintCommands,
+  onSyntaxError,
+  onUnknownCommandError,
+  onGetHelp,
+  onPrintCommands,
 }
 
 let Associates =
@@ -772,6 +742,7 @@ let Extend =
 
   _commandHelp,
 
+  onSyntaxError,
   onGetHelp,
   onPrintCommands,
   _onPhraseDescriptorMake,
