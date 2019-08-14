@@ -19,8 +19,8 @@ if( typeof module !== 'undefined' )
 
   _.include( 'wCopyable' );
   _.include( 'wVocabulary' );
-  _.include( 'wPathFundamentals' );
-  _.include( 'wExternalFundamentals' );
+  _.include( 'wPathBasic' );
+  _.include( 'wAppBasic' );
   _.include( 'wFiles' );
   _.include( 'wVerbal' );
 
@@ -201,7 +201,7 @@ function appArgsPerform( o )
     self.onSyntaxError( o );
     // self.logger.error( 'Illformed request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
     // self.onGetHelp();
-    return;
+    return null;
   }
 
   if( o.printingEcho )
@@ -394,9 +394,12 @@ function commandPerformParsed( o )
     filteredSubjectDescriptors = self.vocabulary.subjectsFilter( subjectDescriptors, { wholePhrase : o.subject } );
     if( filteredSubjectDescriptors.length !== 1 )
     {
-      self.logger.log( 'Ambiguity. Did you mean?' );
-      self.logger.log( self.vocabulary.helpForSubjectAsString( o.subject ) );
-      self.logger.log( '' );
+      let e = _.mapExtend( null, o );
+      e.filteredSubjectDescriptors = filteredSubjectDescriptors;
+      self.onAmbiguity( e );
+      // self.logger.log( 'Ambiguity. Did you mean?' );
+      // self.logger.log( self.vocabulary.helpForSubjectAsString( o.subject ) );
+      // self.logger.log( '' );
     }
     if( filteredSubjectDescriptors.length !== 1 )
     return null;
@@ -566,20 +569,27 @@ function _commandHelp( e )
 
 //
 
-function onSyntaxError( o )
+function onAmbiguity( o )
 {
   let self = this;
-  self.logger.error( 'Illformed request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
-  self.onGetHelp();
+  /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
+  _.appExitCode( -1 );
+
+  self.logger.log( 'Ambiguity. Did you mean?' );
+  self.logger.log( self.vocabulary.helpForSubjectAsString( o.subject ) );
+  self.logger.log( '' );
+
 }
 
-onSyntaxError.defaults = Object.create( appArgsPerform.defaults );
+onAmbiguity.defaults = Object.create( appArgsPerform.defaults );
 
 //
 
 function onUnknownCommandError( o )
 {
   let self = this;
+  /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
+  _.appExitCode( -1 );
   let s = 'Unknown command ' + _.strQuote( o.subject );
   if( self.vocabulary.descriptorMap[ 'help' ] )
   s += '\nTry ".help"';
@@ -587,6 +597,19 @@ function onUnknownCommandError( o )
 }
 
 onUnknownCommandError.defaults = Object.create( commandPerformParsed.defaults );
+
+//
+
+function onSyntaxError( o )
+{
+  let self = this;
+  /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
+  _.appExitCode( -1 );
+  self.logger.error( 'Illformed command', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
+  self.onGetHelp();
+}
+
+onSyntaxError.defaults = Object.create( appArgsPerform.defaults );
 
 //
 
@@ -683,6 +706,7 @@ let Composes =
 let Aggregates =
 {
   onSyntaxError,
+  onAmbiguity,
   onUnknownCommandError,
   onGetHelp,
   onPrintCommands,
@@ -743,6 +767,7 @@ let Extend =
   _commandHelp,
 
   onSyntaxError,
+  onAmbiguity,
   onGetHelp,
   onPrintCommands,
   _onPhraseDescriptorMake,
