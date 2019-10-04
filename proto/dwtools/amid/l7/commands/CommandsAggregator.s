@@ -386,7 +386,7 @@ function commandPerformParsed( o )
     // let s = 'Unknown command ' + _.strQuote( o.subject );
     // if( self.vocabulary.descriptorMap[ 'help' ] )
     // s += '\nTry ".help"';
-    // throw _.errBriefly( s );
+    // throw _.errBrief( s );
     return null;
   }
   else
@@ -573,7 +573,7 @@ function onAmbiguity( o )
 {
   let self = this;
   /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
-  _.appExitCode( -1 );
+  _.process.exitCode( -1 );
 
   self.logger.log( 'Ambiguity. Did you mean?' );
   self.logger.log( self.vocabulary.helpForSubjectAsString( o.subject ) );
@@ -589,11 +589,11 @@ function onUnknownCommandError( o )
 {
   let self = this;
   /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
-  _.appExitCode( -1 );
+  _.process.exitCode( -1 );
   let s = 'Unknown command ' + _.strQuote( o.subject );
   if( self.vocabulary.descriptorMap[ 'help' ] )
   s += '\nTry ".help"';
-  throw _.errBriefly( s );
+  throw _.errBrief( s );
 }
 
 onUnknownCommandError.defaults = Object.create( commandPerformParsed.defaults );
@@ -604,7 +604,7 @@ function onSyntaxError( o )
 {
   let self = this;
   /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
-  _.appExitCode( -1 );
+  _.process.exitCode( -1 );
   self.logger.error( 'Illformed command', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
   self.onGetHelp();
 }
