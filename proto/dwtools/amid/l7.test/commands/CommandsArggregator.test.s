@@ -342,7 +342,7 @@ function help( test )
 var Self =
 {
 
-  name : 'Tools/mid/CommandsAggregator',
+  name : 'Tools.mid.CommandsAggregator',
   silencing : 1,
 
   tests :
