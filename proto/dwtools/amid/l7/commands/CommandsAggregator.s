@@ -475,11 +475,32 @@ function commandsAdd( commands )
 /**
  * @summary Separates second command from provided string.
  * @param {String} command Commands string to parse.
- * @function commandIsolateSecondFromArgument
+ * @function commandIsolateSecondFromArgumentLeft
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
 */
 
-function commandIsolateSecondFromArgument( command )
+function commandIsolateSecondFromArgumentLeft( command )
+{
+  let ca = this;
+  let result = Object.create( null );
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( command ) );
+
+  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.\w[^ ]*\s*/ );
+
+  if( !result.secondSubject )
+  return null;
+
+  result.secondSubject = result.secondSubject.trim();
+  result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
+
+  return result;
+}
+
+//
+
+function commandIsolateSecondFromArgumentRight( command )
 {
   let ca = this;
   let result = Object.create( null );
@@ -761,7 +782,9 @@ let Extend =
 
   commandsAdd,
 
-  commandIsolateSecondFromArgument,
+  commandIsolateSecondFromArgument : commandIsolateSecondFromArgumentLeft,
+  commandIsolateSecondFromArgumentLeft,
+  commandIsolateSecondFromArgumentRight,
   commandIsolateSecondFromArgumentDeprecated,
 
   _commandHelp,
