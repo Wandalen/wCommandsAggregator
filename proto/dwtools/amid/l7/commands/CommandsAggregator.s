@@ -149,6 +149,7 @@ function appArgsNormalize( appArgs )
 
 appArgsNormalize.defaults =
 {
+  original : null,
   subject : null,
   subjects : null,
   map : null,
@@ -158,10 +159,8 @@ appArgsNormalize.defaults =
   interpreterArgs : null,
   scriptArgs : null,
   scriptString : null,
-
   keyValDelimeter : null,
-  cmmandsDelimeter : null,
-
+  commandsDelimeter : null,
 }
 
 //
@@ -452,7 +451,7 @@ commandPerformParsed.defaults =
 /**
  * @summary Adds commands to the vocabulary.
  * @param {Array} commands Array with commands to add.
- * @function commandsAdd
+ * @function commandsAdds
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
 */
 
