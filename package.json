@@ -18,14 +18,14 @@
   }, 
   "dependencies" : 
   {
-    "wTools" : "", 
-    "wCopyable" : "", 
-    "wFiles" : "", 
-    "wvocabulary" : "", 
-    "wpathbasic" : "", 
-    "wappbasic" : "", 
-    "wverbal" : ""
+    "wTools" : "beta", 
+    "wCopyable" : "beta", 
+    "wFiles" : "beta", 
+    "wvocabulary" : "beta", 
+    "wpathbasic" : "beta", 
+    "wappbasic" : "beta", 
+    "wverbal" : "beta"
   }, 
-  "devDependencies" : { "wTesting" : "" }, 
+  "devDependencies" : { "wTesting" : "beta" }, 
   "keywords" : [ "wTools" ]
 }
