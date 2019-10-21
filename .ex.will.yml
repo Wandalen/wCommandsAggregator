@@ -23,7 +23,7 @@ about :
 path :
 
   repository : git+https:///github.com/Wandalen/wCommandsAggregator.git
-  remotes :
+  origins :
    - git+https:///github.com/Wandalen/wCommandsAggregator.git
    - npm:///wcommandsaggregator
   bugtracker : https:///github.com/Wandalen/wCommandsAggregator/issues
