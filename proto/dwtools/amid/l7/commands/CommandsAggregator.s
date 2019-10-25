@@ -488,11 +488,11 @@ function commandIsolateSecondFromArgumentLeft( command )
 
   [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.\w[^ ]*\s*/ );
 
-  if( !result.secondSubject )
-  return null;
-
-  result.secondSubject = result.secondSubject.trim();
-  result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
+  if( result.secondSubject )
+  {
+    result.secondSubject = result.secondSubject.trim();
+    result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
+  }
 
   return result;
 }
