@@ -155,12 +155,15 @@ appArgsNormalize.defaults =
   map : null,
   maps : null,
   interpreterPath : null,
-  mainPath : null,
   interpreterArgs : null,
+  interpreterArgsStrings : null,
+  scriptPath : null,
   scriptArgs : null,
-  scriptString : null,
+  scriptArgsString : null,
   keyValDelimeter : null,
   commandsDelimeter : null,
+  caching : null,
+  parsingArrays : null,
 }
 
 //
@@ -488,8 +491,11 @@ function commandIsolateSecondFromArgumentLeft( command )
 
   [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.\w[^ ]*\s*/ );
 
+  result.argument = _.strUnquote( result.argument.trim() );
+
   if( result.secondSubject )
   {
+    debugger;
     result.secondSubject = result.secondSubject.trim();
     result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
   }
@@ -509,11 +515,11 @@ function commandIsolateSecondFromArgumentRight( command )
 
   [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
 
-  if( !result.secondSubject )
-  return null;
-
-  result.secondSubject = result.secondSubject.trim();
-  result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
+  if( result.secondSubject )
+  {
+    result.secondSubject = _.strUnquote( result.secondSubject.trim() );
+    result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
+  }
 
   return result;
 }

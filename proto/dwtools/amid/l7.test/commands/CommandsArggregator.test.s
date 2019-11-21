@@ -248,13 +248,34 @@ function commandIsolateSecondFromArgument( test )
   test.identical( got, expected );
 
   test.case = 'no second';
-  var expected = null;
+  var expected =
+  {
+    'argument' : 'module git status',
+    'secondSubject' : undefined,
+    'secondArgument' : '',
+  };
   var got = ca.commandIsolateSecondFromArgument( 'module git status' );
   test.identical( got, expected );
 
   test.case = 'quoted doted argument';
-  var expected = null;
+  var expected =
+  {
+    'argument' : '".module" git status',
+    'secondSubject' : undefined,
+    'secondArgument' : '',
+  };
   var got = ca.commandIsolateSecondFromArgument( '".module" git status' );
+  test.identical( got, expected );
+
+  test.case = '"single with space/" .resources.list';
+  var expected =
+  {
+    'argument' : 'single with space/',
+    'secondSubject' : '.resources.list',
+    'secondArgument' : '',
+    'secondCommand' : '.resources.list ',
+  }
+  var got = ca.commandIsolateSecondFromArgument( '"single with space/" .resources.list' );
   test.identical( got, expected );
 
 }
@@ -293,10 +314,12 @@ function help( test )
   got = '';
   ca.commandPerform({ command : '.help' });
   var expected =
-  `  .help - Get help.
-  .action - action
-  .action.first - action first`
-  test.identical( got, expected );
+  `
+.help - Get help.
+.action - action
+.action.first - action first
+`
+  test.equivalent( got, expected );
 
   test.case = 'exact dotless'
   got = '';
