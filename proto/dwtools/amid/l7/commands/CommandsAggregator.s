@@ -495,7 +495,6 @@ function commandIsolateSecondFromArgumentLeft( command )
 
   if( result.secondSubject )
   {
-    debugger;
     result.secondSubject = result.secondSubject.trim();
     result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
   }
