@@ -72,7 +72,7 @@ function form()
 
   _.assert( !self.formed );
   _.assert( _.objectIs( self.commands ) );
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   self.basePath = _.path.resolve( self.basePath );
 
@@ -96,7 +96,7 @@ function form()
 function _formVocabulary()
 {
   let self = this;
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
   self.vocabulary = self.vocabulary || _.Vocabulary();
   self.vocabulary.addingDelimeter = self.addingDelimeter;
   self.vocabulary.lookingDelimeter = self.lookingDelimeter;
@@ -642,7 +642,7 @@ function onGetHelp()
 {
   let self = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( self.vocabulary.subjectDescriptorFor( '.help' ).length )
   {
@@ -661,7 +661,7 @@ function onPrintCommands()
 {
   let self = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   self.logger.log();
   self.logger.log( self.vocabulary.helpForSubjectAsString( '' ) );
