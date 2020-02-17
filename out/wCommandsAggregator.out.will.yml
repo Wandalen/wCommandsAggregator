@@ -166,9 +166,10 @@ module:
           - ../proto/dwtools/amid/l7/commands/CommandsAggregator.s
           - ../proto/dwtools/amid/l7.test
           - ../proto/dwtools/amid/l7.test/commands
-          - ../proto/dwtools/amid/l7.test/commands/Action2.s
-          - ../proto/dwtools/amid/l7.test/commands/Action3.s
           - ../proto/dwtools/amid/l7.test/commands/CommandsArggregator.test.s
+          - ../proto/dwtools/amid/l7.test/commands/_assets
+          - ../proto/dwtools/amid/l7.test/commands/_assets/Action2.s
+          - ../proto/dwtools/amid/l7.test/commands/_assets/Action3.s
           - ../proto/dwtools/atop
     submodule:
       wTools:
