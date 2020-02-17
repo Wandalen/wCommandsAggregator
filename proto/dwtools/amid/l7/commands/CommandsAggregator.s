@@ -81,9 +81,8 @@ function form()
     self.commands.help = { e : self._commandHelp.bind( self ), h : 'Get help' };
   }
 
-  self._formVocabulary();
-
-  self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
+  // self._formVocabulary();
+  // self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
 
   self.commandsAdd( self.commands );
 
@@ -96,10 +95,15 @@ function form()
 function _formVocabulary()
 {
   let self = this;
+
   _.assert( arguments.length === 0, 'Expects no arguments' );
+  _.assert( self.vocabulary === null );
+
   self.vocabulary = self.vocabulary || _.Vocabulary();
   self.vocabulary.addingDelimeter = self.addingDelimeter;
   self.vocabulary.lookingDelimeter = self.lookingDelimeter;
+  self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self );
+
 }
 
 //
@@ -681,6 +685,12 @@ function _onPhraseDescriptorMake( src )
   let result = Object.create( null );
   let phrase = src;
   let executable = null;
+  let knownFields =
+  {
+    hint : null,
+    defaults : null,
+    commandProperties : null,
+  }
 
   if( phrase )
   {
@@ -704,9 +714,16 @@ function _onPhraseDescriptorMake( src )
   if( _.routineIs( executable ) )
   {
     result.executable = executable;
+    if( executable.hint )
+    {
+      _.assert( result.hint === undefined || result.hint === null || result.hint === hint );
+      result.hint = executable.hint;
+    }
+    _.assertMapHasOnly( executable, knownFields, () => `Unknown field of command ${result.phrase} :` );
   }
   else
   {
+    _.assert( _.strIs( executable ) );
     result.executable = _.path.resolve( self.basePath, executable );
     _.sure( !!_.fileProvider.statResolvedRead( result.executable ), () => 'Application not found at ' + _.strQuote( result.executable ) );
   }
@@ -722,8 +739,8 @@ let Composes =
 {
   basePath : null,
   commandPrefix : '',
-  addingDelimeter : ' ',
-  lookingDelimeter : _.define.own([ '.' ]),
+  addingDelimeter : ' ', /* qqq xxx : make it accessor */
+  lookingDelimeter : _.define.own([ '.' ]), /* qqq xxx : make it accessor */
   complexSyntax : 0,
   supplementingByHelp : 1,
 }

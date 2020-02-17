@@ -33,8 +33,8 @@ function trivial( test )
   var Commands =
   {
     'action1' : { e : execCommand1, h : 'Some action' },
-    'action2' : 'Action2.s',
-    'action3' : 'Action3.s',
+    'action2' : '_assets/Action2.s',
+    'action3' : '_assets/Action3.s',
   }
 
   var ca = _.CommandsAggregator
