@@ -719,7 +719,7 @@ function _onPhraseDescriptorMake( src )
       _.assert( result.hint === undefined || result.hint === null || result.hint === hint );
       result.hint = executable.hint;
     }
-    _.assertMapHasOnly( executable, knownFields, () => `Unknown field of command ${result.phrase} :` );
+    _.assertMapHasOnly( executable, knownFields, () => `Unknown field of command "${result.phrase}" :` );
   }
   else
   {
