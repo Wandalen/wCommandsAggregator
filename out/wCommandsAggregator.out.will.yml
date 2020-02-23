@@ -2,10 +2,13 @@ format: outwillfile-2.0
 root:
   - wCommandsAggregator.out
 consistency:
-  ../.ex.will.yml: &ref_0
+  wCommandsAggregator.out.will.yml: &ref_0
+    hash: 2dde14dbddf0e08538e10f6318568145
+    size: 39899
+  ../.ex.will.yml: &ref_1
     hash: 810ea0674fb963602cc0040d69a24831
     size: 1859
-  ../.im.will.yml: &ref_1
+  ../.im.will.yml: &ref_2
     hash: 84575f02a3b1d513cfdccf23305a15ee
     size: 5398
 module:
@@ -19,18 +22,18 @@ module:
         CLI.
       enabled: 1
       version: 0.4.0
-      interpreters: &ref_2
+      interpreters:
         - njs >= 8.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords: &ref_3
+      keywords:
         - wTools
       license: MIT
       author: Kostiantyn Wandalen <wanalen@willbe.so>
-      contributors: &ref_4
+      contributors:
         - Kostiantyn Wandalen <wanalen@willbe.so>
       npm.name: wcommandsaggregator
-      npm.scripts: &ref_5
+      npm.scripts:
         test: wtest .run proto/**
         docgen: wdocgen .build proto
     path:
@@ -724,6 +727,24 @@ module:
           content: prime
         inherit:
           - files.transpile
+      exported.proto.export:
+        opts:
+          reflector: 'reflector::exported.proto.export*'
+        criterion:
+          generated: 1
+          content: proto
+          export: 1
+        inherit:
+          - files.reflect
+      exported.files.proto.export:
+        opts:
+          reflector: 'reflector::exported.files.proto.export*'
+        criterion:
+          generated: 1
+          content: proto
+          export: 1
+        inherit:
+          - files.reflect
     build:
       proto.export:
         steps:
@@ -812,8 +833,9 @@ module:
           content: proto
           export: 1
     consistency:
-      ../.ex.will.yml: *ref_0
-      ../.im.will.yml: *ref_1
+      wCommandsAggregator.out.will.yml: *ref_0
+      ../.ex.will.yml: *ref_1
+      ../.im.will.yml: *ref_2
   ../:
     about:
       name: wCommandsAggregator
@@ -824,13 +846,20 @@ module:
         CLI.
       enabled: 1
       version: 0.4.0
-      interpreters: *ref_2
-      keywords: *ref_3
+      interpreters:
+        - njs >= 8.0.0
+        - chrome >= 60.0.0
+        - firefox >= 60.0.0
+      keywords:
+        - wTools
       license: MIT
       author: Kostiantyn Wandalen <wanalen@willbe.so>
-      contributors: *ref_4
+      contributors:
+        - Kostiantyn Wandalen <wanalen@willbe.so>
       npm.name: wcommandsaggregator
-      npm.scripts: *ref_5
+      npm.scripts:
+        test: wtest .run proto/**
+        docgen: wdocgen .build proto
     path:
       module.willfiles:
         criterion:
@@ -1526,3 +1555,6 @@ module:
       ../.im.will.yml:
         hash: 84575f02a3b1d513cfdccf23305a15ee
         size: 5398
+      wCommandsAggregator.out.will.yml:
+        hash: 2dde14dbddf0e08538e10f6318568145
+        size: 39899
