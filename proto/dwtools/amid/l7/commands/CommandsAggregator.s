@@ -493,7 +493,11 @@ function commandIsolateSecondFromArgumentLeft( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.\w[^ ]*\s*/ );
+  // [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.\w[^ ]*\s*/ );
+  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.(?:(?:\w[^ ]*)|$)\s*/ );
+  /* qqq : cover please
+    dont forget about case : "some/path/Full.stxt ."
+  */
 
   result.argument = _.strUnquote( result.argument.trim() );
 
@@ -516,7 +520,11 @@ function commandIsolateSecondFromArgumentRight( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
+  // [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
+  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.(?:(?:\w[^ ]*)|$)\s*/ );
+  /* qqq : cover please
+    dont forget about case : "some/path/Full.stxt ."
+  */
 
   if( result.secondSubject )
   {
@@ -527,20 +535,20 @@ function commandIsolateSecondFromArgumentRight( command )
   return result;
 }
 
+// //
 //
-
-function commandIsolateSecondFromArgumentDeprecated( subject )
-{
-  let ca = this;
-  let result = Object.create( null );
-
-  _.assert( arguments.length === 1 );
-
-  [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateLeftOrAll( subject, ' ' );
-  [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateLeftOrAll( result.secondCommand, ' ' );
-
-  return result;
-}
+// function commandIsolateSecondFromArgumentDeprecated( subject )
+// {
+//   let ca = this;
+//   let result = Object.create( null );
+//
+//   _.assert( arguments.length === 1 );
+//
+//   [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateLeftOrAll( subject, ' ' );
+//   [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateLeftOrAll( result.secondCommand, ' ' );
+//
+//   return result;
+// }
 
 //
 
@@ -806,7 +814,7 @@ let Extend =
   commandIsolateSecondFromArgument : commandIsolateSecondFromArgumentLeft,
   commandIsolateSecondFromArgumentLeft,
   commandIsolateSecondFromArgumentRight,
-  commandIsolateSecondFromArgumentDeprecated,
+  // commandIsolateSecondFromArgumentDeprecated,
 
   _commandHelp,
 
