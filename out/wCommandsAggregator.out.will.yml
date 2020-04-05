@@ -1555,6 +1555,4 @@ module:
       ../.im.will.yml:
         hash: 84575f02a3b1d513cfdccf23305a15ee
         size: 5398
-      wCommandsAggregator.out.will.yml:
-        hash: 2dde14dbddf0e08538e10f6318568145
-        size: 39899
+      wCommandsAggregator.out.will.yml: *ref_0
