@@ -609,11 +609,7 @@ function _commandHelp( e )
 function onAmbiguity( o )
 {
   let self = this;
-<<<<<<< HEAD
-  /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
-=======
   /* qqq : cover the case. check appExitCode. test should use _.process.start to launch app */
->>>>>>> 1c1894725d0b4bd3b5cd538757527bc85608f1c2
   _.process.exitCode( -1 );
 
   self.logger.log( 'Ambiguity. Did you mean?' );
@@ -629,11 +625,7 @@ onAmbiguity.defaults = Object.create( appArgsPerform.defaults );
 function onUnknownCommandError( o )
 {
   let self = this;
-<<<<<<< HEAD
-  /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
-=======
   /* qqq : cover the case. check appExitCode. test should use _.process.start to launch app */
->>>>>>> 1c1894725d0b4bd3b5cd538757527bc85608f1c2
   _.process.exitCode( -1 );
   let s = 'Unknown command ' + _.strQuote( o.subject );
   if( self.vocabulary.descriptorMap[ 'help' ] )
@@ -648,11 +640,7 @@ onUnknownCommandError.defaults = Object.create( commandPerformParsed.defaults );
 function onSyntaxError( o )
 {
   let self = this;
-<<<<<<< HEAD
-  /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
-=======
   /* qqq : cover the case. check appExitCode. test should use _.process.start to launch app */
->>>>>>> 1c1894725d0b4bd3b5cd538757527bc85608f1c2
   _.process.exitCode( -1 );
   self.logger.error( 'Illformed command', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
   self.onGetHelp();
