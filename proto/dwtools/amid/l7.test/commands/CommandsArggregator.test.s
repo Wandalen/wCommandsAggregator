@@ -5,7 +5,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../../Tools.s' );
+  let _ = require( '../../../../dwtools/Tools.s' );
 
   _.include( 'wTesting' );
 
@@ -33,8 +33,8 @@ function trivial( test )
   var Commands =
   {
     'action1' : { e : execCommand1, h : 'Some action' },
-    'action2' : 'Action2.s',
-    'action3' : 'Action3.s',
+    'action2' : '_assets/Action2.s',
+    'action3' : '_assets/Action3.s',
   }
 
   var ca = _.CommandsAggregator
@@ -248,13 +248,34 @@ function commandIsolateSecondFromArgument( test )
   test.identical( got, expected );
 
   test.case = 'no second';
-  var expected = null;
+  var expected =
+  {
+    'argument' : 'module git status',
+    'secondSubject' : undefined,
+    'secondArgument' : '',
+  };
   var got = ca.commandIsolateSecondFromArgument( 'module git status' );
   test.identical( got, expected );
 
   test.case = 'quoted doted argument';
-  var expected = null;
+  var expected =
+  {
+    'argument' : '".module" git status',
+    'secondSubject' : undefined,
+    'secondArgument' : '',
+  };
   var got = ca.commandIsolateSecondFromArgument( '".module" git status' );
+  test.identical( got, expected );
+
+  test.case = '"single with space/" .resources.list';
+  var expected =
+  {
+    'argument' : 'single with space/',
+    'secondSubject' : '.resources.list',
+    'secondArgument' : '',
+    'secondCommand' : '.resources.list ',
+  }
+  var got = ca.commandIsolateSecondFromArgument( '"single with space/" .resources.list' );
   test.identical( got, expected );
 
 }
@@ -293,10 +314,12 @@ function help( test )
   got = '';
   ca.commandPerform({ command : '.help' });
   var expected =
-  `  .help - Get help.
-  .action - action
-  .action.first - action first`
-  test.identical( got, expected );
+  `
+.help - Get help.
+.action - action
+.action.first - action first
+`
+  test.equivalent( got, expected );
 
   test.case = 'exact dotless'
   got = '';
@@ -342,7 +365,7 @@ function help( test )
 var Self =
 {
 
-  name : 'Tools/mid/CommandsAggregator',
+  name : 'Tools.mid.CommandsAggregator',
   silencing : 1,
 
   tests :

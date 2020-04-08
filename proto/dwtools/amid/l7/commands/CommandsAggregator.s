@@ -15,7 +15,7 @@
 if( typeof module !== 'undefined' )
 {
 
-  let _ = require( '../../../Tools.s' );
+  let _ = require( '../../../../dwtools/Tools.s' );
 
   _.include( 'wCopyable' );
   _.include( 'wVocabulary' );
@@ -72,7 +72,7 @@ function form()
 
   _.assert( !self.formed );
   _.assert( _.objectIs( self.commands ) );
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   self.basePath = _.path.resolve( self.basePath );
 
@@ -81,9 +81,8 @@ function form()
     self.commands.help = { e : self._commandHelp.bind( self ), h : 'Get help' };
   }
 
-  self._formVocabulary();
-
-  self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
+  // self._formVocabulary();
+  // self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
 
   self.commandsAdd( self.commands );
 
@@ -96,10 +95,15 @@ function form()
 function _formVocabulary()
 {
   let self = this;
-  _.assert( arguments.length === 0 );
+
+  _.assert( arguments.length === 0, 'Expects no arguments' );
+  _.assert( self.vocabulary === null );
+
   self.vocabulary = self.vocabulary || _.Vocabulary();
   self.vocabulary.addingDelimeter = self.addingDelimeter;
   self.vocabulary.lookingDelimeter = self.lookingDelimeter;
+  self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self );
+
 }
 
 //
@@ -113,7 +117,7 @@ function _formVocabulary()
 function exec()
 {
   let self = this;
-  let appArgs = _.appArgs();
+  let appArgs = _.process.args();
   return self.appArgsPerform({ appArgs : appArgs });
 }
 
@@ -149,19 +153,21 @@ function appArgsNormalize( appArgs )
 
 appArgsNormalize.defaults =
 {
+  original : null,
   subject : null,
   subjects : null,
   map : null,
   maps : null,
   interpreterPath : null,
-  mainPath : null,
   interpreterArgs : null,
+  interpreterArgsStrings : null,
+  scriptPath : null,
   scriptArgs : null,
-  scriptString : null,
-
+  scriptArgsString : null,
   keyValDelimeter : null,
-  cmmandsDelimeter : null,
-
+  commandsDelimeter : null,
+  caching : null,
+  parsingArrays : null,
 }
 
 //
@@ -187,7 +193,7 @@ function appArgsPerform( o )
   _.routineOptions( appArgsPerform, o );
 
   if( o.appArgs === null )
-  o.appArgs = _.appArgs();
+  o.appArgs = _.process.args();
   o.appArgs = self.appArgsNormalize( o.appArgs );
 
   _.assert( _.arrayIs( o.appArgs.subjects ) );
@@ -428,7 +434,7 @@ function commandPerformParsed( o )
     let execPath = self.commandPrefix + executable + ' ' + o.subject + ' ' + mapStr;
     let o2 = Object.create( null );
     o2.execPath = execPath;
-    result = _.shell( o2 );
+    result = _.process.start( o2 );
   }
 
   if( result === undefined )
@@ -452,7 +458,7 @@ commandPerformParsed.defaults =
 /**
  * @summary Adds commands to the vocabulary.
  * @param {Array} commands Array with commands to add.
- * @function commandsAdd
+ * @function commandsAdds
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
 */
 
@@ -475,11 +481,11 @@ function commandsAdd( commands )
 /**
  * @summary Separates second command from provided string.
  * @param {String} command Commands string to parse.
- * @function commandIsolateSecondFromArgument
+ * @function commandIsolateSecondFromArgumentLeft
  * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
 */
 
-function commandIsolateSecondFromArgument( command )
+function commandIsolateSecondFromArgumentLeft( command )
 {
   let ca = this;
   let result = Object.create( null );
@@ -487,31 +493,62 @@ function commandIsolateSecondFromArgument( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
+  // [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.\w[^ ]*\s*/ );
+  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.(?:(?:\w[^ ]*)|$)\s*/ );
+  /* qqq : cover please
+    dont forget about case : "some/path/Full.stxt ."
+  */
 
-  if( !result.secondSubject )
-  return null;
+  result.argument = _.strUnquote( result.argument.trim() );
 
-  result.secondSubject = result.secondSubject.trim();
-  result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
+  if( result.secondSubject )
+  {
+    result.secondSubject = result.secondSubject.trim();
+    result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
+  }
 
   return result;
 }
 
 //
 
-function commandIsolateSecondFromArgumentDeprecated( subject )
+function commandIsolateSecondFromArgumentRight( command )
 {
   let ca = this;
   let result = Object.create( null );
 
   _.assert( arguments.length === 1 );
+  _.assert( _.strIs( command ) );
 
-  [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateLeftOrAll( subject, ' ' );
-  [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateLeftOrAll( result.secondCommand, ' ' );
+  // [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
+  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.(?:(?:\w[^ ]*)|$)\s*/ );
+  /* qqq : cover please
+    dont forget about case : "some/path/Full.stxt ."
+  */
+
+  if( result.secondSubject )
+  {
+    result.secondSubject = _.strUnquote( result.secondSubject.trim() );
+    result.secondCommand = result.secondSubject + ' ' + result.secondArgument;
+  }
 
   return result;
 }
+
+// //
+//
+// function commandIsolateSecondFromArgumentDeprecated( subject )
+// {
+//   let ca = this;
+//   let result = Object.create( null );
+//
+//   _.assert( arguments.length === 1 );
+//
+//   [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateLeftOrAll( subject, ' ' );
+//   [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateLeftOrAll( result.secondCommand, ' ' );
+//
+//   return result;
+// }
 
 //
 
@@ -572,7 +609,11 @@ function _commandHelp( e )
 function onAmbiguity( o )
 {
   let self = this;
+<<<<<<< HEAD
   /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
+=======
+  /* qqq : cover the case. check appExitCode. test should use _.process.start to launch app */
+>>>>>>> 1c1894725d0b4bd3b5cd538757527bc85608f1c2
   _.process.exitCode( -1 );
 
   self.logger.log( 'Ambiguity. Did you mean?' );
@@ -588,7 +629,11 @@ onAmbiguity.defaults = Object.create( appArgsPerform.defaults );
 function onUnknownCommandError( o )
 {
   let self = this;
+<<<<<<< HEAD
   /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
+=======
+  /* qqq : cover the case. check appExitCode. test should use _.process.start to launch app */
+>>>>>>> 1c1894725d0b4bd3b5cd538757527bc85608f1c2
   _.process.exitCode( -1 );
   let s = 'Unknown command ' + _.strQuote( o.subject );
   if( self.vocabulary.descriptorMap[ 'help' ] )
@@ -603,7 +648,11 @@ onUnknownCommandError.defaults = Object.create( commandPerformParsed.defaults );
 function onSyntaxError( o )
 {
   let self = this;
+<<<<<<< HEAD
   /* qqq : cover the case. check appExitCode. test should use _.shell to launch app */
+=======
+  /* qqq : cover the case. check appExitCode. test should use _.process.start to launch app */
+>>>>>>> 1c1894725d0b4bd3b5cd538757527bc85608f1c2
   _.process.exitCode( -1 );
   self.logger.error( 'Illformed command', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
   self.onGetHelp();
@@ -617,7 +666,7 @@ function onGetHelp()
 {
   let self = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   if( self.vocabulary.subjectDescriptorFor( '.help' ).length )
   {
@@ -636,7 +685,7 @@ function onPrintCommands()
 {
   let self = this;
 
-  _.assert( arguments.length === 0 );
+  _.assert( arguments.length === 0, 'Expects no arguments' );
 
   self.logger.log();
   self.logger.log( self.vocabulary.helpForSubjectAsString( '' ) );
@@ -656,6 +705,12 @@ function _onPhraseDescriptorMake( src )
   let result = Object.create( null );
   let phrase = src;
   let executable = null;
+  let knownFields =
+  {
+    hint : null,
+    defaults : null,
+    commandProperties : null,
+  }
 
   if( phrase )
   {
@@ -679,9 +734,16 @@ function _onPhraseDescriptorMake( src )
   if( _.routineIs( executable ) )
   {
     result.executable = executable;
+    if( executable.hint )
+    {
+      _.assert( result.hint === undefined || result.hint === null || result.hint === hint );
+      result.hint = executable.hint;
+    }
+    _.assertMapHasOnly( executable, knownFields, () => `Unknown field of command "${result.phrase}" :` );
   }
   else
   {
+    _.assert( _.strIs( executable ) );
     result.executable = _.path.resolve( self.basePath, executable );
     _.sure( !!_.fileProvider.statResolvedRead( result.executable ), () => 'Application not found at ' + _.strQuote( result.executable ) );
   }
@@ -697,8 +759,8 @@ let Composes =
 {
   basePath : null,
   commandPrefix : '',
-  addingDelimeter : ' ',
-  lookingDelimeter : _.define.own([ '.' ]),
+  addingDelimeter : ' ', /* qqq xxx : make it accessor */
+  lookingDelimeter : _.define.own([ '.' ]), /* qqq xxx : make it accessor */
   complexSyntax : 0,
   supplementingByHelp : 1,
 }
@@ -761,8 +823,10 @@ let Extend =
 
   commandsAdd,
 
-  commandIsolateSecondFromArgument,
-  commandIsolateSecondFromArgumentDeprecated,
+  commandIsolateSecondFromArgument : commandIsolateSecondFromArgumentLeft,
+  commandIsolateSecondFromArgumentLeft,
+  commandIsolateSecondFromArgumentRight,
+  // commandIsolateSecondFromArgumentDeprecated,
 
   _commandHelp,
 
