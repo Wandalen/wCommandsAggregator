@@ -29,7 +29,8 @@ if( typeof module !== 'undefined' )
 /**
  * @classdesc Class aggregating several applications into single CLI.
  * @class wCommandsAggregator
- * @memberof module:Tools/mid/CommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
  */
 
 //
@@ -111,7 +112,9 @@ function _formVocabulary()
 /**
  * @summary Reads app arguments and performs specified commands.
  * @function exec
- * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
  */
 
 function exec()
@@ -130,7 +133,9 @@ function exec()
  * Supplements object with missing fields.
  * @param {Object} appArgs Application arguments.
  * @function appArgsNormalize
- * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
  */
 
 function appArgsNormalize( appArgs )
@@ -180,7 +185,9 @@ appArgsNormalize.defaults =
  * @param {Boolean} [o.printingEcho=1] Print command before execution.
  * @param {Boolean} [o.allowingDotless=0] Allows to provide command without dot at the beginning.
  * @function appArgsPerform
- * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
  */
 
 function appArgsPerform( o )
@@ -243,7 +250,9 @@ appArgsPerform.defaults =
  * @param {Array|String} o.commands Command(s) to execute.
  * @param {Array} o.propertiesMaps Array of maps with options for commands.
  * @function commandsPerform
- * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
  */
 
 function commandsPerform( o )
@@ -310,7 +319,9 @@ commandsPerform.defaults =
  * @param {String} o.command Command to execute.
  * @param {Array} o.propertiesMap Options for provided command.
  * @function commandPerform
- * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
  */
 
 function commandPerform( o )
@@ -360,7 +371,9 @@ commandPerform.defaults =
  * @param {String} o.argument
  * @param {Array} o.propertiesMap Options for provided command.
  * @function commandPerformParsed
- * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
  */
 
 function commandPerformParsed( o )
@@ -459,7 +472,9 @@ commandPerformParsed.defaults =
  * @summary Adds commands to the vocabulary.
  * @param {Array} commands Array with commands to add.
  * @function commandsAdds
- * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
 */
 
 function commandsAdd( commands )
@@ -482,7 +497,9 @@ function commandsAdd( commands )
  * @summary Separates second command from provided string.
  * @param {String} command Commands string to parse.
  * @function commandIsolateSecondFromArgumentLeft
- * @memberof module:Tools/mid/CommandsAggregator.wCommandsAggregator#
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
 */
 
 function commandIsolateSecondFromArgumentLeft( command )
