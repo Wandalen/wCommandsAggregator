@@ -1,31 +1,31 @@
 {
-  "name" : "wcommandsaggregator", 
-  "version" : "0.3.183", 
-  "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.", 
-  "author" : "Kostiantyn Wandalen <wanalen@willbe.so>", 
-  "license" : "MIT", 
-  "main" : "proto/dwtools/amid/l7/commands/CommandsAggregator.s", 
-  "files" : [ "proto/dwtools/amid/l7", "proto/dwtools/Tools.s", "out" ], 
-  "scripts" : { "test" : "wtest .run proto/**", "docgen" : "wdocgen proto" }, 
-  "repository" : 
+  "name" : "wcommandsaggregator",
+  "version" : "0.3.184",
+  "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
+  "author" : "Kostiantyn Wandalen <wanalen@willbe.so>",
+  "license" : "MIT",
+  "main" : "proto/dwtools/amid/l7/commands/CommandsAggregator.s",
+  "files" : [ "proto/dwtools/amid/l7", "proto/dwtools/Tools.s", "out" ],
+  "scripts" : { "test" : "wtest .run proto/**", "docgen" : "wdocgen proto" },
+  "repository" :
   {
-    "type" : "git", 
+    "type" : "git",
     "url" : "https://github.com/Wandalen/wCommandsAggregator.git"
-  }, 
-  "bugs" : 
+  },
+  "bugs" :
   {
     "url" : "https://github.com/Wandalen/wCommandsAggregator/issues"
-  }, 
-  "dependencies" : 
+  },
+  "dependencies" :
   {
-    "wTools" : "alpha", 
-    "wCopyable" : "alpha", 
-    "wFiles" : "alpha", 
-    "wvocabulary" : "alpha", 
-    "wpathbasic" : "alpha", 
-    "wappbasic" : "alpha", 
-    "wverbal" : "alpha"
-  }, 
-  "devDependencies" : { "wTesting" : "alpha" }, 
+    "wTools" : "gamma",
+    "wCopyable" : "gamma",
+    "wFiles" : "gamma",
+    "wvocabulary" : "gamma",
+    "wpathbasic" : "gamma",
+    "wappbasic" : "gamma",
+    "wverbal" : "gamma"
+  },
+  "devDependencies" : { "wTesting" : "gamma" },
   "keywords" : [ "wTools" ]
 }
