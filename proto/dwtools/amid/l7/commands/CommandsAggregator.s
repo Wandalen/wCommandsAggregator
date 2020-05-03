@@ -484,6 +484,7 @@ function commandsAdd( commands )
   _.assert( !self.formed );
   _.assert( arguments.length === 1 );
 
+  if( !self.vocabulary )
   self._formVocabulary();
 
   self.vocabulary.phrasesAdd( commands );
