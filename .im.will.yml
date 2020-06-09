@@ -19,8 +19,8 @@ submodule :
   wPathBasic :
     path : npm:///wpathbasic
     enabled : 0 # submodule
-  wAppBasic :
-    path : npm:///wappbasic
+  wProcess :
+    path : npm:///wprocess
     enabled : 0 # submodule
   wcommandsaggregator :
     path : hd://.

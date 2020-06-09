@@ -20,7 +20,7 @@ if( typeof module !== 'undefined' )
   _.include( 'wCopyable' );
   _.include( 'wVocabulary' );
   _.include( 'wPathBasic' );
-  _.include( 'wAppBasic' );
+  _.include( 'wProcess' );
   _.include( 'wFiles' );
   _.include( 'wVerbal' );
 
@@ -37,7 +37,8 @@ if( typeof module !== 'undefined' )
 
 let _ = _global_.wTools;
 let Parent = null;
-let Self = function wCommandsAggregator()
+let Self = wCommandsAggregator;
+function wCommandsAggregator()
 {
   return _.workpiece.construct( Self, this, arguments );
 }

@@ -23,7 +23,7 @@
     "wFiles" : "alpha",
     "wvocabulary" : "alpha",
     "wpathbasic" : "alpha",
-    "wappbasic" : "alpha",
+    "wprocess" : "alpha",
     "wverbal" : "alpha"
   },
   "devDependencies" : { "wTesting" : "alpha" },
