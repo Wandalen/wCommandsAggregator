@@ -166,7 +166,7 @@ module:
           - ../proto/dwtools/amid/l7/commands/CommandsAggregator.s
           - ../proto/dwtools/amid/l7.test
           - ../proto/dwtools/amid/l7.test/commands
-          - ../proto/dwtools/amid/l7.test/commands/CommandsArggregator.test.s
+          - ../proto/dwtools/amid/l7.test/commands/CommandsAggregator.test.s
           - ../proto/dwtools/amid/l7.test/commands/_assets
           - ../proto/dwtools/amid/l7.test/commands/_assets/Action2.s
           - ../proto/dwtools/amid/l7.test/commands/_assets/Action3.s
@@ -1538,6 +1538,4 @@ module:
       ../.im.will.yml:
         hash: 085c62571889f62dbbb83563fbc74fdb
         size: 5396
-      wCommandsAggregator.out.will.yml:
-        hash: b04c0990d4c81f4d8fa19d59ddd5d8aa
-        size: 39548
+      wCommandsAggregator.out.will.yml: *ref_0
