@@ -17,7 +17,7 @@ var _global = _global_;
 var _ = _global_.wTools;
 
 // --
-//
+// tests
 // --
 
 function trivial( test )
@@ -309,7 +309,6 @@ function help( test )
     logger : logger,
   }).form();
 
-
   test.case = 'trivial help'
   got = '';
   ca.commandPerform({ command : '.help' });
@@ -358,8 +357,56 @@ function help( test )
   test.identical( got, expected );
 }
 
-// --
 //
+
+function severalCommands( test )
+{
+  let done = [];
+  let command1 = ( e ) => { done.push( e ); };
+  let command2 = ( e ) => { done.push( e ); };
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ] });
+
+  var commands =
+  {
+    'command1' : { e : command1 },
+    'command2' : { e : command2 },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1
+  }).form();
+
+  debugger;
+  ca.commandPerform({ command : '.command1 arg1 arg2 .command2 arg3' });
+  debugger;
+
+  done.forEach( ( command ) =>
+  {
+    delete command.ca;
+    delete command.subjectDescriptor;
+  });
+
+  var exp =
+  [
+    {
+      'command' : '.command1 arg1 arg2 .command2 arg3',
+      'subject' : '.command1',
+      'argument' : 'arg1 arg2 .command2 arg3',
+      'propertiesMap' : {}
+    },
+  ]
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  debugger;
+}
+
+// --
+// declare
 // --
 
 var Self =
@@ -374,7 +421,8 @@ var Self =
     trivial,
     perform,
     commandIsolateSecondFromArgument,
-    help
+    help,
+    severalCommands,
 
   }
 

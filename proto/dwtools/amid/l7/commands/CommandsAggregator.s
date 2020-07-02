@@ -196,8 +196,6 @@ function appArgsPerform( o )
   _.assert( _.arrayIs( o.appArgs.subjects ) );
   _.assert( _.arrayIs( o.appArgs.maps ) );
 
-  /* */
-
   if( !o.allowingDotless )
   if( !_.strBegins( o.appArgs.subject, '.' ) || _.strBegins( o.appArgs.subject, './' ) || _.strBegins( o.appArgs.subject, '.\\' ) )
   {
@@ -271,7 +269,7 @@ function commandsPerform( o )
   for( let c = 0 ; c < o.commands.length ; c++ )
   {
     let command = o.commands[ c ];
-    _.arrayAppendArray( commands, _.strSplitNonPreserving( command, ';' ) );
+    _.arrayAppendArray( commands, _.strSplitNonPreserving( command, self.commandDelimeter ) );
   }
 
   o.commands = _.arrayFlatten( null, commands );
@@ -604,37 +602,11 @@ function _commandVersion_functor( fop )
   {
     let cui = this;
 
-    _.npm.versionLog
+    return _.npm.versionLog
     ({
       localPath : fop.localPath,
       remotePath : fop.remotePath,
     });
-
-    // // let packageJsonPath = path.join( __dirname, '../../../../../package.json' );
-    // let packageJson =  _.fileProvider.fileRead({ filePath : fop.packageJsonPath, encoding : 'json', throwing : 0 });
-    //
-    // return _.process.start
-    // ({
-    //   execPath : `npm view ${fop.packageName} version`,
-    //   outputCollecting : 1,
-    //   outputPiping : 0,
-    //   inputMirroring : 0,
-    //   throwingExitCode : 0,
-    // })
-    // .then( ( got ) =>
-    // {
-    //   let current = packageJson ? packageJson.version : 'unknown';
-    //   let latest = _.strStrip( got.output );
-    //
-    //   if( got.exitCode || !latest )
-    //   latest = 'unknown'
-    //
-    //   logger.log( 'Current version:', current );
-    //   logger.log( 'Available version:', latest );
-    //
-    //   return null;
-    // })
-
   }
 
 }
@@ -789,9 +761,11 @@ let Composes =
   basePath : null,
   commandPrefix : '',
   addingDelimeter : ' ', /* qqq xxx : make it accessor */
+  commandDelimeter : ';',
   lookingDelimeter : _.define.own([ '.' ]), /* qqq xxx : make it accessor */
   complexSyntax : 0,
   supplementingByHelp : 1,
+  commandsSplitting : 0,
 }
 
 let Aggregates =
