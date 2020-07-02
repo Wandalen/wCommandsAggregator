@@ -257,6 +257,39 @@ function commandsPerform( o )
 
   o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
 
+  // for( let c = 0 ; c < o.commands.length ; c++ )
+  // {
+  //   let command = o.commands[ c ];
+  //   _.arrayAppendArray( commands, _.strSplitNonPreserving( command, self.commandExplicitDelimeter ) );
+  // }
+
+  commands = o.commands;
+  commands = _.filter_( null, commands, ( command ) =>
+  {
+    let result = _.strSplitNonPreserving( command, self.commandExplicitDelimeter );
+    return _.unrollFrom( result );
+  });
+
+  if( self.implicitCommandsDelimiting )
+  {
+
+    commands = _.filter_( null, commands, ( command ) =>
+    {
+      let result = _.strSplit( command, self.commandImplicitDelimeter );
+
+      for( let i = 1 ; i < result.length-1 ; i += 2 )
+      {
+        result[ i ] = result[ i ] + ' ' + result[ i+1 ];
+        result.splice( i+1, 1 );
+      }
+
+      return _.unrollFrom( result );
+    });
+
+  }
+
+  o.commands = _.arrayFlatten( null, commands );
+
   if( o.propertiesMaps === null || o.propertiesMaps.length === 0 )
   {
     o.propertiesMaps = _.dup( Object.create( null ), o.commands.length );
@@ -265,14 +298,6 @@ function commandsPerform( o )
   {
     o.propertiesMaps = _.arrayFlatten( null, _.arrayAs( o.propertiesMaps ) );
   }
-
-  for( let c = 0 ; c < o.commands.length ; c++ )
-  {
-    let command = o.commands[ c ];
-    _.arrayAppendArray( commands, _.strSplitNonPreserving( command, self.commandDelimeter ) );
-  }
-
-  o.commands = _.arrayFlatten( null, commands );
 
   _.assert( o.commands.length === o.propertiesMaps.length );
   _.assert( o.commands.length !== 0, 'not tested' );
@@ -490,7 +515,7 @@ function commandIsolateSecondFromArgumentLeft( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.(?:(?:\w[^ ]*)|$)\s*/ );
+  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, ca.commandImplicitDelimeter );
   /* qqq : cover please
     dont forget about case : "some/path/Full.stxt ."
   */
@@ -516,7 +541,7 @@ function commandIsolateSecondFromArgumentRight( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.(?:(?:\w[^ ]*)|$)\s*/ );
+  [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, ca.commandImplicitDelimeter );
   /* qqq : cover please
     dont forget about case : "some/path/Full.stxt ."
   */
@@ -761,11 +786,12 @@ let Composes =
   basePath : null,
   commandPrefix : '',
   addingDelimeter : ' ', /* qqq xxx : make it accessor */
-  commandDelimeter : ';',
+  commandExplicitDelimeter : ';',
+  commandImplicitDelimeter : _.define.own( /\s+\.(?:(?:\w[^ ]*)|$)\s*/ ),
   lookingDelimeter : _.define.own([ '.' ]), /* qqq xxx : make it accessor */
-  complexSyntax : 0,
+  complexSyntax : 0, /* xxx : ? */
   supplementingByHelp : 1,
-  commandsSplitting : 0,
+  implicitCommandsDelimiting : 0,
 }
 
 let Aggregates =

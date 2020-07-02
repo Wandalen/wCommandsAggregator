@@ -367,6 +367,90 @@ function severalCommands( test )
   let logger2 = new _.LoggerToString();
   let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ] });
 
+  // /* - */
+  //
+  // test.case = 'implicitCommandsDelimiting : 0, without ;';
+  //
+  // clean();
+  //
+  // var commands =
+  // {
+  //   'command1' : { e : command1 },
+  //   'command2' : { e : command2 },
+  // }
+  //
+  // var ca = _.CommandsAggregator
+  // ({
+  //   commands,
+  //   logger : logger1,
+  //   implicitCommandsDelimiting : 0,
+  // }).form();
+  //
+  // ca.commandsPerform({ commands : '.command1 arg1 arg2 .command2 arg3' });
+  //
+  // commandsClean();
+  //
+  // var exp =
+  // [
+  //   {
+  //     'command' : '.command1 arg1 arg2 .command2 arg3',
+  //     'subject' : '.command1',
+  //     'argument' : 'arg1 arg2 .command2 arg3',
+  //     'propertiesMap' : {}
+  //   },
+  // ]
+  // test.identical( done, exp );
+  // var exp = '';
+  // test.identical( logger2.outputData, exp );
+  //
+  // /* - */
+  //
+  // test.case = 'implicitCommandsDelimiting : 0, with ;';
+  //
+  // clean();
+  //
+  // var commands =
+  // {
+  //   'command1' : { e : command1 },
+  //   'command2' : { e : command2 },
+  // }
+  //
+  // var ca = _.CommandsAggregator
+  // ({
+  //   commands,
+  //   logger : logger1,
+  //   implicitCommandsDelimiting : 0,
+  // }).form();
+  //
+  // ca.commandsPerform({ commands : '.command1 arg1 arg2 ; .command2 arg3' });
+  //
+  // commandsClean();
+  //
+  // var exp =
+  // [
+  //   {
+  //     'command' : '.command1 arg1 arg2',
+  //     'subject' : '.command1',
+  //     'argument' : 'arg1 arg2',
+  //     'propertiesMap' : {}
+  //   },
+  //   {
+  //     'command' : '.command2 arg3',
+  //     'subject' : '.command2',
+  //     'argument' : 'arg3',
+  //     'propertiesMap' : {}
+  //   }
+  // ]
+  // test.identical( done, exp );
+  // var exp = '';
+  // test.identical( logger2.outputData, exp );
+
+  /* - */
+
+  test.case = 'implicitCommandsDelimiting : 1';
+
+  clean();
+
   var commands =
   {
     'command1' : { e : command1 },
@@ -376,33 +460,92 @@ function severalCommands( test )
   var ca = _.CommandsAggregator
   ({
     commands,
-    logger : logger1
+    logger : logger1,
+    implicitCommandsDelimiting : 1,
   }).form();
 
-  debugger;
-  ca.commandPerform({ command : '.command1 arg1 arg2 .command2 arg3' });
-  debugger;
+  ca.commandsPerform({ commands : '.command1 arg1 arg2 .command2 arg3' });
 
-  done.forEach( ( command ) =>
-  {
-    delete command.ca;
-    delete command.subjectDescriptor;
-  });
+  commandsClean();
 
   var exp =
   [
     {
-      'command' : '.command1 arg1 arg2 .command2 arg3',
+      'command' : '.command1 arg1 arg2',
       'subject' : '.command1',
-      'argument' : 'arg1 arg2 .command2 arg3',
+      'argument' : 'arg1 arg2',
       'propertiesMap' : {}
     },
+    {
+      'command' : '.command2 arg3',
+      'subject' : '.command2',
+      'argument' : 'arg3',
+      'propertiesMap' : {}
+    }
   ]
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  debugger;
+  /* - */
+
+  test.case = 'implicitCommandsDelimiting : 1, with "';
+
+  clean();
+
+  var commands =
+  {
+    'command1' : { e : command1 },
+    'command2' : { e : command2 },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    implicitCommandsDelimiting : 1,
+  }).form();
+
+  ca.commandsPerform({ commands : '.command1 arg1 arg2 .command2 arg3' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1 arg1 arg2',
+      'subject' : '.command1',
+      'argument' : 'arg1 arg2',
+      'propertiesMap' : {}
+    },
+    {
+      'command' : '.command2 arg3',
+      'subject' : '.command2',
+      'argument' : 'arg3',
+      'propertiesMap' : {}
+    }
+  ]
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* - */
+
+  function commandsClean()
+  {
+    done.forEach( ( command ) =>
+    {
+      delete command.ca;
+      delete command.subjectDescriptor;
+    });
+  }
+
+  function clean()
+  {
+    logger2.outputData = '';
+    done = [];
+  }
+
 }
 
 // --
