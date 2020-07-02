@@ -7,11 +7,6 @@
   @module Tools/mid/CommandsAggregator
 */
 
-/**
- * @file CommandsAggregator.s.
- */
-
-
 if( typeof module !== 'undefined' )
 {
 
@@ -61,9 +56,6 @@ function init( o )
   if( o )
   self.copy( o );
 
-  // if( self.logger === null )
-  // self.logger = new _.Logger({ output : _global_.logger });
-
 }
 
 //
@@ -82,9 +74,6 @@ function form()
   {
     self.commands.help = { e : self._commandHelp.bind( self ), h : 'Get help' };
   }
-
-  // self._formVocabulary();
-  // self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self ),
 
   self.commandsAdd( self.commands );
 
@@ -213,8 +202,6 @@ function appArgsPerform( o )
   if( !_.strBegins( o.appArgs.subject, '.' ) || _.strBegins( o.appArgs.subject, './' ) || _.strBegins( o.appArgs.subject, '.\\' ) )
   {
     self.onSyntaxError( o );
-    // self.logger.error( 'Illformed request', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
-    // self.onGetHelp();
     return null;
   }
 
@@ -403,10 +390,6 @@ function commandPerformParsed( o )
   if( !subjectDescriptors.length )
   {
     self.onUnknownCommandError( o );
-    // let s = 'Unknown command ' + _.strQuote( o.subject );
-    // if( self.vocabulary.descriptorMap[ 'help' ] )
-    // s += '\nTry ".help"';
-    // throw _.errBrief( s );
     return null;
   }
   else
@@ -417,9 +400,6 @@ function commandPerformParsed( o )
       let e = _.mapExtend( null, o );
       e.filteredSubjectDescriptors = filteredSubjectDescriptors;
       self.onAmbiguity( e );
-      // self.logger.log( 'Ambiguity. Did you mean?' );
-      // self.logger.log( self.vocabulary.helpForSubjectAsString( o.subject ) );
-      // self.logger.log( '' );
     }
     if( filteredSubjectDescriptors.length !== 1 )
     return null;
@@ -512,7 +492,6 @@ function commandIsolateSecondFromArgumentLeft( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  // [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.\w[^ ]*\s*/ );
   [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateLeftOrAll( command, /\s+\.(?:(?:\w[^ ]*)|$)\s*/ );
   /* qqq : cover please
     dont forget about case : "some/path/Full.stxt ."
@@ -539,7 +518,6 @@ function commandIsolateSecondFromArgumentRight( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  // [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.\w[^ ]*\s*/ );
   [ result.argument, result.secondSubject, result.secondArgument  ] = _.strIsolateRightOrAll( command, /\s+\.(?:(?:\w[^ ]*)|$)\s*/ );
   /* qqq : cover please
     dont forget about case : "some/path/Full.stxt ."
@@ -553,21 +531,6 @@ function commandIsolateSecondFromArgumentRight( command )
 
   return result;
 }
-
-// //
-//
-// function commandIsolateSecondFromArgumentDeprecated( subject )
-// {
-//   let ca = this;
-//   let result = Object.create( null );
-//
-//   _.assert( arguments.length === 1 );
-//
-//   [ result.subject, result.del1, result.secondCommand  ] = _.strIsolateLeftOrAll( subject, ' ' );
-//   [ result.secondCommand, result.del2, result.secondSubject  ] = _.strIsolateLeftOrAll( result.secondCommand, ' ' );
-//
-//   return result;
-// }
 
 //
 
@@ -621,6 +584,65 @@ function _commandHelp( e )
   }
 
   return self;
+}
+
+_commandHelp.hint = 'Get help.';
+
+//
+
+function _commandVersion_functor( fop )
+{
+
+  _.routineOptions( _commandVersion_functor, arguments );
+  _.assert( _.strDefined( fop.packageJsonPath ) );
+  _.assert( _.strDefined( fop.packageName ) );
+
+  _commandVersion.hint = 'Get information about version.';
+  return _commandVersion;
+
+  function _commandVersion( e )
+  {
+    let cui = this;
+
+    _.npm.versionLog
+    ({
+      localPath : fop.localPath,
+      remotePath : fop.remotePath,
+    });
+
+    // // let packageJsonPath = path.join( __dirname, '../../../../../package.json' );
+    // let packageJson =  _.fileProvider.fileRead({ filePath : fop.packageJsonPath, encoding : 'json', throwing : 0 });
+    //
+    // return _.process.start
+    // ({
+    //   execPath : `npm view ${fop.packageName} version`,
+    //   outputCollecting : 1,
+    //   outputPiping : 0,
+    //   inputMirroring : 0,
+    //   throwingExitCode : 0,
+    // })
+    // .then( ( got ) =>
+    // {
+    //   let current = packageJson ? packageJson.version : 'unknown';
+    //   let latest = _.strStrip( got.output );
+    //
+    //   if( got.exitCode || !latest )
+    //   latest = 'unknown'
+    //
+    //   logger.log( 'Current version:', current );
+    //   logger.log( 'Available version:', latest );
+    //
+    //   return null;
+    // })
+
+  }
+
+}
+
+_commandVersion_functor.defaults =
+{
+  localPath : null,
+  remotePath : null,
 }
 
 //
@@ -833,9 +855,9 @@ let Extend =
   commandIsolateSecondFromArgument : commandIsolateSecondFromArgumentLeft,
   commandIsolateSecondFromArgumentLeft,
   commandIsolateSecondFromArgumentRight,
-  // commandIsolateSecondFromArgumentDeprecated,
 
   _commandHelp,
+  _commandVersion_functor,
 
   onSyntaxError,
   onAmbiguity,
