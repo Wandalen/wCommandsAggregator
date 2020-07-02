@@ -506,7 +506,7 @@ function severalCommands( test )
     implicitCommandsDelimiting : 1,
   }).form();
 
-  ca.commandsPerform({ commands : '.command1 arg1 arg2 .command2 arg3' });
+  ca.commandsPerform({ commands : '.command1 arg1 "arg2 .command2 arg3" .command2 "arg4" arg5' });
 
   commandsClean();
 
