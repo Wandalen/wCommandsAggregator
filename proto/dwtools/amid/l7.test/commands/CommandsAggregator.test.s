@@ -238,10 +238,10 @@ function commandIsolateSecondFromArgument( test )
   test.case = 'with dot';
   var expected =
   {
-    'commandArgument' : '.module',
-    'secondCommandName' : '.shell',
-    'secondCommandArgument' : 'git status',
-    'secondCommand' : '.shell git status',
+    'commandArgument' : '',
+    'secondCommandName' : '.module',
+    'secondCommandArgument' : '.shell git status',
+    'secondCommand' : '.module .shell git status',
   }
   var got = ca.commandIsolateSecondFromArgument( '.module .shell git status' );
   test.identical( got, expected );
@@ -250,7 +250,6 @@ function commandIsolateSecondFromArgument( test )
   var expected =
   {
     'commandArgument' : 'module git status',
-    'secondCommandName' : undefined,
     'secondCommandArgument' : '',
   };
   var got = ca.commandIsolateSecondFromArgument( 'module git status' );
@@ -260,7 +259,6 @@ function commandIsolateSecondFromArgument( test )
   var expected =
   {
     'commandArgument' : '".module" git status',
-    'secondCommandName' : undefined,
     'secondCommandArgument' : '',
   };
   var got = ca.commandIsolateSecondFromArgument( '".module" git status' );
@@ -275,6 +273,24 @@ function commandIsolateSecondFromArgument( test )
     'secondCommand' : '.resources.list ',
   }
   var got = ca.commandIsolateSecondFromArgument( '"single with space/" .resources.list' );
+  test.identical( got, expected );
+
+  test.case = 'some/path/Full.stxt .';
+  var expected =
+  {
+    'commandArgument' : 'some/path/Full.stxt .',
+    'secondCommandArgument' : '',
+  }
+  var got = ca.commandIsolateSecondFromArgument( 'some/path/Full.stxt .' );
+  test.identical( got, expected );
+
+  test.case = 'some/path/Full.stxt ./';
+  var expected =
+  {
+    'commandArgument' : 'some/path/Full.stxt ./',
+    'secondCommandArgument' : '',
+  }
+  var got = ca.commandIsolateSecondFromArgument( 'some/path/Full.stxt ./' );
   test.identical( got, expected );
 
 }
@@ -353,7 +369,7 @@ function help( test )
 
 //
 
-function severalCommands( test )
+function programPerform( test )
 {
   let done = [];
   let command1 = ( e ) => { done.push( e ); };
@@ -378,9 +394,10 @@ function severalCommands( test )
     commands,
     logger : logger1,
     commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
   }).form();
 
-  ca.commandsPerform({ commands : '.command1 arg1 arg2 .command2 arg3' });
+  ca.programPerform({ program : '.command1 arg1 arg2 .command2 arg3' });
 
   commandsClean();
 
@@ -390,7 +407,8 @@ function severalCommands( test )
       'command' : '.command1 arg1 arg2 .command2 arg3',
       'commandName' : '.command1',
       'commandArgument' : 'arg1 arg2 .command2 arg3',
-      'propertiesMap' : {}
+      'subject' : 'arg1 arg2 .command2 arg3',
+      'propertiesMap' : {},
     },
   ]
   test.identical( done, exp );
@@ -414,9 +432,10 @@ function severalCommands( test )
     commands,
     logger : logger1,
     commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
   }).form();
 
-  ca.commandsPerform({ commands : '.command1 arg1 arg2 ; .command2 arg3' });
+  ca.programPerform({ program : '.command1 arg1 arg2 ; .command2 arg3' });
 
   commandsClean();
 
@@ -426,12 +445,14 @@ function severalCommands( test )
       'command' : '.command1 arg1 arg2',
       'commandName' : '.command1',
       'commandArgument' : 'arg1 arg2',
+      'subject' : 'arg1 arg2',
       'propertiesMap' : {}
     },
     {
       'command' : '.command2 arg3',
       'commandName' : '.command2',
       'commandArgument' : 'arg3',
+      'subject' : 'arg3',
       'propertiesMap' : {}
     }
   ]
@@ -456,9 +477,10 @@ function severalCommands( test )
     commands,
     logger : logger1,
     commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
   }).form();
 
-  ca.commandsPerform({ commands : '.command1 arg1 arg2 .command2 arg3' });
+  ca.programPerform({ program : '.command1 arg1 arg2 .command2 arg3' });
 
   commandsClean();
 
@@ -468,12 +490,14 @@ function severalCommands( test )
       'command' : '.command1 arg1 arg2',
       'commandName' : '.command1',
       'commandArgument' : 'arg1 arg2',
+      'subject' : 'arg1 arg2',
       'propertiesMap' : {}
     },
     {
       'command' : '.command2 arg3',
       'commandName' : '.command2',
       'commandArgument' : 'arg3',
+      'subject' : 'arg3',
       'propertiesMap' : {}
     }
   ]
@@ -498,9 +522,10 @@ function severalCommands( test )
     commands,
     logger : logger1,
     commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
   }).form();
 
-  ca.commandsPerform({ commands : '.command1 arg1 "arg2 .command2 arg3" .command2 "arg4 arg5" arg6' });
+  ca.programPerform({ program : '.command1 arg1 "arg2 .command2 arg3" .command2 "arg4 arg5" arg6' });
 
   commandsClean();
 
@@ -510,12 +535,14 @@ function severalCommands( test )
       'command' : '.command1 arg1 "arg2 .command2 arg3"',
       'commandName' : '.command1',
       'commandArgument' : 'arg1 "arg2 .command2 arg3"',
+      'subject' : 'arg1 "arg2 .command2 arg3"',
       'propertiesMap' : {}
     },
     {
       'command' : '.command2 "arg4 arg5" arg6',
       'commandName' : '.command2',
       'commandArgument' : '"arg4 arg5" arg6',
+      'subject' : '"arg4 arg5" arg6',
       'propertiesMap' : {}
     },
   ]
@@ -540,9 +567,10 @@ function severalCommands( test )
     commands,
     logger : logger1,
     commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
   }).form();
 
-  ca.commandsPerform({ commands : '.command1 arg1 "arg2 .command2 arg3" .command2 "arg4 ; arg5" arg6 ; .command1 key:val' });
+  ca.programPerform({ program : '.command1 arg1 "arg2 .command2 arg3" .command2 "arg4 ; arg5" arg6 ; .command1 key:val' });
 
   commandsClean();
 
@@ -552,24 +580,265 @@ function severalCommands( test )
       'command' : '.command1 arg1 "arg2 .command2 arg3"',
       'commandName' : '.command1',
       'commandArgument' : 'arg1 "arg2 .command2 arg3"',
+      'subject' : 'arg1 "arg2 .command2 arg3"',
       'propertiesMap' : {}
     },
     {
       'command' : '.command2 "arg4 ; arg5" arg6',
       'commandName' : '.command2',
       'commandArgument' : '"arg4 ; arg5" arg6',
+      'subject' : '"arg4 ; arg5" arg6',
       'propertiesMap' : {}
     },
     {
       'command' : '.command1 key:val',
       'commandName' : '.command1',
       'commandArgument' : 'key:val',
+      'subject' : '',
+      'propertiesMap' : { 'key' : 'val' }
+    },
+  ]
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* - */
+
+  test.case = 'commandsImplicitDelimiting : 1, trivial triplet';
+
+  clean();
+
+  var commands =
+  {
+    'command1' : { e : command1 },
+    'command2' : { e : command2 },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+  }).form();
+
+  ca.programPerform({ program : '.command1 .command2 .command1' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1',
+      'commandName' : '.command1',
+      'commandArgument' : '',
+      'subject' : '',
+      'propertiesMap' : {}
+    },
+    {
+      'command' : '.command2',
+      'commandName' : '.command2',
+      'commandArgument' : '',
+      'subject' : '',
+      'propertiesMap' : {}
+    },
+    {
+      'command' : '.command1',
+      'commandName' : '.command1',
+      'commandArgument' : '',
+      'subject' : '',
       'propertiesMap' : {}
     },
   ]
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
+
+  /* - */
+
+  test.case = 'complex without subject';
+
+  clean();
+
+  var commands =
+  {
+    'command1' : { e : command1 },
+    'command2' : { e : command2 },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+  }).form();
+
+  ca.programPerform({ program : '.command1 filePath:before/** ins:line sub:abc .command2 .command1' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1 filePath:before/** ins:line sub:abc',
+      'commandName' : '.command1',
+      'commandArgument' : 'filePath:before/** ins:line sub:abc',
+      'subject' : '',
+      'propertiesMap' : { 'filePath' : 'before/**', 'ins' : 'line', 'sub' : 'abc' }
+    },
+    {
+      'command' : '.command2',
+      'commandName' : '.command2',
+      'commandArgument' : '',
+      'subject' : '',
+      'propertiesMap' : {}
+    },
+    {
+      'command' : '.command1',
+      'commandName' : '.command1',
+      'commandArgument' : '',
+      'subject' : '',
+      'propertiesMap' : {}
+    }
+  ]
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* - */
+
+  test.case = 'complex with subject';
+
+  clean();
+
+  var commands =
+  {
+    'command1' : { e : command1 },
+    'command2' : { e : command2 },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+  }).form();
+
+  ca.programPerform({ program : '.command1  some subject  filePath:before/** ins:line sub:abc .command2 .command1' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1 some subject  filePath:before/** ins:line sub:abc', /* qqq : does not look right! */
+      'commandName' : '.command1',
+      'commandArgument' : 'some subject  filePath:before/** ins:line sub:abc',
+      'subject' : 'some subject ',
+      'propertiesMap' : { 'filePath' : 'before/**', 'ins' : 'line', 'sub' : 'abc' }
+    },
+    {
+      'command' : '.command2',
+      'commandName' : '.command2',
+      'commandArgument' : '',
+      'subject' : '',
+      'propertiesMap' : {}
+    },
+    {
+      'command' : '.command1',
+      'commandName' : '.command1',
+      'commandArgument' : '',
+      'subject' : '',
+      'propertiesMap' : {}
+    }
+  ]
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* - */
+
+  test.case = 'several values';
+
+  clean();
+
+  var commands =
+  {
+    'command1' : { e : command1 },
+    'command2' : { e : command2 },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+  }).form();
+
+  ca.programPerform({ program : '.command1 a:1 b:2 a:3 a:x .command2 a:4 a:a' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1 a:1 b:2 a:3 a:x',
+      'commandName' : '.command1',
+      'commandArgument' : 'a:1 b:2 a:3 a:x',
+      'subject' : '',
+      'propertiesMap' :
+      {
+        'a' : [ 1, 3, 'x' ],
+        'b' : 2,
+      }
+    },
+    {
+      'command' : '.command2 a:4 a:a',
+      'commandName' : '.command2',
+      'commandArgument' : 'a:4 a:a',
+      'subject' : '',
+      'propertiesMap' :
+      {
+        'a' : [ 4, 'a' ],
+      }
+    }
+  ]
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'notcommand prefix';
+
+  clean();
+
+  var commands =
+  {
+    'command1' : { e : command1 },
+    'command2' : { e : command2 },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+    changingExitCode : 0,
+  }).form();
+
+  test.shouldThrowErrorOfAnyKind
+  (
+    () => ca.programPerform({ program : 'notcommand .command1' }),
+    ( err ) => test.identical( _.strCount( err.message, 'Unknown command "notcommand"' ), 1 ),
+  );
 
   /* - */
 
@@ -607,7 +876,7 @@ var Self =
     perform,
     commandIsolateSecondFromArgument,
     help,
-    severalCommands,
+    programPerform,
 
   }
 

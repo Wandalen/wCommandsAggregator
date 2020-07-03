@@ -243,6 +243,7 @@ function programPerform( o )
   {
     let o2 = _.mapOnly( o, commandsParse.defaults );
     o2.commands = o.program;
+    o2.propertiesMapParsing = 1;
     parsedCommands = self.commandsParse( o2 );
   }
 
@@ -297,11 +298,30 @@ function commandsParse( o )
 
     commands = _.filter_( null, commands, ( command ) =>
     {
-      let result = _.strSplit( command, self.commandImplicitDelimeter );
+      let result = _.strSplit
+      ({
+        src : command,
+        delimeter : self.commandImplicitDelimeter,
+        onDelimeter : ( del ) =>
+        {
+          debugger;
+          return [ del ];
+        }
+      });
 
-      for( let i = 1 ; i < result.length-1 ; i += 2 )
+      result[ 0 ] = result[ 0 ].trim();
+
+      if( result[ 0 ].length )
       {
-        result[ i ] = result[ i ] + ' ' + result[ i+1 ];
+      }
+      else
+      {
+        result.splice( 0, 1 );
+      }
+
+      for( let i = 0 ; i < result.length-1 ; i += 1 )
+      {
+        result[ i ] = ( result[ i ].trim() + ' ' + result[ i+1 ].trim() ).trim();
         result.splice( i+1, 1 );
       }
 
@@ -318,7 +338,7 @@ function commandsParse( o )
   {
     let command = commands[ c ];
     let propertiesMap = o.propertiesMaps ? o.propertiesMaps[ c ] : null;
-    parsedCommands.push( self.commandParse({ command : command, propertiesMap }) );
+    parsedCommands.push( self.commandParse({ command : command, propertiesMap, propertiesMapParsing : o.propertiesMapParsing }) );
   }
 
   return parsedCommands
@@ -349,6 +369,8 @@ function commandParse( o )
 
   if( o.propertiesMapParsing === null )
   o.propertiesMapParsing = self.propertiesMapParsing;
+  if( o.severalValues === null )
+  o.severalValues = self.severalValues;
 
   let splits = _.strIsolateLeftOrAll( o.command, ' ' );
   let commandName = splits[ 0 ];
@@ -367,14 +389,13 @@ function commandParse( o )
   if( o.propertiesMapParsing )
   {
 
-    debugger;
     let request = _.strRequestParse
     ({
       src : commandArgument,
       commandsDelimeter : false,
+      severalValues : o.severalValues,
     });
 
-    debugger;
     parsed.propertiesMap = _.mapExtend( parsed.propertiesMap || null, request.map );
     parsed.subject = request.subject
 
@@ -388,6 +409,7 @@ commandParse.defaults =
   command : null,
   propertiesMap : null,
   propertiesMapParsing : null,
+  severalValues : null,
 }
 
 //
@@ -418,44 +440,7 @@ function commandsPerform( o )
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
 
-  // if( o.commandsImplicitDelimiting === null )
-  // o.commandsImplicitDelimiting = self.commandsImplicitDelimiting;
-
   o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
-
-  // for( let c = 0 ; c < o.commands.length ; c++ )
-  // {
-  //   let command = o.commands[ c ];
-  //   _.arrayAppendArray( commands, _.strSplitNonPreserving( command, self.commandExplicitDelimeter ) );
-  // }
-
-  // commands = o.commands;
-  // commands = _.filter_( null, commands, ( command ) =>
-  // {
-  //   let result = _.strSplitNonPreserving( command, self.commandExplicitDelimeter );
-  //   return _.unrollFrom( result );
-  // });
-  //
-  // debugger;
-  // if( o.commandsImplicitDelimiting )
-  // {
-  //
-  //   commands = _.filter_( null, commands, ( command ) =>
-  //   {
-  //     let result = _.strSplit( command, self.commandImplicitDelimeter );
-  //
-  //     for( let i = 1 ; i < result.length-1 ; i += 2 )
-  //     {
-  //       result[ i ] = result[ i ] + ' ' + result[ i+1 ];
-  //       result.splice( i+1, 1 );
-  //     }
-  //
-  //     return _.unrollFrom( result );
-  //   });
-  //
-  // }
-  //
-  // o.commands = _.arrayFlatten( null, commands );
 
   if( o.propertiesMaps === null || o.propertiesMaps.length === 0 )
   {
@@ -487,8 +472,6 @@ commandsPerform.defaults =
 {
   commands : null,
   propertiesMaps : null,
-  // commandsImplicitDelimiting : null,
-  // commandsExplicitDelimiting : null,
 }
 
 //
@@ -516,33 +499,14 @@ function commandPerform( o )
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
 
-  // let splits = _.strIsolateLeftOrAll( o.command, ' ' );
-  // // let subject = splits[ 0 ]; /* yyy */
-  // // let argument = splits[ 2 ];
-  // let commandName = splits[ 0 ];
-  // let commandArgument = splits[ 2 ];
-  //
-  // o.propertiesMap = o.propertiesMap || Object.create( null );
-
   let parsedCommand = self.commandParse( o );
-
   let result = self.commandPerformParsed( parsedCommand );
-
-  // ({
-  //   command : o.command,
-  //   commandName,
-  //   commandArgument,
-  //   propertiesMap : o.propertiesMap,
-  //   // prev : o.prev,
-  // });
-
   return result;
 }
 
 commandPerform.defaults =
 {
   command : null,
-  // prev : null,
   propertiesMap : null,
 }
 
@@ -613,6 +577,7 @@ function commandPerformParsed( o )
       command : o.command,
       commandName : o.commandName,
       commandArgument : o.commandArgument,
+      subject : o.subject,
       propertiesMap : o.propertiesMap,
       ca : self,
       subjectDescriptor : subjectDescriptor,
@@ -636,14 +601,11 @@ function commandPerformParsed( o )
 
 commandPerformParsed.defaults =
 {
-
   command : null,
   commandName : null,
   commandArgument : null,
   propertiesMap : null,
   subject : null,
-  // prev : null,
-
 }
 
 //
@@ -691,12 +653,18 @@ function commandIsolateSecondFromArgumentLeft( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
+  debugger;
   [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = _.strIsolateLeftOrAll( command, ca.commandImplicitDelimeter );
-  /* qqq : cover please
-    dont forget about case : "some/path/Full.stxt ."
-  */
+  debugger;
+
+  if( result.secondCommandName === undefined )
+  delete result.secondCommandName;
 
   result.commandArgument = _.strUnquote( result.commandArgument.trim() );
+  if( result.secondCommandName )
+  result.secondCommandName = result.secondCommandName.trim();
+  if( result.secondCommandArgument )
+  result.secondCommandArgument = result.secondCommandArgument.trim();
 
   if( result.secondCommandName )
   {
@@ -718,9 +686,15 @@ function commandIsolateSecondFromArgumentRight( command )
   _.assert( _.strIs( command ) );
 
   [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = _.strIsolateRightOrAll( command, ca.commandImplicitDelimeter );
-  /* qqq : cover please
-    dont forget about case : "some/path/Full.stxt ."
-  */
+
+  if( result.secondCommandName === undefined )
+  delete result.secondCommandName;
+
+  result.commandArgument = _.strUnquote( result.commandArgument.trim() );
+  if( result.secondCommandName )
+  result.secondCommandName = result.secondCommandName.trim();
+  if( result.secondCommandArgument )
+  result.secondCommandArgument = result.secondCommandArgument.trim();
 
   if( result.secondCommandName )
   {
@@ -823,7 +797,9 @@ _commandVersion_functor.defaults =
 function onAmbiguity( o )
 {
   let self = this;
+
   /* qqq : cover the case. check appExitCode. test should be external ( launch process ) */
+  if( self.changingExitCode )
   _.process.exitCode( -1 );
 
   self.logger.log( 'Ambiguity. Did you mean?' );
@@ -839,8 +815,11 @@ onAmbiguity.defaults = Object.create( appArgsPerform.defaults );
 function onUnknownCommandError( o )
 {
   let self = this;
+
   /* qqq : cover the case. check appExitCode. test should be external ( launch process ) */
+  if( self.changingExitCode )
   _.process.exitCode( -1 );
+
   let s = 'Unknown command ' + _.strQuote( o.commandName );
   if( self.vocabulary.descriptorMap[ 'help' ] )
   s += '\nTry ".help"';
@@ -854,8 +833,11 @@ onUnknownCommandError.defaults = Object.create( commandPerformParsed.defaults );
 function onSyntaxError( o )
 {
   let self = this;
+
   /* qqq : cover the case. check appExitCode. test should be external ( launch process ) */
+  if( self.changingExitCode )
   _.process.exitCode( -1 );
+
   self.logger.error( 'Illformed command', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
   self.onGetHelp();
 }
@@ -935,6 +917,7 @@ function _onPhraseDescriptorMake( src )
 
   if( _.routineIs( executable ) )
   {
+    // debugger;
     result.executable = executable;
     if( executable.hint )
     {
@@ -942,6 +925,9 @@ function _onPhraseDescriptorMake( src )
       result.hint = executable.hint;
     }
     _.assertMapHasOnly( executable, knownFields, () => `Unknown field of command "${result.phrase}" :` );
+    // executable.commandDescriptor = result;
+    // if( executable.originalRoutine )
+    // executable.originalRoutine.commandDescriptor = result;
   }
   else
   {
@@ -963,12 +949,15 @@ let Composes =
   commandPrefix : '',
   addingDelimeter : ' ', /* qqq xxx : make it accessor */ /* qqq xxx : make possilbe both ":.command.postfix" and "command postfix" in definition of commands */
   commandExplicitDelimeter : ';',
-  commandImplicitDelimeter : _.define.own( /\s+\.(?:(?:\w[^ ]*)|$)\s*/ ),
-  propertiesMapParsing : 0,
+  commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]+))/ ),
+  // commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]*)|$)/ ), /* yyy */
   commandsExplicitDelimiting : 1,
   commandsImplicitDelimiting : 0,
+  propertiesMapParsing : 0,
+  severalValues : 1,
   lookingDelimeter : _.define.own([ '.' ]), /* qqq xxx : make it accessor */
   supplementingByHelp : 1,
+  changingExitCode : 1,
 }
 
 let Aggregates =
