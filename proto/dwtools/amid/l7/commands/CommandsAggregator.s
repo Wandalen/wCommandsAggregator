@@ -889,12 +889,12 @@ function _onPhraseDescriptorMake( src )
   let result = Object.create( null );
   let phrase = src;
   let executable = null;
-  let knownFields =
-  {
-    hint : null,
-    defaults : null,
-    commandProperties : null,
-  }
+  // let knownFields =
+  // {
+  //   hint : null,
+  //   defaults : null,
+  //   commandProperties : null,
+  // }
 
   if( phrase )
   {
@@ -924,7 +924,7 @@ function _onPhraseDescriptorMake( src )
       _.assert( result.hint === undefined || result.hint === null || result.hint === hint );
       result.hint = executable.hint;
     }
-    _.assertMapHasOnly( executable, knownFields, () => `Unknown field of command "${result.phrase}" :` );
+    _.assertMapHasOnly( executable, self.CommandRoutineFields, () => `Unknown field of command "${result.phrase}" :` );
     // executable.commandDescriptor = result;
     // if( executable.originalRoutine )
     // executable.originalRoutine.commandDescriptor = result;
@@ -942,6 +942,14 @@ function _onPhraseDescriptorMake( src )
 // --
 //
 // --
+
+let CommandRoutineFields =
+{
+  defaults : null,
+  hint : null,
+  commandSubjectHint : null,
+  commandProperties : null,
+}
 
 let Composes =
 {
@@ -983,6 +991,7 @@ let Restricts =
 
 let Statics =
 {
+  CommandRoutineFields,
 }
 
 let Forbids =
@@ -1037,6 +1046,7 @@ let Extend =
 
   //
 
+  CommandRoutineFields,
   Composes,
   Aggregates,
   Associates,
