@@ -199,7 +199,7 @@ function appArgsPerform( o )
   if( !o.allowingDotless )
   if( !_.strBegins( o.appArgs.subject, '.' ) || _.strBegins( o.appArgs.subject, './' ) || _.strBegins( o.appArgs.subject, '.\\' ) )
   {
-    self.onSyntaxError( o );
+    self.onSyntaxError({ command : o.appArgs.subject });
     return null;
   }
 
@@ -239,6 +239,22 @@ function programPerform( o )
   _.assert( _.strIs( o.program ) );
   _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
+
+  o.program = o.program.trim();
+
+  if( !o.allowingDotless )
+  if( !_.strBegins( o.program, '.' ) || _.strBegins( o.program, './' ) || _.strBegins( o.program, '.\\' ) )
+  {
+    self.onSyntaxError({ command : o.program });
+    return null;
+  }
+
+  if( o.printingEcho )
+  {
+    self.logger.rbegin({ verbosity : -1 });
+    self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
+    self.logger.rend({ verbosity : -1 });
+  }
 
   {
     let o2 = _.mapOnly( o, commandsParse.defaults );
@@ -653,9 +669,7 @@ function commandIsolateSecondFromArgumentLeft( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  debugger;
   [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = _.strIsolateLeftOrAll( command, ca.commandImplicitDelimeter );
-  debugger;
 
   if( result.secondCommandName === undefined )
   delete result.secondCommandName;
@@ -838,11 +852,16 @@ function onSyntaxError( o )
   if( self.changingExitCode )
   _.process.exitCode( -1 );
 
-  self.logger.error( 'Illformed command', self.logger.colorFormat( _.strQuote( o.appArgs.subject ), 'code' ) );
+  self.logger.error( 'Illformed command', self.logger.colorFormat( _.strQuote( o.command ), 'code' ) );
   self.onGetHelp();
 }
 
-onSyntaxError.defaults = Object.create( appArgsPerform.defaults );
+onSyntaxError.defaults =
+{
+  command : null,
+}
+
+// onSyntaxError.defaults = Object.create( appArgsPerform.defaults );
 
 //
 

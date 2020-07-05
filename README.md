@@ -1,5 +1,5 @@
 
-# wCommandsAggregator [![Build Status](https://travis-ci.org/Wandalen/wCommandsAggregator.svg?branch=master)](https://travis-ci.org/Wandalen/wCommandsAggregator)
+# module::CommandsAggregator [![Status](https://github.com/Wandalen/wCommandsAggregator/workflows/Test/badge.svg)](https://github.com/Wandalen/wCommandsAggregator}/actions?query=workflow%3ATest)
 
 Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.
 
