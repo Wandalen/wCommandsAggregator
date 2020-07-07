@@ -812,6 +812,44 @@ function programPerform( test )
 
   /* - */
 
+  test.case = 'quoted complex';
+
+  clean();
+
+  var commands =
+  {
+    'command1' : { e : command1 },
+    'command2' : { e : command2 },
+  }
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+  }).form();
+
+  ca.programPerform({ program : `.command1 "path/key 1":val1 "path/key 2":val2 "path/key3":'val3'` });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : `.command1 "path/key 1":val1 "path/key 2":val2 "path/key3":'val3'`,
+      'commandName' : '.command1',
+      'commandArgument' : `"path/key 1":val1 "path/key 2":val2 "path/key3":'val3'`,
+      'subject' : '',
+      'propertiesMap' : { 'path/key 2' : 'val2', 'path/key 1' : 'val1', 'path/key3' : 'val3' }
+    }
+  ]
+  test.identical( done, exp ); /* xxx qqq : should work after fix of strRequestParse */
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* - */
+
   if( !Config.debug )
   return;
 
@@ -834,10 +872,11 @@ function programPerform( test )
     changingExitCode : 0,
   }).form();
 
+
   test.shouldThrowErrorOfAnyKind
   (
     () => ca.programPerform({ program : 'notcommand .command1' }),
-    ( err ) => test.identical( _.strCount( err.message, 'Unknown command "notcommand"' ), 1 ),
+    ( err ) => test.identical( _.strCount( err.message, 'Illformed command' ), 1 ),
   );
 
   /* - */

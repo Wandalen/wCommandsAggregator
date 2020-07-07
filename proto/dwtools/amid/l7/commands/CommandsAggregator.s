@@ -852,8 +852,10 @@ function onSyntaxError( o )
   if( self.changingExitCode )
   _.process.exitCode( -1 );
 
-  self.logger.error( 'Illformed command', self.logger.colorFormat( _.strQuote( o.command ), 'code' ) );
+  let err = _.errBrief( 'Illformed command', self.logger.colorFormat( _.strQuote( o.command ), 'code' ) );
+  self.logger.error( err );
   self.onGetHelp();
+  throw err;
 }
 
 onSyntaxError.defaults =
@@ -982,7 +984,7 @@ let Composes =
   commandsImplicitDelimiting : 0,
   propertiesMapParsing : 0,
   severalValues : 1,
-  lookingDelimeter : _.define.own([ '.' ]), /* qqq xxx : make it accessor */
+  lookingDelimeter : _.define.own([ '.', ' ' ]), /* qqq xxx : make it accessor */
   supplementingByHelp : 1,
   changingExitCode : 1,
 }
