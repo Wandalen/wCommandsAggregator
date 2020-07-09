@@ -4,8 +4,8 @@
   "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "license" : "MIT",
-  "main" : "proto/dwtools/amid/l7/commands/CommandsAggregator.s",
-  "files" : [ "proto/dwtools/amid/l7", "proto/dwtools/Tools.s", "out" ],
+  "main" : "proto/wtools/amid/l7/commands/CommandsAggregator.s",
+  "files" : [ "proto/wtools/amid/l7", "proto/wtools/Tools.s", "out" ],
   "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen proto" },
   "repository" :
   {
