@@ -318,11 +318,10 @@ function commandsParse( o )
       ({
         src : command,
         delimeter : self.commandImplicitDelimeter,
-        onDelimeter : ( del ) =>
-        {
-          debugger;
-          return [ del ];
-        }
+        // onDelimeter : ( del ) =>
+        // {
+        //   return [ del ];
+        // }
       });
 
       result[ 0 ] = result[ 0 ].trim();
@@ -335,6 +334,7 @@ function commandsParse( o )
         result.splice( 0, 1 );
       }
 
+      debugger;
       for( let i = 0 ; i < result.length-1 ; i += 1 )
       {
         result[ i ] = ( result[ i ].trim() + ' ' + result[ i+1 ].trim() ).trim();
