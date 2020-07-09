@@ -334,7 +334,6 @@ function commandsParse( o )
         result.splice( 0, 1 );
       }
 
-      debugger;
       for( let i = 0 ; i < result.length-1 ; i += 1 )
       {
         result[ i ] = ( result[ i ].trim() + ' ' + result[ i+1 ].trim() ).trim();
