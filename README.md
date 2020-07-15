@@ -6,7 +6,7 @@ Class aggregating several applications into single CLI. It can aggregate externa
 ## Try out
 ```
 npm install
-node sample/Sample.js
+node sample/Sample.s
 ```
 
 
