@@ -263,10 +263,22 @@ function programPerform( o )
     parsedCommands = self.commandsParse( o2 );
   }
 
-  for( let c = 0 ; c < parsedCommands.length ; c++ )
+  if( o.withParsed )
   {
-    let parsedCommand = parsedCommands[ c ];
-    con.then( () => self.commandPerformParsed( parsedCommand ) );
+    for( let c = 0 ; c < parsedCommands.length ; c++ )
+    {
+      let parsedCommand = parsedCommands[ c ];
+      parsedCommand.parsedCommands = parsedCommands;
+      con.then( () => self.commandPerformParsed( parsedCommand ) );
+    }
+  }
+  else
+  {
+    for( let c = 0 ; c < parsedCommands.length ; c++ )
+    {
+      let parsedCommand = parsedCommands[ c ];
+      con.then( () => self.commandPerformParsed( parsedCommand ) );
+    }
   }
 
   return con;
@@ -277,6 +289,7 @@ programPerform.defaults =
   program : null,
   commandsImplicitDelimiting : null,
   commandsExplicitDelimiting : null,
+  withParsed : 1,
 }
 
 //
@@ -596,6 +609,7 @@ function commandPerformParsed( o )
       propertiesMap : o.propertiesMap,
       ca : self,
       subjectDescriptor : subjectDescriptor,
+      parsedCommands : o.parsedCommands,
     });
   }
   else
@@ -621,6 +635,7 @@ commandPerformParsed.defaults =
   commandArgument : null,
   propertiesMap : null,
   subject : null,
+  parsedCommands : null,
 }
 
 //
