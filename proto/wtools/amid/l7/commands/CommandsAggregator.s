@@ -289,7 +289,7 @@ programPerform.defaults =
   program : null,
   commandsImplicitDelimiting : null,
   commandsExplicitDelimiting : null,
-  withParsed : 1,
+  withParsed : 0,
 }
 
 //
@@ -600,8 +600,8 @@ function commandPerformParsed( o )
   let executable = subjectDescriptor.phraseDescriptor.executable;
   if( _.routineIs( executable ) )
   {
-    result = executable
-    ({
+    let o2 =
+    {
       command : o.command,
       commandName : o.commandName,
       commandArgument : o.commandArgument,
@@ -609,8 +609,10 @@ function commandPerformParsed( o )
       propertiesMap : o.propertiesMap,
       ca : self,
       subjectDescriptor : subjectDescriptor,
-      parsedCommands : o.parsedCommands,
-    });
+    };
+    if( o.parsedCommands )
+    o2.parsedCommands = o.parsedCommands;
+    result = executable( o2 );
   }
   else
   {
