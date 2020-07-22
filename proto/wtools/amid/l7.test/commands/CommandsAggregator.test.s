@@ -1,4 +1,5 @@
-( function _CommandsAggregator_test_s_() {
+( function _CommandsAggregator_test_s_(  )
+{
 
 'use strict';
 
@@ -50,7 +51,7 @@ function trivial( test )
   appArgs.maps = [ appArgs.map ];
   appArgs.subjects = [ 'action1' ];
   done = 0;
-  ca.appArgsPerform({ appArgs : appArgs, allowingDotless : 1 });
+  ca.appArgsPerform({ appArgs, allowingDotless : 1 });
   test.identical( done, 1 );
 
   var appArgs = Object.create( null );
@@ -58,7 +59,7 @@ function trivial( test )
   appArgs.map = { help : true };
   appArgs.maps = [ appArgs.map ];
   appArgs.subjects = [ 'help' ];
-  ca.appArgsPerform({ appArgs : appArgs, allowingDotless : 1 });
+  ca.appArgsPerform({ appArgs, allowingDotless : 1 });
   test.identical( done, 1 );
 
   var appArgs = Object.create( null );
@@ -67,7 +68,7 @@ function trivial( test )
   appArgs.subject = 'action2';
   appArgs.subjects = [ 'action2' ];
 
-  return ca.appArgsPerform({ appArgs : appArgs, allowingDotless : 1 })
+  return ca.appArgsPerform({ appArgs, allowingDotless : 1 })
   .finally( function( err, arg )
   {
     test.is( !err );
@@ -77,7 +78,7 @@ function trivial( test )
     appArgs.maps = [ appArgs.map ];
     appArgs.subject = '.action3';
     appArgs.subjects = [ '.action3' ];
-    return ca.appArgsPerform({ appArgs : appArgs });
+    return ca.appArgsPerform({ appArgs });
   })
 
   return result;
@@ -148,7 +149,7 @@ function perform( test )
   var appArgs = Object.create( null );
   appArgs.subject = '.with path to dir .list all';
   done = 0;
-  ca.appArgsPerform({ appArgs : appArgs });
+  ca.appArgsPerform({ appArgs });
   test.identical( done, 2 );
 
   /* */
@@ -305,8 +306,8 @@ function help( test )
   var Commands =
   {
     'help' : { e : commandHelp, h : 'Get help.' },
-    'action' : { e : execCommand, h :'action' },
-    'action first' : { e : execCommand, h :'action first' },
+    'action' : { e : execCommand, h : 'action' },
+    'action first' : { e : execCommand, h : 'action first' },
   }
 
   let logger2 = new _.LoggerToString();
