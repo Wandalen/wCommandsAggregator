@@ -1,5 +1,5 @@
 
-# module::CommandsAggregator [![Status](https://github.com/Wandalen/wCommandsAggregator/workflows/publish/badge.svg)](https://github.com/Wandalen/wCommandsAggregator/actions?query=workflow%3Apublish) [![experimental](https://img.shields.io/badge/stability-experimental-orange.svg)](https://github.com/emersion/stability-badges#experimental)
+# module::CommandsAggregator [![Status](https://github.com/Wandalen/wCommandsAggregator/workflows/publish/badge.svg)](https://github.com/Wandalen/wCommandsAggregator/actions?query=workflow%3Apublish) [![stability-stable](https://img.shields.io/badge/stability-stable-green.svg)](https://github.com/emersion/stability-badges#stable)
 
 Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.
 

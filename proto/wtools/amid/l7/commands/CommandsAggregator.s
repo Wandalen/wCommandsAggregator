@@ -995,7 +995,8 @@ let Composes =
   commandPrefix : '',
   addingDelimeter : ' ', /* qqq xxx : make it accessor */ /* qqq xxx : make possilbe both ":.command.postfix" and "command postfix" in definition of commands */
   commandExplicitDelimeter : ';',
-  commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]+))/ ),
+  commandImplicitDelimeter : _.define.own( /(\s|^)\.\w[\w\.]*[^ \\\/\*\?](\s|$)/ ),
+  // commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]+))/ ),
   // commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]*)|$)/ ), /* yyy */
   commandsExplicitDelimiting : 1,
   commandsImplicitDelimiting : 0,
