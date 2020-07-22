@@ -252,7 +252,7 @@ function programPerform( o )
   if( o.printingEcho )
   {
     self.logger.rbegin({ verbosity : -1 });
-    self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
+    self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.program ), 'code' ) );
     self.logger.rend({ verbosity : -1 });
   }
 
@@ -289,6 +289,7 @@ programPerform.defaults =
   program : null,
   commandsImplicitDelimiting : null,
   commandsExplicitDelimiting : null,
+  printingEcho : 1,
   withParsed : 0,
 }
 
