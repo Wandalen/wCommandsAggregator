@@ -15,6 +15,7 @@ about :
   author : 'Kostiantyn Wandalen <wanalen@01.school>'
   contributors :
   - 'Kostiantyn Wandalen <wanalen@01.school>'
+  - 'Dmytro Kryvoruchko <dm.vict.kr@gmail.com>'
   npm.name : 'wcommandsaggregator'
   npm.scripts :
     test : 'wtest .run proto/**'

@@ -22,4 +22,24 @@ var ca = _.CommandsAggregator
   commandPrefix : 'node ',
 }).form();
 
-ca.exec();
+/* run first command */
+
+var appArgs = Object.create( null );
+appArgs.subject = '.action.first';
+appArgs.map = { 'action first' : true };
+appArgs.maps = [ appArgs.map ];
+appArgs.subjects = [ '.action.first' ];
+ca.appArgsPerform({ appArgs, allowingDotless : 0 });
+/* log : executable1 */
+
+/* run second command */
+
+var appArgs = Object.create( null );
+appArgs.subject = '.action.second';
+ca.appArgsPerform({ appArgs, allowingDotless : 0 });
+/* log :
+ > node /.../wCommandsAggregator/sample/Action2.s .action.second
+Action2
+ */
+
+
