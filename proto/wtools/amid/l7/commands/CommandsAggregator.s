@@ -1,4 +1,5 @@
-( function _CommandsAggregator_s_() {
+( function _CommandsAggregator_s_()
+{
 
 'use strict';
 
@@ -111,7 +112,7 @@ function exec()
 {
   let self = this;
   let appArgs = _.process.args();
-  return self.appArgsPerform({ appArgs : appArgs });
+  return self.appArgsPerform({ appArgs });
 }
 
 //
@@ -252,7 +253,7 @@ function programPerform( o )
   if( o.printingEcho )
   {
     self.logger.rbegin({ verbosity : -1 });
-    self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
+    self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.program ), 'code' ) );
     self.logger.rend({ verbosity : -1 });
   }
 
@@ -263,10 +264,22 @@ function programPerform( o )
     parsedCommands = self.commandsParse( o2 );
   }
 
-  for( let c = 0 ; c < parsedCommands.length ; c++ )
+  if( o.withParsed )
   {
-    let parsedCommand = parsedCommands[ c ];
-    con.then( () => self.commandPerformParsed( parsedCommand ) );
+    for( let c = 0 ; c < parsedCommands.length ; c++ )
+    {
+      let parsedCommand = parsedCommands[ c ];
+      parsedCommand.parsedCommands = parsedCommands;
+      con.then( () => self.commandPerformParsed( parsedCommand ) );
+    }
+  }
+  else
+  {
+    for( let c = 0 ; c < parsedCommands.length ; c++ )
+    {
+      let parsedCommand = parsedCommands[ c ];
+      con.then( () => self.commandPerformParsed( parsedCommand ) );
+    }
   }
 
   return con;
@@ -277,6 +290,8 @@ programPerform.defaults =
   program : null,
   commandsImplicitDelimiting : null,
   commandsExplicitDelimiting : null,
+  printingEcho : 1,
+  withParsed : 0,
 }
 
 //
@@ -353,7 +368,7 @@ function commandsParse( o )
   {
     let command = commands[ c ];
     let propertiesMap = o.propertiesMaps ? o.propertiesMaps[ c ] : null;
-    parsedCommands.push( self.commandParse({ command : command, propertiesMap, propertiesMapParsing : o.propertiesMapParsing }) );
+    parsedCommands.push( self.commandParse({ command, propertiesMap, propertiesMapParsing : o.propertiesMapParsing }) );
   }
 
   return parsedCommands
@@ -475,7 +490,7 @@ function commandsPerform( o )
     _.assert( command.trim() === command );
     con.then( () => self.commandPerform
     ({
-      command : command,
+      command,
       propertiesMap : o.propertiesMaps[ c ],
     }));
   }
@@ -587,16 +602,19 @@ function commandPerformParsed( o )
   let executable = subjectDescriptor.phraseDescriptor.executable;
   if( _.routineIs( executable ) )
   {
-    result = executable
-    ({
+    let o2 =
+    {
       command : o.command,
       commandName : o.commandName,
       commandArgument : o.commandArgument,
       subject : o.subject,
       propertiesMap : o.propertiesMap,
       ca : self,
-      subjectDescriptor : subjectDescriptor,
-    });
+      subjectDescriptor,
+    };
+    if( o.parsedCommands )
+    o2.parsedCommands = o.parsedCommands;
+    result = executable( o2 );
   }
   else
   {
@@ -621,6 +639,7 @@ commandPerformParsed.defaults =
   commandArgument : null,
   propertiesMap : null,
   subject : null,
+  parsedCommands : null,
 }
 
 //
@@ -668,7 +687,8 @@ function commandIsolateSecondFromArgumentLeft( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = _.strIsolateLeftOrAll( command, ca.commandImplicitDelimeter );
+  let splits = _.strIsolateLeftOrAll( command, ca.commandImplicitDelimeter );
+  [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = splits;
 
   if( result.secondCommandName === undefined )
   delete result.secondCommandName;
@@ -698,7 +718,8 @@ function commandIsolateSecondFromArgumentRight( command )
   _.assert( arguments.length === 1 );
   _.assert( _.strIs( command ) );
 
-  [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = _.strIsolateRightOrAll( command, ca.commandImplicitDelimeter );
+  let splits = _.strIsolateRightOrAll( command, ca.commandImplicitDelimeter );
+  [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = splits;
 
   if( result.secondCommandName === undefined )
   delete result.secondCommandName;
@@ -752,7 +773,7 @@ function _commandHelp( e )
       if( subject.phraseDescriptor.executable && subject.phraseDescriptor.executable.commandProperties )
       {
         let properties = subject.phraseDescriptor.executable.commandProperties;
-        logger.log( _.toStr( properties, { levels : 2, wrap : 0, multiline : 1, wrap : 0, stringWrapper : '' } ) );
+        logger.log( _.toStr( properties, { levels : 2, multiline : 1, wrap : 0, stringWrapper : '' } ) );
       }
     }
 
@@ -977,7 +998,8 @@ let Composes =
   commandPrefix : '',
   addingDelimeter : ' ', /* qqq xxx : make it accessor */ /* qqq xxx : make possilbe both ":.command.postfix" and "command postfix" in definition of commands */
   commandExplicitDelimeter : ';',
-  commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]+))/ ),
+  commandImplicitDelimeter : _.define.own( /(\s|^)\.\w[\w\.]*[^ \\\/\*\?](\s|$)/ ),
+  // commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]+))/ ),
   // commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]*)|$)/ ), /* yyy */
   commandsExplicitDelimiting : 1,
   commandsImplicitDelimiting : 0,
