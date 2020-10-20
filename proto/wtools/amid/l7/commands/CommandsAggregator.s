@@ -111,7 +111,7 @@ function _formVocabulary()
 function exec()
 {
   let self = this;
-  let appArgs = _.process.args();
+  let appArgs = _.process.input();
   return self.appArgsPerform({ appArgs });
 }
 
@@ -191,7 +191,7 @@ function appArgsPerform( o )
   _.routineOptions( appArgsPerform, o );
 
   if( o.appArgs === null )
-  o.appArgs = _.process.args();
+  o.appArgs = _.process.input();
   o.appArgs = self.appArgsNormalize( o.appArgs );
 
   _.assert( _.arrayIs( o.appArgs.subjects ) );
