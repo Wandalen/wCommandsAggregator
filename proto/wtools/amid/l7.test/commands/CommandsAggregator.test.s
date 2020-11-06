@@ -370,6 +370,90 @@ function help( test )
 
 //
 
+function helpWithLongHint( test )
+{
+  /* init */
+
+  let execCommand = () => {};
+  let commandHelp = ( e ) => e.ca._commandHelp( e );
+
+  var commands =
+  {
+    'help' :
+    {
+      e : commandHelp,
+      h : 'Get help.',
+      lh : 'Get common help and help for separate command.',
+    },
+    'action' :
+    {
+      e : execCommand,
+      h : 'action',
+      lh : 'Use command action to execute some action.'
+    },
+    'action first' :
+    {
+      e : execCommand,
+      h : 'action first',
+      lh : 'Define actions which will be executed first.'
+    },
+  };
+
+  let loggerToString = new _.LoggerToString();
+  let logger = new _.Logger({ outputs : [ _global_.logger, loggerToString ], outputRaw : 1 });
+
+  var ca = _.CommandsAggregator
+  ({
+    commands,
+    logger,
+  }).form();
+
+  /* */
+
+  test.case = 'without subject'
+  loggerToString.outputData = '';
+  ca.commandPerform({ command : '.help' });
+  var expected =
+`
+.help - Get help.
+.action - action
+.action.first - action first
+`;
+  test.equivalent( loggerToString.outputData, expected );
+
+  test.case = 'dotless single word subject - single possible method';
+  loggerToString.outputData = '';
+  ca.commandPerform({ command : '.help action' });
+  var expected = '  .action - Use command action to execute some action.';
+  test.identical( loggerToString.outputData, expected );
+
+  test.case = 'subject - two words, dotless'
+  loggerToString.outputData = '';
+  ca.commandPerform({ command : '.help action first' });
+  var expected = '  .action.first - Define actions which will be executed first.';
+  test.identical( loggerToString.outputData, expected );
+
+  test.case = 'exact, two words, with dot'
+  loggerToString.outputData = '';
+  ca.commandPerform({ command : '.help .action.first' });
+  var expected = '  .action.first - Define actions which will be executed first.';
+  test.identical( loggerToString.outputData, expected );
+
+  test.case = 'part of phrase, dotless'
+  loggerToString.outputData = '';
+  ca.commandPerform({ command : '.help first' });
+  var expected = '  .action.first - Define actions which will be executed first.\n  No command first';
+  test.identical( loggerToString.outputData, expected );
+
+  test.case = 'part of phrase, with dot'
+  loggerToString.outputData = '';
+  ca.commandPerform({ command : '.help .first' });
+  var expected = '  .action.first - Define actions which will be executed first.\n  No command .first';
+  test.identical( loggerToString.outputData, expected );
+}
+
+//
+
 function programPerform( test )
 {
   let done = [];
@@ -916,6 +1000,7 @@ let Self =
     perform,
     commandIsolateSecondFromArgument,
     help,
+    helpWithLongHint,
     programPerform,
 
   }
