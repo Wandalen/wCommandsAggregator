@@ -758,7 +758,7 @@ function _commandHelp( e )
   if( e.commandArgument )
   {
     logger.log();
-    logger.log( e.ca.vocabulary.helpForSubjectAsString({ phrase : e.commandArgument, longHintFirst : 1 }) );
+    logger.log( e.ca.vocabulary.helpForSubjectAsString({ phrase : e.commandArgument, filter }) );
     logger.up();
 
     let subject = e.ca.vocabulary.subjectDescriptorFor({ phrase : e.commandArgument, exact : 1 });
@@ -787,6 +787,13 @@ function _commandHelp( e )
   }
 
   return self;
+
+  /* */
+
+  function filter( e )
+  {
+    return e.phraseDescriptor.longHint || e.phraseDescriptor.hint || _.strCapitalize( e.phraseDescriptor.phrase + '.' );
+  }
 
   /* */
 
