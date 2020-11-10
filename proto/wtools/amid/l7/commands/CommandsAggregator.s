@@ -758,7 +758,7 @@ function _commandHelp( e )
   if( e.commandArgument )
   {
     logger.log();
-    logger.log( e.ca.vocabulary.helpForSubjectAsString( e.commandArgument ) );
+    logger.log( e.ca.vocabulary.helpForSubjectAsString({ phrase : e.commandArgument, filter }) );
     logger.up();
 
     let subject = e.ca.vocabulary.subjectDescriptorFor({ phrase : e.commandArgument, exact : 1 });
@@ -769,12 +769,8 @@ function _commandHelp( e )
     }
     else
     {
-      debugger;
       if( subject.phraseDescriptor.executable && subject.phraseDescriptor.executable.commandProperties )
-      {
-        let properties = subject.phraseDescriptor.executable.commandProperties;
-        logger.log( _.toStr( properties, { levels : 2, multiline : 1, wrap : 0, stringWrapper : '' } ) );
-      }
+      logger.log( helpForOptionsMake( subject ) );
     }
 
     logger.down();
@@ -791,6 +787,25 @@ function _commandHelp( e )
   }
 
   return self;
+
+  /* */
+
+  function filter( e )
+  {
+    return e.phraseDescriptor.longHint || e.phraseDescriptor.hint || _.strCapitalize( e.phraseDescriptor.phrase + '.' );
+  }
+
+  /* */
+
+  function helpForOptionsMake( subject )
+  {
+    let properties = subject.phraseDescriptor.executable.commandProperties;
+    let options = _.ct.format( _.mapKeys( properties ), 'path' );
+    let hints = _.mapVals( properties );
+
+    let help = _.strJoin( [ options, ' : ', hints ] );
+    return _.toStr( help, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
+  }
 }
 
 _commandHelp.hint = 'Get help.';
@@ -945,25 +960,36 @@ function _onPhraseDescriptorMake( src )
   }
 
   let hint = phrase;
+  let longHint;
 
   if( _.objectIs( executable ) )
   {
-    _.assertMapHasOnly( executable, { e : null, h : null } );
+    // _.assertMapHasOnly( executable, { e : null, h : null } ); /* Dmytro : without longHint */
+    // hint = executable.h;
+    // executable = executable.e;
+
+    _.assertMapHasOnly( executable, { e : null, h : null, lh : null } );
     hint = executable.h;
+    longHint = executable.lh;
     executable = executable.e;
   }
 
   result.phrase = phrase;
   result.hint = hint;
+  result.longHint = longHint;
 
   if( _.routineIs( executable ) )
   {
-    // debugger;
     result.executable = executable;
     if( executable.hint )
     {
       _.assert( result.hint === undefined || result.hint === null || result.hint === hint );
       result.hint = executable.hint;
+    }
+    if( executable.longHint )
+    {
+      _.assert( result.longHint === undefined || result.longHint === null || result.longHint === longHint );
+      result.longHint = executable.longHint;
     }
     _.assertMapHasOnly( executable, self.CommandRoutineFields, () => `Unknown field of command "${result.phrase}" :` );
     // executable.commandDescriptor = result;
@@ -988,6 +1014,7 @@ let CommandRoutineFields =
 {
   defaults : null,
   hint : null,
+  longHint : null,
   commandSubjectHint : null,
   commandProperties : null,
 }
