@@ -71,8 +71,8 @@ function trivial( test )
   return ca.appArgsPerform({ appArgs, allowingDotless : 1 })
   .finally( function( err, arg )
   {
-    test.is( !err );
-    test.is( !!arg );
+    test.true( !err );
+    test.true( !!arg );
     var appArgs = Object.create( null );
     appArgs.map = { '.action3' : true };
     appArgs.maps = [ appArgs.map ];
@@ -96,8 +96,8 @@ function perform( test )
     test.identical( e.command, '.with path to dir .list all' );
     test.identical( e.commandName, '.with' );
     test.identical( e.commandArgument, 'path to dir .list all' );
-    test.is( e.ca === ca );
-    test.is( _.objectIs( e.subjectDescriptor ) );
+    test.true( e.ca === ca );
+    test.true( _.objectIs( e.subjectDescriptor ) );
     test.identical( e.subjectDescriptor.wholePhrase, 'with' );
 
     test.description = 'second command';
@@ -125,8 +125,8 @@ function perform( test )
     test.identical( e.command, '.list all' );
     test.identical( e.commandName, '.list' );
     test.identical( e.commandArgument, 'all' );
-    test.is( e.ca === ca );
-    test.is( _.objectIs( e.subjectDescriptor ) );
+    test.true( e.ca === ca );
+    test.true( _.objectIs( e.subjectDescriptor ) );
     test.identical( e.subjectDescriptor.wholePhrase, 'list' );
 
     done = 2;
