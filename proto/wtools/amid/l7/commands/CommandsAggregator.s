@@ -292,6 +292,7 @@ programPerform.defaults =
   commandsExplicitDelimiting : null,
   printingEcho : 1,
   withParsed : 0,
+  severalValues : null,
 }
 
 //
@@ -368,7 +369,14 @@ function commandsParse( o )
   {
     let command = commands[ c ];
     let propertiesMap = o.propertiesMaps ? o.propertiesMaps[ c ] : null;
-    parsedCommands.push( self.commandParse({ command, propertiesMap, propertiesMapParsing : o.propertiesMapParsing }) );
+    let o2 =
+    {
+      command,
+      propertiesMap,
+      propertiesMapParsing : o.propertiesMapParsing,
+      severalValues : o.severalValues
+    };
+    parsedCommands.push ( self.commandParse( o2 ) );
   }
 
   return parsedCommands
@@ -381,6 +389,7 @@ commandsParse.defaults =
   commandsExplicitDelimiting : null,
   propertiesMapParsing : null,
   propertiesMaps : null,
+  severalValues : null,
 }
 
 //
