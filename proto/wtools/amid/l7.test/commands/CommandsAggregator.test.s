@@ -472,7 +472,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -495,12 +495,12 @@ function programPerform( test )
       'subject' : 'arg1 arg2 .command2 arg3',
       'propertiesMap' : {},
     },
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'commandsImplicitDelimiting : 0, with ;';
 
@@ -510,7 +510,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -540,12 +540,12 @@ function programPerform( test )
       'subject' : 'arg3',
       'propertiesMap' : {}
     }
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'commandsImplicitDelimiting : 1';
 
@@ -555,7 +555,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -585,12 +585,12 @@ function programPerform( test )
       'subject' : 'arg3',
       'propertiesMap' : {}
     }
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'commandsImplicitDelimiting : 1, with "';
 
@@ -600,7 +600,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -630,12 +630,12 @@ function programPerform( test )
       'subject' : '"arg4 arg5" arg6',
       'propertiesMap' : {}
     },
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'commandsImplicitDelimiting : 1, with " and ;';
 
@@ -645,7 +645,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -682,12 +682,12 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : { 'key' : 'val' }
     },
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'commandsImplicitDelimiting : 1, trivial triplet';
 
@@ -697,7 +697,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -734,12 +734,12 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {}
     },
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'complex without subject';
 
@@ -749,7 +749,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -786,12 +786,12 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {}
     }
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'complex with subject';
 
@@ -801,7 +801,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -838,12 +838,12 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {}
     }
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'several values';
 
@@ -853,7 +853,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -890,12 +890,12 @@ function programPerform( test )
         'a' : [ 4, 'a' ],
       }
     }
-  ]
+  ];
   test.identical( done, exp );
   var exp = '';
   test.identical( logger2.outputData, exp );
 
-  /* - */
+  /* */
 
   test.case = 'quoted complex';
 
@@ -905,7 +905,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -928,7 +928,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : { 'path/key 2' : 'val2', 'path/key 1' : 'val1', 'path/key3' : 'val3' }
     }
-  ]
+  ];
   test.identical( done, exp ); /* xxx qqq : should work after fix of strRequestParse */
   var exp = '';
   test.identical( logger2.outputData, exp );
@@ -946,7 +946,7 @@ function programPerform( test )
   {
     'command1' : { e : command1 },
     'command2' : { e : command2 },
-  }
+  };
 
   var ca = _.CommandsAggregator
   ({
@@ -957,12 +957,170 @@ function programPerform( test )
     changingExitCode : 0,
   }).form();
 
-
   test.shouldThrowErrorOfAnyKind
   (
     () => ca.programPerform({ program : 'notcommand .command1' }),
     ( err ) => test.identical( _.strCount( err.message, 'Illformed command' ), 1 ),
   );
+
+  /* - */
+
+  function commandsClean()
+  {
+    done.forEach( ( command ) =>
+    {
+      delete command.ca;
+      delete command.subjectDescriptor;
+    });
+  }
+
+  function clean()
+  {
+    logger2.outputData = '';
+    done = [];
+  }
+
+}
+
+//
+
+function programPerformOptionSeveralValues( test )
+{
+  let done = [];
+  let command1 = ( e ) => { done.push( e ); };
+  let command2 = ( e ) => { done.push( e ); };
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ] });
+
+  /* - */
+
+  test.case = 'severalValues - 1, commandsImplicitDelimiting - 0';
+
+  clean();
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : { 'command1' : { e : command1 } },
+    logger : logger1,
+    commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
+  }).form();
+
+  ca.programPerform({ program : '.command1 arg1 v:1 r:1 v:2' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1 arg1 v:1 r:1 v:2',
+      'commandName' : '.command1',
+      'commandArgument' : 'arg1 v:1 r:1 v:2',
+      'subject' : 'arg1',
+      'propertiesMap' : { 'v' : [ 1, 2 ], 'r' : 1 },
+    },
+  ];
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* */
+
+  test.case = 'severalValues : 0, commandsImplicitDelimiting - 0';
+
+  clean();
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : { 'command1' : { e : command1 } },
+    logger : logger1,
+    commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
+    severalValues : 0,
+  }).form();
+
+  ca.programPerform({ program : '.command1 arg1 v:1 r:1 v:2' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1 arg1 v:1 r:1 v:2',
+      'commandName' : '.command1',
+      'commandArgument' : 'arg1 v:1 r:1 v:2',
+      'subject' : 'arg1',
+      'propertiesMap' : { 'v' : 2, 'r' : 1 },
+    },
+  ];
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* */
+
+  test.case = 'severalValues - 1, commandsImplicitDelimiting - 1';
+
+  clean();
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : { 'command1' : { e : command1 } },
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+  }).form();
+
+  ca.programPerform({ program : '.command1 arg1 v:1 r:1 v:2' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1 arg1 v:1 r:1 v:2',
+      'commandName' : '.command1',
+      'commandArgument' : 'arg1 v:1 r:1 v:2',
+      'subject' : 'arg1',
+      'propertiesMap' : { 'v' : [ 1, 2 ], 'r' : 1 },
+    },
+  ];
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* */
+
+  test.case = 'severalValues : 0, commandsImplicitDelimiting - 1';
+
+  clean();
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : { 'command1' : { e : command1 } },
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+    severalValues : 0,
+  }).form();
+
+  ca.programPerform({ program : '.command1 arg1 v:1 r:1 v:2' });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : '.command1 arg1 v:1 r:1 v:2',
+      'commandName' : '.command1',
+      'commandArgument' : 'arg1 v:1 r:1 v:2',
+      'subject' : 'arg1',
+      'propertiesMap' : { 'v' : 2, 'r' : 1 },
+    },
+  ];
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
 
   /* - */
 
@@ -1002,6 +1160,7 @@ let Self =
     help,
     helpWithLongHint,
     programPerform,
+    programPerformOptionSeveralValues,
 
   }
 
