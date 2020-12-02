@@ -292,7 +292,7 @@ programPerform.defaults =
   commandsExplicitDelimiting : null,
   printingEcho : 1,
   withParsed : 0,
-  severalValues : null,
+  severalValues : 1,
 }
 
 //
@@ -389,7 +389,7 @@ commandsParse.defaults =
   commandsExplicitDelimiting : null,
   propertiesMapParsing : null,
   propertiesMaps : null,
-  severalValues : null,
+  severalValues : 1,
 }
 
 //
@@ -448,7 +448,7 @@ commandParse.defaults =
   command : null,
   propertiesMap : null,
   propertiesMapParsing : null,
-  severalValues : null,
+  severalValues : 1,
 }
 
 //

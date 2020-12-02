@@ -1039,7 +1039,7 @@ function programPerformOptionSeveralValues( test )
     severalValues : 0,
   }).form();
 
-  ca.programPerform({ program : '.command1 arg1 v:1 r:1 v:2' });
+  ca.programPerform({ program : '.command1 arg1 v:1 r:1 v:2', severalValues : 0 });
 
   commandsClean();
 
@@ -1104,7 +1104,7 @@ function programPerformOptionSeveralValues( test )
     severalValues : 0,
   }).form();
 
-  ca.programPerform({ program : '.command1 arg1 v:1 r:1 v:2' });
+  ca.programPerform({ program : '.command1 arg1 v:1 r:1 v:2', severalValues : 0 });
 
   commandsClean();
 
