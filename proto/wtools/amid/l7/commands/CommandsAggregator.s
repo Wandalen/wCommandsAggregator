@@ -293,6 +293,7 @@ programPerform.defaults =
   printingEcho : 1,
   withParsed : 0,
   severalValues : 1,
+  subjectWinPathsMaybe : 0,
 }
 
 //
@@ -374,7 +375,8 @@ function commandsParse( o )
       command,
       propertiesMap,
       propertiesMapParsing : o.propertiesMapParsing,
-      severalValues : o.severalValues
+      severalValues : o.severalValues,
+      subjectWinPathsMaybe : o.subjectWinPathsMaybe,
     };
     parsedCommands.push ( self.commandParse( o2 ) );
   }
@@ -390,6 +392,7 @@ commandsParse.defaults =
   propertiesMapParsing : null,
   propertiesMaps : null,
   severalValues : 1,
+  subjectWinPathsMaybe : 0,
 }
 
 //
@@ -433,6 +436,7 @@ function commandParse( o )
       src : commandArgument,
       commandsDelimeter : false,
       severalValues : o.severalValues,
+      subjectWinPathsMaybe : o.subjectWinPathsMaybe,
     });
 
     parsed.propertiesMap = _.mapExtend( parsed.propertiesMap || null, request.map );
@@ -449,6 +453,7 @@ commandParse.defaults =
   propertiesMap : null,
   propertiesMapParsing : null,
   severalValues : 1,
+  subjectWinPathsMaybe : 0,
 }
 
 //
