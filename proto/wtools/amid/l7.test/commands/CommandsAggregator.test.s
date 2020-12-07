@@ -1141,6 +1141,168 @@ function programPerformOptionSeveralValues( test )
 
 }
 
+//
+
+function programPerformOptionSubjectWinPathMaybe( test )
+{
+  let done = [];
+  let command1 = ( e ) => { done.push( e ); };
+  let command2 = ( e ) => { done.push( e ); };
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ] });
+
+  /* - */
+
+  test.case = 'severalValues - 1, commandsImplicitDelimiting - 0';
+
+  clean();
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : { 'command1' : { e : command1 } },
+    logger : logger1,
+    commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
+  }).form();
+
+  var subject = `${ _.path.nativize( _.path.current() ) }`;
+  ca.programPerform({ program : `.command1 ${ subject } v:1 r:1 v:2`, subjectWinPathsMaybe : 1 });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : `.command1 ${ subject } v:1 r:1 v:2`,
+      'commandName' : '.command1',
+      'commandArgument' : `${ subject } v:1 r:1 v:2`,
+      'subject' : `${ subject }`,
+      'propertiesMap' : { 'v' : [ 1, 2 ], 'r' : 1 },
+    },
+  ];
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* */
+
+  test.case = 'severalValues : 0, commandsImplicitDelimiting - 0';
+
+  clean();
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : { 'command1' : { e : command1 } },
+    logger : logger1,
+    commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
+  }).form();
+
+  var subject = `${ _.path.nativize( _.path.current() ) }`;
+  ca.programPerform({ program : `.command1 ${ subject } v:1 r:1 v:2`, severalValues : 0, subjectWinPathsMaybe : 1 });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : `.command1 ${ subject } v:1 r:1 v:2`,
+      'commandName' : '.command1',
+      'commandArgument' : `${ subject } v:1 r:1 v:2`,
+      'subject' : `${ subject }`,
+      'propertiesMap' : { 'v' : 2, 'r' : 1 },
+    },
+  ];
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* */
+
+  test.case = 'severalValues - 1, commandsImplicitDelimiting - 1';
+
+  clean();
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : { 'command1' : { e : command1 } },
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+  }).form();
+
+  var subject = `${ _.path.nativize( _.path.current() ) }`;
+  ca.programPerform({ program : `.command1 ${ subject } v:1 r:1 v:2`, subjectWinPathsMaybe : 1 });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : `.command1 ${ subject } v:1 r:1 v:2`,
+      'commandName' : '.command1',
+      'commandArgument' : `${ subject } v:1 r:1 v:2`,
+      'subject' : `${ subject }`,
+      'propertiesMap' : { 'v' : [ 1, 2 ], 'r' : 1 },
+    },
+  ];
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* */
+
+  test.case = 'severalValues : 0, commandsImplicitDelimiting - 1';
+
+  clean();
+
+  var ca = _.CommandsAggregator
+  ({
+    commands : { 'command1' : { e : command1 } },
+    logger : logger1,
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+    severalValues : 0,
+  }).form();
+
+  var subject = `${ _.path.nativize( _.path.current() ) }`;
+  ca.programPerform({ program : `.command1 ${ subject } v:1 r:1 v:2`, severalValues : 0, subjectWinPathsMaybe : 1 });
+
+  commandsClean();
+
+  var exp =
+  [
+    {
+      'command' : `.command1 ${ subject } v:1 r:1 v:2`,
+      'commandName' : '.command1',
+      'commandArgument' : `${ subject } v:1 r:1 v:2`,
+      'subject' : `${ subject }`,
+      'propertiesMap' : { 'v' : 2, 'r' : 1 },
+    },
+  ];
+  test.identical( done, exp );
+  var exp = '';
+  test.identical( logger2.outputData, exp );
+
+  /* - */
+
+  function commandsClean()
+  {
+    done.forEach( ( command ) =>
+    {
+      delete command.ca;
+      delete command.subjectDescriptor;
+    });
+  }
+
+  function clean()
+  {
+    logger2.outputData = '';
+    done = [];
+  }
+
+}
+
 // --
 // declare
 // --
@@ -1161,6 +1323,7 @@ let Self =
     helpWithLongHint,
     programPerform,
     programPerformOptionSeveralValues,
+    programPerformOptionSubjectWinPathMaybe,
 
   }
 
