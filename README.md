@@ -11,7 +11,6 @@ npm install
 node sample/Sample.s
 ```
 
-
 ## To add to your project
 ```
 npm add 'wcommandsaggregator@alpha'
