@@ -1,36 +1,45 @@
 {
-  "name" : "wcommandsaggregator",
-  "version" : "0.3.260",
-  "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
-  "author" : "Kostiantyn Wandalen <wanalen@01.school>",
-  "contributors" :
-  [
+  "name": "wcommandsaggregator",
+  "version": "0.3.261",
+  "description": "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
+  "author": "Kostiantyn Wandalen <wanalen@01.school>",
+  "contributors": [
     "Kostiantyn Wandalen <wanalen@01.school>",
     "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>"
   ],
-  "license" : "MIT",
-  "main" : "proto/wtools/amid/l7/commands/CommandsAggregator.s",
-  "files" : [ "proto/wtools/amid/l7", "proto/wtools/Tools.s", "out" ],
-  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-1", "docgen" : "wdocgen proto" },
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/Wandalen/wCommandsAggregator.git"
+  "license": "MIT",
+  "main": "proto/wtools/amid/l7/commands/CommandsAggregator.s",
+  "files": [
+    "proto/wtools/amid/l7",
+    "proto/wtools/Tools.s",
+    "out"
+  ],
+  "scripts": {
+    "test": "wtest .run 'proto/**' rapidity:-1",
+    "docgen": "wdocgen proto"
   },
-  "bugs" :
-  {
-    "url" : "https://github.com/Wandalen/wCommandsAggregator/issues"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wCommandsAggregator.git"
   },
-  "dependencies" :
-  {
-    "wTools" : "alpha",
-    "wCopyable" : "alpha",
-    "wFiles" : "alpha",
-    "wvocabulary" : "alpha",
-    "wpathbasic" : "alpha",
-    "wprocess" : "alpha",
-    "wverbal" : "alpha"
+  "bugs": {
+    "url": "https://github.com/Wandalen/wCommandsAggregator/issues"
   },
-  "devDependencies" : { "eslint" : "7.1.0", "wcommandsaggregator" : "file:.", "wTesting" : "alpha" },
-  "keywords" : [ "wTools" ]
+  "dependencies": {
+    "wTools": "alpha",
+    "wCopyable": "alpha",
+    "wFiles": "alpha",
+    "wvocabulary": "alpha",
+    "wpathbasic": "alpha",
+    "wprocess": "alpha",
+    "wverbal": "alpha"
+  },
+  "devDependencies": {
+    "eslint": "7.1.0",
+    "wTesting": "alpha",
+    "wcommandsaggregator": "file:."
+  },
+  "keywords": [
+    "wTools"
+  ]
 }
