@@ -8,7 +8,7 @@ Class aggregating several applications into single CLI. It can aggregate externa
 git clone https://github.com/Wandalen/wCommandsAggregator
 cd wCommandsAggregator
 npm install
-node sample/Sample.s
+node sample/trivial/Sample.s
 ```
 
 ## To add to your project
