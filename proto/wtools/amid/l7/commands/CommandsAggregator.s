@@ -51,7 +51,11 @@ function init( o )
 
   self.logger = new _.Logger({ output : _global_.logger });
 
+  // debugger;
   _.workpiece.initFields( self );
+  // debugger;
+  // console.log( self.commandImplicitDelimeter );
+
   Object.preventExtensions( self )
 
   if( o )
@@ -886,7 +890,9 @@ function onUnknownCommandError( o )
   let s = 'Unknown command ' + _.strQuote( o.commandName );
   if( self.vocabulary.descriptorMap[ 'help' ] )
   s += '\nTry ".help"';
-  throw _.errBrief( s );
+  let err = _.errBrief( s );
+  debugger;
+  throw err;
 }
 
 onUnknownCommandError.defaults = Object.create( commandPerformParsed.defaults );
