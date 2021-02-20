@@ -1,6 +1,6 @@
 {
   "name" : "wcommandsaggregator",
-  "version" : "0.3.275",
+  "version" : "0.3.276",
   "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors" :
