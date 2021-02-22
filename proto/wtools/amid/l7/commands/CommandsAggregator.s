@@ -822,7 +822,7 @@ function _commandHelp( e )
     let hints = _.mapVals( properties );
 
     let help = _.strJoin( [ options, ' : ', hints ] );
-    return _.toStr( help, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
+    return _.entity.exportString( help, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
   }
 }
 
