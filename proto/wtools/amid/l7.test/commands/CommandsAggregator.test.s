@@ -14,8 +14,8 @@ if( typeof module !== 'undefined' )
 
 }
 
-let _global = _global_;
-let _ = _global_.wTools;
+const _global = _global_;
+const _ = _global_.wTools;
 
 // --
 // tests
@@ -1307,7 +1307,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
 // declare
 // --
 
-let Self =
+const Proto =
 {
 
   name : 'Tools.mid.CommandsAggregator',
@@ -1329,7 +1329,7 @@ let Self =
 
 }
 
-Self = wTestSuite( Self );
+const Self = wTestSuite( Proto );
 if( typeof module !== 'undefined' && !module.parent )
 wTester.test( Self.name );
 

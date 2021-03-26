@@ -31,9 +31,9 @@ if( typeof module !== 'undefined' )
 
 //
 
-let _ = _global_.wTools;
+const _ = _global_.wTools;
 let Parent = null;
-let Self = wCommandsAggregator;
+const Self = wCommandsAggregator;
 function wCommandsAggregator()
 {
   return _.workpiece.construct( Self, this, arguments );
@@ -138,7 +138,7 @@ function appArgsNormalize( appArgs )
   let self = this;
 
   _.mapSupplement( appArgs, appArgsNormalize.defaults );
-  _.assertMapHasOnly( appArgs, appArgsNormalize.defaults );
+  _.map.assertHasOnly( appArgs, appArgsNormalize.defaults );
 
   appArgs.map = appArgs.map || Object.create( null );
 
@@ -262,7 +262,7 @@ function programPerform( o )
   }
 
   {
-    let o2 = _.mapOnly( o, commandsParse.defaults );
+    let o2 = _.mapOnly_( null, o, commandsParse.defaults );
     o2.commands = o.program;
     o2.propertiesMapParsing = 1;
     parsedCommands = self.commandsParse( o2 );
@@ -984,11 +984,11 @@ function _onPhraseDescriptorMake( src )
 
   if( _.objectIs( executable ) )
   {
-    // _.assertMapHasOnly( executable, { e : null, h : null } ); /* Dmytro : without longHint */
+    // _.map.assertHasOnly( executable, { e : null, h : null } ); /* Dmytro : without longHint */
     // hint = executable.h;
     // executable = executable.e;
 
-    _.assertMapHasOnly( executable, { e : null, h : null, lh : null } );
+    _.map.assertHasOnly( executable, { e : null, h : null, lh : null } );
     hint = executable.h;
     longHint = executable.lh;
     executable = executable.e;
@@ -1011,7 +1011,7 @@ function _onPhraseDescriptorMake( src )
       _.assert( result.longHint === undefined || result.longHint === null || result.longHint === longHint );
       result.longHint = executable.longHint;
     }
-    _.assertMapHasOnly( executable, self.CommandRoutineFields, () => `Unknown field of command "${result.phrase}" :` );
+    _.map.assertHasOnly( executable, self.CommandRoutineFields, () => `Unknown field of command "${result.phrase}" :` );
     // executable.commandDescriptor = result;
     // if( executable.originalRoutine )
     // executable.originalRoutine.commandDescriptor = result;
