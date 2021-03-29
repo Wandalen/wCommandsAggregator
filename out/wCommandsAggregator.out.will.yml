@@ -65,6 +65,7 @@ module:
       download:
         criterion:
           predefined: 1
+        path: ../
       repository:
         path: 'git+https:///github.com/Wandalen/wCommandsAggregator.git'
       origins:
@@ -889,6 +890,7 @@ module:
       download:
         criterion:
           predefined: 1
+        path: ./
       repository:
         path: 'git+https:///github.com/Wandalen/wCommandsAggregator.git'
       origins:
