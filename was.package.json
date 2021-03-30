@@ -10,7 +10,7 @@
   ],
   "license" : "MIT",
   "main" : "proto/wtools/amid/l7/commands/CommandsAggregator.s",
-  "files" : [ "proto/wtools/amid/l7", "proto/wtools/Tools.s", "out" ],
+  "files" : [ "proto/wtools/amid/l7", "proto/wtools/Tools.s", "out", "proto/node_modules" ],
   "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-1", "docgen" : "wdocgen proto" },
   "repository" :
   {
@@ -31,6 +31,6 @@
     "wprocess" : "",
     "wverbal" : ""
   },
-  "devDependencies" : { "wTesting" : "", "eslint" : "7.1.0", "wcommandsaggregator" : "file:." },
+  "devDependencies" : { "wTesting" : "", "eslint" : "7.1.0" },
   "keywords" : [ "wTools" ]
 }
