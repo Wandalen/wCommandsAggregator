@@ -618,6 +618,27 @@ function commandPerformParsed( o )
 
   let subjectDescriptor = filteredSubjectDescriptors[ 0 ];
   let executable = subjectDescriptor.phraseDescriptor.executable;
+
+  if( executable.commandPropertiesAliases )
+  {
+    let usedAliases = Object.create( null );
+    _.assert( _.objectIs( executable.commandPropertiesAliases ) );
+    for( let propName in executable.commandPropertiesAliases )
+    {
+      let aliases = _.arrayAs( executable.commandPropertiesAliases[ propName ] );
+      _.assert( aliases.length >= 1 );
+      aliases.forEach( ( alias ) =>
+      {
+        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
+        if( o.propertiesMap[ alias ] === undefined )
+        return;
+        o.propertiesMap[ propName ] = o.propertiesMap[ alias ];
+        delete o.propertiesMap[ alias ];
+        usedAliases[ alias ] = 1;
+      })
+    }
+  }
+
   if( _.routineIs( executable ) )
   {
     let o2 =
@@ -1037,6 +1058,7 @@ let CommandRoutineFields =
   longHint : null,
   commandSubjectHint : null,
   commandProperties : null,
+  commandPropertiesAliases : null,
 }
 
 let Composes =
