@@ -1303,6 +1303,245 @@ function programPerformOptionSubjectWinPathMaybe( test )
 
 }
 
+//
+
+function commandPropertiesAliases( test )
+{
+  let descriptor = null;
+
+  //
+
+  function command( e )
+  {
+    descriptor = e;
+  }
+  command.commandPropertiesAliases =
+  {
+    verbosity : [ 'v' ],
+    routine : [ 'r' ]
+  }
+  command.commandProperties =
+  {
+    verbosity : 'verbosity',
+    routine : 'routine',
+  }
+
+  //
+
+  function commandAliasesArrayEmpty( e )
+  {
+    descriptor = e;
+  }
+  commandAliasesArrayEmpty.commandPropertiesAliases =
+  {
+    verbosity : []
+  }
+  commandAliasesArrayEmpty.commandProperties =
+  {
+    verbosity : 'verbosity'
+  }
+
+  //
+
+  function commandAliasDuplication( e )
+  {
+    descriptor = e;
+  }
+  commandAliasDuplication.commandPropertiesAliases =
+  {
+    verbosity : [ 'v', 'v' ]
+  }
+  commandAliasDuplication.commandProperties =
+  {
+    verbosity : 'verbosity'
+  }
+
+  //
+
+  function commandNoAliases( e )
+  {
+    descriptor = e;
+  }
+  commandNoAliases.commandProperties =
+  {
+    verbosity : 'verbosity'
+  }
+
+  //
+
+  function commandSeveralAliasesToSameProperty( e )
+  {
+    descriptor = e;
+  }
+  commandSeveralAliasesToSameProperty.commandPropertiesAliases =
+  {
+    verbosity : [ 'v', 'v1' ]
+  }
+  commandSeveralAliasesToSameProperty.commandProperties =
+  {
+    verbosity : 'verbosity'
+  }
+
+  //
+
+  let Commands =
+  {
+    'command' : { e : command, h : 'Test command' },
+    'command.aliases.array.empty' : { e : commandAliasesArrayEmpty, h : 'Test command' },
+    'command.alias.duplication' : { e : commandAliasDuplication, h : 'Test command' },
+    'command.no.aliases' : { e : commandNoAliases, h : 'Test command' },
+    'command.several.aliases.to.same.property' : { e : commandSeveralAliasesToSameProperty, h : 'Test command' },
+  }
+
+  let ca = _.CommandsAggregator
+  ({
+    commands : Commands,
+    propertiesMapParsing : 1,
+  }).form();
+
+  /* */
+
+  test.case = 'trivial';
+  var appArgs = Object.create( null );
+  appArgs.subject = '.command v:1 r:abc';
+  ca.appArgsPerform({ appArgs });
+  var expected = { verbosity : 1, routine : 'abc' }
+  test.identical( descriptor.propertiesMap, expected );
+
+  /* */
+
+  test.case = 'alias and property together';
+  var appArgs = Object.create( null );
+  appArgs.subject = '.command verbosity:0 v:1 r:abc routine:xyz';
+  ca.appArgsPerform({ appArgs });
+  var expected = { verbosity : 1, routine : 'abc' }
+  test.identical( descriptor.propertiesMap, expected );
+
+  /* */
+
+  test.case = 'no aliases';
+  var appArgs = Object.create( null );
+  appArgs.subject = '.command.no.aliases v:1 verbosity:1';
+  ca.appArgsPerform({ appArgs });
+  var expected = { verbosity : 1, v : 1 }
+  test.identical( descriptor.propertiesMap, expected );
+
+  /* */
+
+  test.case = 'several aliases to same property';
+  var appArgs = Object.create( null );
+  appArgs.subject = '.command.several.aliases.to.same.property v:0 v1:1';
+  ca.appArgsPerform({ appArgs });
+  var expected = { verbosity : 1 }
+  test.identical( descriptor.propertiesMap, expected );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'aliases array is empty';
+  var appArgs = Object.create( null );
+  appArgs.subject = '.command.aliases.array.empty v:1';
+  test.shouldThrowErrorSync( () => ca.appArgsPerform({ appArgs }) )
+
+  /* */
+
+  test.case = 'alias duplication';
+  var appArgs = Object.create( null );
+  appArgs.subject = '.command.alias.duplication v:1';
+  test.shouldThrowErrorSync( () => ca.appArgsPerform({ appArgs }) )
+}
+
+//
+
+function helpForCommandWithAliases( test )
+{
+
+  let commandHelp = ( e ) => e.ca._commandHelp( e );
+
+  function command( e )
+  {
+  }
+  command.commandPropertiesAliases =
+  {
+    verbosity : [ 'v' ],
+    routine : [ 'r' ]
+  }
+  command.commandProperties =
+  {
+    verbosity : 'verbosity',
+    routine : 'routine',
+  }
+
+  function commandEmptyAliasesArray( e )
+  {
+  }
+  commandEmptyAliasesArray.commandPropertiesAliases =
+  {
+    verbosity : [],
+  }
+  commandEmptyAliasesArray.commandProperties =
+  {
+    verbosity : 'verbosity',
+    routine : 'routine',
+  }
+
+  function commandAliasDuplicated( e )
+  {
+  }
+  commandAliasDuplicated.commandPropertiesAliases =
+  {
+    verbosity : [ 'v' ],
+    routine : [ 'v' ]
+  }
+  commandAliasDuplicated.commandProperties =
+  {
+    verbosity : 'verbosity',
+    routine : 'routine',
+  }
+
+  //
+
+  let Commands =
+  {
+    'help' : { e : commandHelp, h : 'Get help.' },
+    'command' : { e : command, h : 'Test command' },
+    'command.aliases.array.empty' : { e : commandEmptyAliasesArray, h : 'Test command' },
+    'command.alias.duplicated' : { e : commandAliasDuplicated, h : 'Test command' },
+  }
+
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ], outputRaw : 1 });
+
+  let ca = _.CommandsAggregator
+  ({
+    commands : Commands,
+    logger : logger1,
+  }).form();
+
+  /* */
+
+  test.case = 'trivial'
+  logger2.outputData = '';
+  ca.commandPerform({ command : '.help command' });
+  var expected =
+  `.command - Test command
+  v : verbosity
+  verbosity : verbosity
+  r : routine
+  routine : routine`
+  test.equivalent( logger2.outputData, expected );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  test.shouldThrowErrorSync( () => ca.commandPerform({ command : '.help command.aliases.array.empty' }) )
+  test.shouldThrowErrorSync( () => ca.commandPerform({ command : '.help command.alias.duplicated' }) )
+}
+
 // --
 // declare
 // --
@@ -1324,6 +1563,8 @@ const Proto =
     programPerform,
     programPerformOptionSeveralValues,
     programPerformOptionSubjectWinPathMaybe,
+    commandPropertiesAliases,
+    helpForCommandWithAliases
 
   }
 
