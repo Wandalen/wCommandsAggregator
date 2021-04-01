@@ -618,6 +618,27 @@ function commandPerformParsed( o )
 
   let subjectDescriptor = filteredSubjectDescriptors[ 0 ];
   let executable = subjectDescriptor.phraseDescriptor.executable;
+
+  if( executable.commandPropertiesAliases )
+  {
+    let usedAliases = Object.create( null );
+    _.assert( _.objectIs( executable.commandPropertiesAliases ) );
+    for( let propName in executable.commandPropertiesAliases )
+    {
+      let aliases = _.arrayAs( executable.commandPropertiesAliases[ propName ] );
+      _.assert( aliases.length >= 1 );
+      aliases.forEach( ( alias ) =>
+      {
+        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
+        if( o.propertiesMap[ alias ] === undefined )
+        return;
+        o.propertiesMap[ propName ] = o.propertiesMap[ alias ];
+        delete o.propertiesMap[ alias ];
+        usedAliases[ alias ] = 1;
+      })
+    }
+  }
+
   if( _.routineIs( executable ) )
   {
     let o2 =
@@ -817,9 +838,33 @@ function _commandHelp( e )
 
   function helpForOptionsMake( subject )
   {
-    let properties = subject.phraseDescriptor.executable.commandProperties;
-    let options = _.ct.format( _.mapKeys( properties ), 'path' );
+    let executable = subject.phraseDescriptor.executable;
+    let properties = executable.commandProperties;
+
+    let options = _.mapKeys( properties )
     let hints = _.mapVals( properties );
+
+    if( executable.commandPropertiesAliases )
+    {
+      let usedAliases = Object.create( null );
+      _.assert( _.objectIs( executable.commandPropertiesAliases ) );
+      for( let propName in executable.commandPropertiesAliases )
+      {
+        let aliases = _.arrayAs( executable.commandPropertiesAliases[ propName ] );
+        _.assert( aliases.length >= 1 );
+        aliases.forEach( ( alias ) =>
+        {
+          _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
+          let hint = executable.commandProperties[ propName ];
+          let propIndex = options.indexOf( propName );
+          options.splice( propIndex, 0, alias );
+          hints.splice( propIndex, 0, hint );
+          usedAliases[ alias ] = 1;
+        })
+      }
+    }
+
+    options = _.ct.format( options, 'path' );
 
     let help = _.strJoin( [ options, ' : ', hints ] );
     return _.entity.exportString( help, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
@@ -1037,6 +1082,7 @@ let CommandRoutineFields =
   longHint : null,
   commandSubjectHint : null,
   commandProperties : null,
+  commandPropertiesAliases : null,
 }
 
 let Composes =
