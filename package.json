@@ -1,6 +1,6 @@
 {
   "name" : "wcommandsaggregator",
-  "version" : "0.3.290",
+  "version" : "0.3.291",
   "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors" :
@@ -9,7 +9,7 @@
     "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>"
   ],
   "license" : "MIT",
-  "main" : "/pro/module/wCommandsAggregator/proto/node_modules/wcommandsaggregator",
+  "main" : "proto/node_modules/wcommandsaggregator",
   "files" : [ "proto/wtools/amid/l7", "proto/wtools/Tools.s", "out", "proto/node_modules" ],
   "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-1", "docgen" : "wdocgen proto" },
   "repository" :
