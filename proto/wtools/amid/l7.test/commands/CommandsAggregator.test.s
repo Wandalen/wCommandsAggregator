@@ -21,206 +21,208 @@ const _ = _global_.wTools;
 // tests
 // --
 
-function trivial( test )
-{
-
-  var done = 0;
-  function execCommand1( e )
-  {
-    done = 1;
-    console.log( 'execCommand1' );
-  }
-
-  var Commands =
-  {
-    'action1' : { e : execCommand1, h : 'Some action' },
-    'action2' : '_assets/Action2.s',
-    'action3' : '_assets/Action3.s',
-  }
-
-  var ca = _.CommandsAggregator
-  ({
-    basePath : __dirname,
-    commands : Commands,
-    commandPrefix : 'node ',
-  }).form();
-
-  var appArgs = Object.create( null );
-  appArgs.subject = 'action1';
-  appArgs.map = { action1 : true };
-  appArgs.maps = [ appArgs.map ];
-  appArgs.subjects = [ 'action1' ];
-  done = 0;
-  ca.appArgsPerform({ appArgs, allowingDotless : 1 });
-  test.identical( done, 1 );
-
-  var appArgs = Object.create( null );
-  appArgs.subject = 'help';
-  appArgs.map = { help : true };
-  appArgs.maps = [ appArgs.map ];
-  appArgs.subjects = [ 'help' ];
-  ca.appArgsPerform({ appArgs, allowingDotless : 1 });
-  test.identical( done, 1 );
-
-  var appArgs = Object.create( null );
-  appArgs.map = { action2 : true };
-  appArgs.maps = [ appArgs.map ];
-  appArgs.subject = 'action2';
-  appArgs.subjects = [ 'action2' ];
-
-  return ca.appArgsPerform({ appArgs, allowingDotless : 1 })
-  .finally( function( err, arg )
-  {
-    test.true( !err );
-    test.true( !!arg );
-    var appArgs = Object.create( null );
-    appArgs.map = { '.action3' : true };
-    appArgs.maps = [ appArgs.map ];
-    appArgs.subject = '.action3';
-    appArgs.subjects = [ '.action3' ];
-    return ca.appArgsPerform({ appArgs });
-  })
-
-  return result;
-}
+// qqq : rewrite test using programPerform
+// function trivial( test )
+// {
+//
+//   var done = 0;
+//   function execCommand1( e )
+//   {
+//     done = 1;
+//     console.log( 'execCommand1' );
+//   }
+//
+//   var Commands =
+//   {
+//     'action1' : { e : execCommand1, h : 'Some action' },
+//     'action2' : '_assets/Action2.s',
+//     'action3' : '_assets/Action3.s',
+//   }
+//
+//   var ca = _.CommandsAggregator
+//   ({
+//     basePath : __dirname,
+//     commands : Commands,
+//     commandPrefix : 'node ',
+//   }).form();
+//
+//   var appArgs = Object.create( null );
+//   appArgs.subject = 'action1';
+//   appArgs.map = { action1 : true };
+//   appArgs.maps = [ appArgs.map ];
+//   appArgs.subjects = [ 'action1' ];
+//   done = 0;
+//   ca.appArgsPerform({ appArgs, allowingDotless : 1 });
+//   test.identical( done, 1 );
+//
+//   var appArgs = Object.create( null );
+//   appArgs.subject = 'help';
+//   appArgs.map = { help : true };
+//   appArgs.maps = [ appArgs.map ];
+//   appArgs.subjects = [ 'help' ];
+//   ca.appArgsPerform({ appArgs, allowingDotless : 1 });
+//   test.identical( done, 1 );
+//
+//   var appArgs = Object.create( null );
+//   appArgs.map = { action2 : true };
+//   appArgs.maps = [ appArgs.map ];
+//   appArgs.subject = 'action2';
+//   appArgs.subjects = [ 'action2' ];
+//
+//   return ca.appArgsPerform({ appArgs, allowingDotless : 1 })
+//   .finally( function( err, arg )
+//   {
+//     test.true( !err );
+//     test.true( !!arg );
+//     var appArgs = Object.create( null );
+//     appArgs.map = { '.action3' : true };
+//     appArgs.maps = [ appArgs.map ];
+//     appArgs.subject = '.action3';
+//     appArgs.subjects = [ '.action3' ];
+//     return ca.appArgsPerform({ appArgs });
+//   })
+//
+//   return result;
+// }
 
 //
 
-function perform( test )
-{
-
-  function commandWith( e )
-  {
-
-    test.description = 'integrity of the first event';
-    test.identical( e.command, '.with path to dir .list all' );
-    test.identical( e.commandName, '.with' );
-    test.identical( e.commandArgument, 'path to dir .list all' );
-    test.true( e.ca === ca );
-    test.true( _.objectIs( e.subjectDescriptor ) );
-    test.identical( e.subjectDescriptor.wholePhrase, 'with' );
-
-    test.description = 'second command';
-    let isolated = ca.commandIsolateSecondFromArgument( e.commandArgument );
-    test.identical( isolated.commandArgument, 'path to dir' );
-    test.identical( isolated.secondCommand, '.list all' );
-    test.identical( isolated.secondCommandName, '.list' );
-    test.identical( isolated.secondCommandArgument, 'all' );
-
-    done = 1;
-
-    e.ca.commandPerform
-    ({
-      command : isolated.secondCommand,
-      propertiesMap : e.propertiesMap,
-    });
-
-  }
-
-  function commandList( e )
-  {
-    let ca = e.ca;
-
-    test.description = 'integrity of the second event';
-    test.identical( e.command, '.list all' );
-    test.identical( e.commandName, '.list' );
-    test.identical( e.commandArgument, 'all' );
-    test.true( e.ca === ca );
-    test.true( _.objectIs( e.subjectDescriptor ) );
-    test.identical( e.subjectDescriptor.wholePhrase, 'list' );
-
-    done = 2;
-  }
-
-  var Commands =
-  {
-    'with' : { e : commandWith, h : 'With' },
-    'list' : { e : commandList, h : 'List' },
-  }
-
-  var ca = _.CommandsAggregator
-  ({
-    commands : Commands,
-  }).form();
-
-  /* */
-
-  test.case = 'appArgsPerform';
-  var appArgs = Object.create( null );
-  appArgs.subject = '.with path to dir .list all';
-  done = 0;
-  ca.appArgsPerform({ appArgs });
-  test.identical( done, 2 );
-
-  /* */
-
-  test.case = 'commandsPerform with empty propertiesMaps';
-  done = 0;
-  ca.commandsPerform
-  ({
-    commands : '.with path to dir .list all',
-    propertiesMaps : {},
-  });
-  test.identical( done, 2 );
-
-  /* */
-
-  test.case = 'commandsPerform without propertiesMaps';
-  done = 0;
-  ca.commandsPerform
-  ({
-    commands : '.with path to dir .list all',
-  });
-  test.identical( done, 2 );
-
-  /* */
-
-  test.case = 'commandsPerform with string';
-  done = 0;
-  ca.commandsPerform( '.with path to dir .list all' );
-  test.identical( done, 2 );
-
-  /* */
-
-  test.case = 'commandPerform with empty properties map';
-  var done = 0;
-  ca.commandPerform
-  ({
-    command : '.with path to dir .list all',
-    propertiesMap : Object.create( null ),
-  });
-  test.identical( done, 2 );
-
-  /* */
-
-  test.case = 'commandPerform without peroperties map';
-  var done = 0;
-  ca.commandPerform
-  ({
-    command : '.with path to dir .list all',
-  });
-  test.identical( done, 2 );
-
-  /* */
-
-  test.case = 'commandPerform with string';
-  var done = 0;
-  ca.commandPerform( '.with path to dir .list all' );
-  test.identical( done, 2 );
-
-  /* */
-
-  test.case = 'commandPerformParsed';
-  var done = 0;
-  ca.commandPerformParsed
-  ({
-    command : '.with path to dir .list all',
-    commandName : '.with',
-    commandArgument : 'path to dir .list all',
-  });
-  test.identical( done, 2 );
-
-}
+// qqq : rewrite test using programPerform
+// function perform( test )
+// {
+//
+//   function commandWith( e )
+//   {
+//
+//     test.description = 'integrity of the first event';
+//     test.identical( e.command, '.with path to dir .list all' );
+//     test.identical( e.commandName, '.with' );
+//     test.identical( e.commandArgument, 'path to dir .list all' );
+//     test.true( e.ca === ca );
+//     test.true( _.objectIs( e.subjectDescriptor ) );
+//     test.identical( e.subjectDescriptor.wholePhrase, 'with' );
+//
+//     test.description = 'second command';
+//     let isolated = ca.commandIsolateSecondFromArgument( e.commandArgument );
+//     test.identical( isolated.commandArgument, 'path to dir' );
+//     test.identical( isolated.secondCommand, '.list all' );
+//     test.identical( isolated.secondCommandName, '.list' );
+//     test.identical( isolated.secondCommandArgument, 'all' );
+//
+//     done = 1;
+//
+//     e.ca.commandPerform
+//     ({
+//       command : isolated.secondCommand,
+//       propertiesMap : e.propertiesMap,
+//     });
+//
+//   }
+//
+//   function commandList( e )
+//   {
+//     let ca = e.ca;
+//
+//     test.description = 'integrity of the second event';
+//     test.identical( e.command, '.list all' );
+//     test.identical( e.commandName, '.list' );
+//     test.identical( e.commandArgument, 'all' );
+//     test.true( e.ca === ca );
+//     test.true( _.objectIs( e.subjectDescriptor ) );
+//     test.identical( e.subjectDescriptor.wholePhrase, 'list' );
+//
+//     done = 2;
+//   }
+//
+//   var Commands =
+//   {
+//     'with' : { e : commandWith, h : 'With' },
+//     'list' : { e : commandList, h : 'List' },
+//   }
+//
+//   var ca = _.CommandsAggregator
+//   ({
+//     commands : Commands,
+//   }).form();
+//
+//   /* */
+//
+//   test.case = 'appArgsPerform';
+//   var appArgs = Object.create( null );
+//   appArgs.subject = '.with path to dir .list all';
+//   done = 0;
+//   ca.appArgsPerform({ appArgs });
+//   test.identical( done, 2 );
+//
+//   /* */
+//
+//   test.case = 'commandsPerform with empty propertiesMaps';
+//   done = 0;
+//   ca.commandsPerform
+//   ({
+//     commands : '.with path to dir .list all',
+//     propertiesMaps : {},
+//   });
+//   test.identical( done, 2 );
+//
+//   /* */
+//
+//   test.case = 'commandsPerform without propertiesMaps';
+//   done = 0;
+//   ca.commandsPerform
+//   ({
+//     commands : '.with path to dir .list all',
+//   });
+//   test.identical( done, 2 );
+//
+//   /* */
+//
+//   test.case = 'commandsPerform with string';
+//   done = 0;
+//   ca.commandsPerform( '.with path to dir .list all' );
+//   test.identical( done, 2 );
+//
+//   /* */
+//
+//   test.case = 'commandPerform with empty properties map';
+//   var done = 0;
+//   ca.commandPerform
+//   ({
+//     command : '.with path to dir .list all',
+//     propertiesMap : Object.create( null ),
+//   });
+//   test.identical( done, 2 );
+//
+//   /* */
+//
+//   test.case = 'commandPerform without peroperties map';
+//   var done = 0;
+//   ca.commandPerform
+//   ({
+//     command : '.with path to dir .list all',
+//   });
+//   test.identical( done, 2 );
+//
+//   /* */
+//
+//   test.case = 'commandPerform with string';
+//   var done = 0;
+//   ca.commandPerform( '.with path to dir .list all' );
+//   test.identical( done, 2 );
+//
+//   /* */
+//
+//   test.case = 'commandPerformParsed';
+//   var done = 0;
+//   ca.commandPerformParsed
+//   ({
+//     command : '.with path to dir .list all',
+//     commandName : '.with',
+//     commandArgument : 'path to dir .list all',
+//   });
+//   test.identical( done, 2 );
+//
+// }
 
 //
 
@@ -1309,7 +1311,7 @@ function commandPropertiesAliases( test )
 {
   let descriptor = null;
 
-  //
+  /* */
 
   function command( e )
   {
@@ -1326,7 +1328,7 @@ function commandPropertiesAliases( test )
     routine : 'routine',
   }
 
-  //
+  /* */
 
   function commandAliasesArrayEmpty( e )
   {
@@ -1341,7 +1343,7 @@ function commandPropertiesAliases( test )
     verbosity : 'verbosity'
   }
 
-  //
+  /* */
 
   function commandAliasDuplication( e )
   {
@@ -1356,7 +1358,7 @@ function commandPropertiesAliases( test )
     verbosity : 'verbosity'
   }
 
-  //
+  /* */
 
   function commandNoAliases( e )
   {
@@ -1367,7 +1369,7 @@ function commandPropertiesAliases( test )
     verbosity : 'verbosity'
   }
 
-  //
+  /* */
 
   function commandSeveralAliasesToSameProperty( e )
   {
@@ -1382,7 +1384,7 @@ function commandPropertiesAliases( test )
     verbosity : 'verbosity'
   }
 
-  //
+  /* */
 
   let Commands =
   {
@@ -1402,36 +1404,28 @@ function commandPropertiesAliases( test )
   /* */
 
   test.case = 'trivial';
-  var appArgs = Object.create( null );
-  appArgs.subject = '.command v:1 r:abc';
-  ca.appArgsPerform({ appArgs });
+  ca.programPerform( '.command v:1 r:abc' );
   var expected = { verbosity : 1, routine : 'abc' }
   test.identical( descriptor.propertiesMap, expected );
 
   /* */
 
   test.case = 'alias and property together';
-  var appArgs = Object.create( null );
-  appArgs.subject = '.command verbosity:0 v:1 r:abc routine:xyz';
-  ca.appArgsPerform({ appArgs });
+  ca.programPerform( '.command verbosity:0 v:1 r:abc routine:xyz' );
   var expected = { verbosity : 1, routine : 'abc' }
   test.identical( descriptor.propertiesMap, expected );
 
   /* */
 
   test.case = 'no aliases';
-  var appArgs = Object.create( null );
-  appArgs.subject = '.command.no.aliases v:1 verbosity:1';
-  ca.appArgsPerform({ appArgs });
+  ca.programPerform( '.command.no.aliases v:1 verbosity:1' );
   var expected = { verbosity : 1, v : 1 }
   test.identical( descriptor.propertiesMap, expected );
 
   /* */
 
   test.case = 'several aliases to same property';
-  var appArgs = Object.create( null );
-  appArgs.subject = '.command.several.aliases.to.same.property v:0 v1:1';
-  ca.appArgsPerform({ appArgs });
+  ca.programPerform( '.command.several.aliases.to.same.property v:0 v1:1' );
   var expected = { verbosity : 1 }
   test.identical( descriptor.propertiesMap, expected );
 
@@ -1440,17 +1434,25 @@ function commandPropertiesAliases( test )
   if( !Config.debug )
   return;
 
-  test.case = 'aliases array is empty';
-  var appArgs = Object.create( null );
-  appArgs.subject = '.command.aliases.array.empty v:1';
-  test.shouldThrowErrorSync( () => ca.appArgsPerform({ appArgs }) )
+  // qqq : adjust and extend test
+  // test.case = 'aliases array is empty';
+  // test.shouldThrowErrorSync
+  // (
+  //   () => ca.programPerform( '.command.aliases.array.empty v:1' ),
+  //   ( err ) => test.identical( err.originalMessage, 'xxx' ),
+  // )
+  //
+  // /* */
+  //
+  // test.case = 'alias duplication';
+  // test.shouldThrowErrorSync
+  // (
+  //   () => ca.programPerform( '.command.alias.duplication v:1' ),
+  //   ( err ) => test.identical( err.originalMessage, 'xxx' ),
+  // )
 
   /* */
 
-  test.case = 'alias duplication';
-  var appArgs = Object.create( null );
-  appArgs.subject = '.command.alias.duplication v:1';
-  test.shouldThrowErrorSync( () => ca.appArgsPerform({ appArgs }) )
 }
 
 //
@@ -1501,7 +1503,7 @@ function helpForCommandWithAliases( test )
     routine : 'routine',
   }
 
-  //
+  /* */
 
   let Commands =
   {
@@ -1555,8 +1557,8 @@ const Proto =
   tests :
   {
 
-    trivial,
-    perform,
+    // trivial,
+    // perform,
     commandIsolateSecondFromArgument,
     help,
     helpWithLongHint,

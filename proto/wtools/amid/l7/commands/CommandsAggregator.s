@@ -115,7 +115,9 @@ function exec()
 {
   let self = this;
   let appArgs = _.process.input();
-  return self.appArgsPerform({ appArgs });
+  debugger;
+  return self.programPerform({ program : appArgs.original });
+  // return self.appArgsPerform({ appArgs });
 }
 
 //
@@ -169,67 +171,67 @@ appArgsNormalize.defaults =
   parsingArrays : null,
 }
 
+// //
 //
-
-/**
- * @summary Reads provided application arguments and performs specified commands.
- * @description Parses application arguments if they were not provided through options.
- * @param {Object} o Options map.
- * @param {Object} o.appArgs Parsed arguments.
- * @param {Boolean} [o.printingEcho=1] Print command before execution.
- * @param {Boolean} [o.allowingDotless=0] Allows to provide command without dot at the beginning.
- * @function appArgsPerform
- * @class wCommandsAggregator
- * @namespace wTools
- * @module Tools/mid/CommandsAggregator
- */
-
-function appArgsPerform( o )
-{
-  let self = this;
-
-  _.assert( _.instanceIs( self ) );
-  _.assert( !!self.formed );
-  _.assert( arguments.length === 1 );
-  _.routineOptions( appArgsPerform, o );
-
-  if( o.appArgs === null )
-  o.appArgs = _.process.input();
-  o.appArgs = self.appArgsNormalize( o.appArgs );
-
-  _.assert( _.arrayIs( o.appArgs.subjects ) );
-  _.assert( _.arrayIs( o.appArgs.maps ) );
-
-  if( !o.allowingDotless )
-  if( !_.strBegins( o.appArgs.subject, '.' ) || _.strBegins( o.appArgs.subject, './' ) || _.strBegins( o.appArgs.subject, '.\\' ) )
-  {
-    self.onSyntaxError({ command : o.appArgs.subject });
-    return null;
-  }
-
-  if( o.printingEcho )
-  {
-    self.logger.rbegin({ verbosity : -1 });
-    self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
-    self.logger.rend({ verbosity : -1 });
-  }
-
-  /* */
-
-  return self.commandsPerform
-  ({
-    commands : o.appArgs.subjects,
-    propertiesMaps : o.appArgs.maps,
-  });
-
-}
-
-appArgsPerform.defaults =
-{
-  printingEcho : 1,
-  allowingDotless : 0,
-  appArgs : null,
-}
+// /**
+//  * @summary Reads provided application arguments and performs specified commands.
+//  * @description Parses application arguments if they were not provided through options.
+//  * @param {Object} o Options map.
+//  * @param {Object} o.appArgs Parsed arguments.
+//  * @param {Boolean} [o.printingEcho=1] Print command before execution.
+//  * @param {Boolean} [o.allowingDotless=0] Allows to provide command without dot at the beginning.
+//  * @function appArgsPerform
+//  * @class wCommandsAggregator
+//  * @namespace wTools
+//  * @module Tools/mid/CommandsAggregator
+//  */
+//
+// function appArgsPerform( o )
+// {
+//   let self = this;
+//
+//   _.assert( _.instanceIs( self ) );
+//   _.assert( !!self.formed );
+//   _.assert( arguments.length === 1 );
+//   _.routineOptions( appArgsPerform, o );
+//
+//   if( o.appArgs === null )
+//   o.appArgs = _.process.input();
+//   o.appArgs = self.appArgsNormalize( o.appArgs );
+//
+//   _.assert( _.arrayIs( o.appArgs.subjects ) );
+//   _.assert( _.arrayIs( o.appArgs.maps ) );
+//
+//   if( !o.allowingDotless )
+//   if( !_.strBegins( o.appArgs.subject, '.' ) || _.strBegins( o.appArgs.subject, './' ) || _.strBegins( o.appArgs.subject, '.\\' ) )
+//   {
+//     self.onSyntaxError({ command : o.appArgs.subject });
+//     return null;
+//   }
+//
+//   if( o.printingEcho )
+//   {
+//     self.logger.rbegin({ verbosity : -1 });
+//     self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
+//     self.logger.rend({ verbosity : -1 });
+//   }
+//
+//   /* */
+//
+//   return self.commandsPerform
+//   ({
+//     commands : o.appArgs.subjects,
+//     propertiesMaps : o.appArgs.maps,
+//   });
+//
+// }
+//
+// appArgsPerform.defaults =
+// {
+//   printingEcho : 1,
+//   allowingDotless : 0,
+//   appArgs : null,
+// }
 
 //
 
@@ -238,6 +240,9 @@ function programPerform( o )
   let self = this;
   let parsedCommands;
   let con = new _.Consequence().take( null );
+
+  if( !_.mapIs( o ) )
+  o = { program : arguments[ 0 ] };
 
   _.routineOptions( programPerform, o );
   _.assert( _.strIs( o.program ) );
@@ -887,11 +892,11 @@ function _commandVersion_functor( fop )
   function _commandVersion( e )
   {
     let cui = this;
-
     return _.npm.versionLog
     ({
       localPath : fop.localPath,
       remotePath : fop.remotePath,
+      logger : _.logger.relative( cui.logger, 1 ),
     });
   }
 
@@ -919,7 +924,7 @@ function onAmbiguity( o )
 
 }
 
-onAmbiguity.defaults = Object.create( appArgsPerform.defaults );
+onAmbiguity.defaults = Object.create( programPerform.defaults );
 
 //
 
@@ -1130,6 +1135,7 @@ let Statics =
 
 let Forbids =
 {
+  verbosity : 'verbosity',
 }
 
 let Accessors =
@@ -1153,7 +1159,7 @@ let Extension =
   exec,
 
   appArgsNormalize,
-  appArgsPerform,
+  // appArgsPerform,
 
   programPerform,
 
@@ -1202,7 +1208,7 @@ _.classDeclare
 });
 
 _.Copyable.mixin( Self );
-_.Verbal.mixin( Self );
+// _.Verbal.mixin( Self );
 
 //
 
