@@ -95,9 +95,8 @@ path:
       raw: compiled
       content: prime
   npm.proto.entry:
-    - >-
-      /pro/module/wCommandsAggregator/proto/wtools/amid/l7/commands/CommandsAggregator.s
-    - /pro/module/wCommandsAggregator/proto/node_modules/wcommandsaggregator
+    - proto/wtools/amid/l7/commands/CommandsAggregator.s
+    - proto/node_modules/wcommandsaggregator
 reflector:
   reflect.proto:
     inherit: predefined.*
