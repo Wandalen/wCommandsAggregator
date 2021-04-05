@@ -1,36 +1,45 @@
 {
-  "name" : "wcommandsaggregator",
-  "version" : "0.3.292",
-  "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
-  "author" : "Kostiantyn Wandalen <wanalen@01.school>",
-  "contributors" :
-  [
+  "name": "wcommandsaggregator",
+  "version": "0.3.292",
+  "description": "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
+  "author": "Kostiantyn Wandalen <wanalen@01.school>",
+  "contributors": [
     "Kostiantyn Wandalen <wanalen@01.school>",
     "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>"
   ],
-  "license" : "MIT",
-  "main" : "proto/node_modules/wcommandsaggregator",
-  "files" : [ "proto/wtools/amid/l7", "proto/wtools/Tools.s", "out", "proto/node_modules" ],
-  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-1", "docgen" : "wdocgen proto" },
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/Wandalen/wCommandsAggregator.git"
+  "license": "MIT",
+  "main": "proto/node_modules/wcommandsaggregator",
+  "files": [
+    "proto/wtools/amid/l7",
+    "proto/wtools/Tools.s",
+    "out",
+    "proto/node_modules"
+  ],
+  "scripts": {
+    "test": "wtest .run 'proto/**' rapidity:-1",
+    "docgen": "wdocgen proto"
   },
-  "bugs" :
-  {
-    "url" : "https://github.com/Wandalen/wCommandsAggregator/issues"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wCommandsAggregator.git"
   },
-  "dependencies" :
-  {
-    "wTools" : "delta",
-    "wCopyable" : "delta",
-    "wFiles" : "delta",
-    "wvocabulary" : "delta",
-    "wpathbasic" : "delta",
-    "wprocess" : "delta",
-    "wverbal" : "delta"
+  "bugs": {
+    "url": "https://github.com/Wandalen/wCommandsAggregator/issues"
   },
-  "devDependencies" : { "eslint" : "7.1.0", "wTesting" : "delta" },
-  "keywords" : [ "wTools" ]
+  "dependencies": {
+    "wTools": "delta",
+    "wCopyable": "delta",
+    "wFiles": "delta",
+    "wvocabulary": "delta",
+    "wpathbasic": "delta",
+    "wprocess": "delta",
+    "wverbal": "delta"
+  },
+  "devDependencies": {
+    "eslint": "7.1.0",
+    "wTesting": "delta"
+  },
+  "keywords": [
+    "wTools"
+  ]
 }

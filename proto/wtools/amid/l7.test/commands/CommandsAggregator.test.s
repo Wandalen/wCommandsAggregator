@@ -497,8 +497,8 @@ function programPerform( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 arg2 .command2 arg3"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp ); debugger;
 
   /* */
 
@@ -542,8 +542,8 @@ function programPerform( test )
     }
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 arg2 ; .command2 arg3"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -587,8 +587,8 @@ function programPerform( test )
     }
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 arg2 .command2 arg3"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -632,8 +632,8 @@ function programPerform( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 "arg2 .command2 arg3" .command2 "arg4 arg5" arg6"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -684,8 +684,8 @@ function programPerform( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 "arg2 .command2 arg3" .command2 "arg4 ; arg5" arg6 ; .command1 key:val"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -736,8 +736,8 @@ function programPerform( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 .command2 .command1"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -788,8 +788,8 @@ function programPerform( test )
     }
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 filePath:before/** ins:line sub:abc .command2 .command1"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -840,8 +840,8 @@ function programPerform( test )
     }
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1  some subject  filePath:before/** ins:line sub:abc .command2 .command1"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -892,8 +892,8 @@ function programPerform( test )
     }
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 a:1 b:2 a:3 a:x .command2 a:4 a:a"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -930,8 +930,8 @@ function programPerform( test )
     }
   ];
   test.identical( done, exp ); /* xxx qqq : should work after fix of strRequestParse */
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = `Command ".command1 "path/key 1":val1 "path/key 2":val2 "path/key3":'val3'"`;
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* - */
 
@@ -1021,8 +1021,8 @@ function programPerformOptionSeveralValues( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 v:1 r:1 v:2"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -1054,8 +1054,8 @@ function programPerformOptionSeveralValues( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 v:1 r:1 v:2"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -1086,8 +1086,8 @@ function programPerformOptionSeveralValues( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 v:1 r:1 v:2"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -1119,8 +1119,8 @@ function programPerformOptionSeveralValues( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 arg1 v:1 r:1 v:2"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* - */
 
@@ -1181,8 +1181,8 @@ function programPerformOptionSubjectWinPathMaybe( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 /pro/builder/proto v:1 r:1 v:2"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -1214,8 +1214,8 @@ function programPerformOptionSubjectWinPathMaybe( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 /pro/builder/proto v:1 r:1 v:2"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -1247,8 +1247,8 @@ function programPerformOptionSubjectWinPathMaybe( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 /pro/builder/proto v:1 r:1 v:2"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
 
@@ -1281,8 +1281,8 @@ function programPerformOptionSubjectWinPathMaybe( test )
     },
   ];
   test.identical( done, exp );
-  var exp = '';
-  test.identical( logger2.outputData, exp );
+  var exp = 'Command ".command1 /pro/builder/proto v:1 r:1 v:2"';
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* - */
 
