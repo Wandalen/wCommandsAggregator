@@ -40,25 +40,27 @@ function wCommandsAggregator()
 
 Self.shortName = 'CommandsAggregator';
 
-//
+// --
+// inter
+// --
 
 function init( o )
 {
-  let self = this;
+  let aggregator = this;
 
   _.assert( arguments.length === 0 || arguments.length === 1 );
 
-  self.logger = new _.Logger({ output : _global_.logger });
+  aggregator.logger = _.logger.fromStrictly( o ? o.logger || 1 : 1 );
 
-  // debugger;
-  _.workpiece.initFields( self );
-  // debugger;
-  // console.log( self.commandImplicitDelimeter );
-
-  Object.preventExtensions( self )
+  _.workpiece.initFields( aggregator );
+  Object.preventExtensions( aggregator )
 
   if( o )
-  self.copy( o );
+  {
+    aggregator.copy( o );
+    // if( o.delimeter )
+    // aggregator._.delimeter = o.delimeter;
+  }
 
 }
 
@@ -66,38 +68,42 @@ function init( o )
 
 function form()
 {
-  let self = this;
+  let aggregator = this;
 
-  _.assert( !self.formed );
-  _.assert( _.objectIs( self.commands ) );
+  _.assert( !aggregator.formed );
+  _.assert( _.objectIs( aggregator.commands ) || _.longIs( aggregator.commands ) );
   _.assert( arguments.length === 0, 'Expects no arguments' );
 
-  self.basePath = _.path.resolve( self.basePath );
+  aggregator.basePath = _.path.resolve( aggregator.basePath );
 
-  if( self.supplementingByHelp && !self.commands.help )
+  aggregator.commandsAdd( aggregator.commands );
+
+  if( aggregator.withHelp && !aggregator.vocabulary.phraseMap[ 'help' ] )
   {
-    self.commands.help = { e : self._commandHelp.bind( self ), h : 'Get help' };
+    let commandHelp = { ro : aggregator._commandHelp.bind( aggregator ), h : 'Get help' };
+    aggregator.commandsAdd({ 'help' : commandHelp });
   }
 
-  self.commandsAdd( self.commands );
-
-  self.formed = 1;
-  return self;
+  aggregator.commands = null;
+  aggregator.formed = 1;
+  return aggregator;
 }
 
 //
 
 function _formVocabulary()
 {
-  let self = this;
+  let aggregator = this;
 
   _.assert( arguments.length === 0, 'Expects no arguments' );
-  _.assert( self.vocabulary === null );
+  _.assert( aggregator.vocabulary === null );
+  _.assert( !!aggregator.delimeter );
 
-  self.vocabulary = self.vocabulary || _.Vocabulary();
-  self.vocabulary.addingDelimeter = self.addingDelimeter;
-  self.vocabulary.lookingDelimeter = self.lookingDelimeter;
-  self.vocabulary.onPhraseDescriptorMake = self._onPhraseDescriptorMake.bind( self );
+  aggregator.vocabulary = aggregator.vocabulary || new _.Vocabulary();
+  aggregator.vocabulary.delimeter = aggregator.delimeter;
+  aggregator.vocabulary.onPhraseDescriptorIs = aggregator.commandIs.bind( aggregator );
+  aggregator.vocabulary.onPhraseDescriptorFrom = aggregator.commandFrom.bind( aggregator );
+  aggregator.vocabulary.preform();
 
 }
 
@@ -113,163 +119,67 @@ function _formVocabulary()
 
 function exec()
 {
-  let self = this;
+  let aggregator = this;
   let appArgs = _.process.input();
   debugger;
-  return self.programPerform({ program : appArgs.original });
-  // return self.appArgsPerform({ appArgs });
+  return aggregator.programPerform({ program : appArgs.original });
+  // return aggregator.appArgsPerform({ appArgs });
 }
 
 //
 
-/**
- * @summary Normalizes application arguments.
- * @description
- * Checks if arguments object doesn't have redundant fields.
- * Supplements object with missing fields.
- * @param {Object} appArgs Application arguments.
- * @function appArgsNormalize
- * @class wCommandsAggregator
- * @namespace wTools
- * @module Tools/mid/CommandsAggregator
- */
+/* qqq : xxx : cover Exec */
 
-function appArgsNormalize( appArgs )
+function Exec( o )
 {
-  let self = this;
-
-  _.mapSupplement( appArgs, appArgsNormalize.defaults );
-  _.map.assertHasOnly( appArgs, appArgsNormalize.defaults );
-
-  appArgs.map = appArgs.map || Object.create( null );
-
-  if( !appArgs.subjects )
-  appArgs.subjects = _.strIs( appArgs.subject ) ? [ appArgs.subject ] : [];
-
-  if( !appArgs.maps )
-  appArgs.maps = _.mapIs( appArgs.map ) ? [ appArgs.map ] : [];
-
-  return appArgs;
+  let aggregator = new Self( o );
+  return aggregator.exec();
 }
 
-appArgsNormalize.defaults =
-{
-  original : null,
-  subject : null,
-  subjects : null,
-  map : null,
-  maps : null,
-  interpreterPath : null,
-  interpreterArgs : null,
-  interpreterArgsStrings : null,
-  scriptPath : null,
-  scriptArgs : null,
-  scriptArgsString : null,
-  keyValDelimeter : null,
-  commandsDelimeter : null,
-  caching : null,
-  parsingArrays : null,
-}
-
-// //
-//
-// /**
-//  * @summary Reads provided application arguments and performs specified commands.
-//  * @description Parses application arguments if they were not provided through options.
-//  * @param {Object} o Options map.
-//  * @param {Object} o.appArgs Parsed arguments.
-//  * @param {Boolean} [o.printingEcho=1] Print command before execution.
-//  * @param {Boolean} [o.allowingDotless=0] Allows to provide command without dot at the beginning.
-//  * @function appArgsPerform
-//  * @class wCommandsAggregator
-//  * @namespace wTools
-//  * @module Tools/mid/CommandsAggregator
-//  */
-//
-// function appArgsPerform( o )
-// {
-//   let self = this;
-//
-//   _.assert( _.instanceIs( self ) );
-//   _.assert( !!self.formed );
-//   _.assert( arguments.length === 1 );
-//   _.routineOptions( appArgsPerform, o );
-//
-//   if( o.appArgs === null )
-//   o.appArgs = _.process.input();
-//   o.appArgs = self.appArgsNormalize( o.appArgs );
-//
-//   _.assert( _.arrayIs( o.appArgs.subjects ) );
-//   _.assert( _.arrayIs( o.appArgs.maps ) );
-//
-//   if( !o.allowingDotless )
-//   if( !_.strBegins( o.appArgs.subject, '.' ) || _.strBegins( o.appArgs.subject, './' ) || _.strBegins( o.appArgs.subject, '.\\' ) )
-//   {
-//     self.onSyntaxError({ command : o.appArgs.subject });
-//     return null;
-//   }
-//
-//   if( o.printingEcho )
-//   {
-//     self.logger.rbegin({ verbosity : -1 });
-//     self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.appArgs.subjects.join( ' ; ' ) ), 'code' ) );
-//     self.logger.rend({ verbosity : -1 });
-//   }
-//
-//   /* */
-//
-//   return self.commandsPerform
-//   ({
-//     commands : o.appArgs.subjects,
-//     propertiesMaps : o.appArgs.maps,
-//   });
-//
-// }
-//
-// appArgsPerform.defaults =
-// {
-//   printingEcho : 1,
-//   allowingDotless : 0,
-//   appArgs : null,
-// }
-
-//
+// --
+// run
+// --
 
 function programPerform( o )
 {
-  let self = this;
+  let aggregator = this;
   let parsedCommands;
   let con = new _.Consequence().take( null );
 
   if( !_.mapIs( o ) )
   o = { program : arguments[ 0 ] };
 
-  _.routineOptions( programPerform, o );
+  _.routine.options( programPerform, o );
   _.assert( _.strIs( o.program ) );
-  _.assert( !!self.formed );
+  _.assert( !!aggregator.formed );
   _.assert( arguments.length === 1 );
 
   o.program = o.program.trim();
 
   if( !o.allowingDotless )
-  if( !_.strBegins( o.program, '.' ) || _.strBegins( o.program, './' ) || _.strBegins( o.program, '.\\' ) )
+  if
+  (
+    !_.strBegins( o.program, aggregator.vocabulary.defaultDelimeter )
+    || _.strBegins( o.program, `${aggregator.vocabulary.defaultDelimeter}/` )
+    || _.strBegins( o.program, `${aggregator.vocabulary.defaultDelimeter}\\` )
+  )
   {
-    self.onSyntaxError({ command : o.program });
+    aggregator.onSyntaxError({ command : o.program });
     return null;
   }
 
   if( o.printingEcho )
   {
-    self.logger.rbegin({ verbosity : -1 });
-    self.logger.log( 'Command', self.logger.colorFormat( _.strQuote( o.program ), 'code' ) );
-    self.logger.rend({ verbosity : -1 });
+    aggregator.logger.rbegin({ verbosity : -1 });
+    aggregator.logger.log( 'Command', _.ct.format( _.strQuote( o.program ), 'code' ) );
+    aggregator.logger.rend({ verbosity : -1 });
   }
 
   {
-    let o2 = _.mapOnly_( null, o, commandsParse.defaults );
+    let o2 = _.mapOnly_( null, o, instructionsParse.defaults );
     o2.commands = o.program;
     o2.propertiesMapParsing = 1;
-    parsedCommands = self.commandsParse( o2 );
+    parsedCommands = aggregator.instructionsParse( o2 );
   }
 
   if( o.withParsed )
@@ -278,7 +188,7 @@ function programPerform( o )
     {
       let parsedCommand = parsedCommands[ c ];
       parsedCommand.parsedCommands = parsedCommands;
-      con.then( () => self.commandPerformParsed( parsedCommand ) );
+      con.then( () => aggregator.instructionPerformParsedLooking( parsedCommand ) );
     }
   }
   else
@@ -286,7 +196,7 @@ function programPerform( o )
     for( let c = 0 ; c < parsedCommands.length ; c++ )
     {
       let parsedCommand = parsedCommands[ c ];
-      con.then( () => self.commandPerformParsed( parsedCommand ) );
+      con.then( () => aggregator.instructionPerformParsedLooking( parsedCommand ) );
     }
   }
 
@@ -300,37 +210,260 @@ programPerform.defaults =
   commandsExplicitDelimiting : null,
   printingEcho : 1,
   withParsed : 0,
-  severalValues : 1,
-  subjectWinPathsMaybe : 0,
+  severalValues : null,
+  subjectWinPathsMaybe : 0, /* xxx : qqq : remove */
 }
 
 //
 
-function commandsParse( o )
+/**
+ * @summary Perfroms requested command(s) one by one.
+ * @description Multiple commands in one string should be separated by semicolon.
+ * @param {Object} o Options map.
+ * @param {Array|String} o.commands Command(s) to execute.
+ * @param {Array} o.propertiesMaps Array of maps with options for commands.
+ * @function instructionsPerform
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
+ */
+
+function instructionsPerform( o )
 {
-  let self = this;
+  let aggregator = this;
+  let con = new _.Consequence().take( null );
   let commands = [];
 
   if( _.strIs( o ) || _.arrayIs( o ) )
   o = { commands : o };
 
-  _.routineOptions( commandsParse, o );
+  _.routine.options( instructionsPerform, o );
   _.assert( _.strIs( o.commands ) || _.arrayIs( o.commands ) );
-  _.assert( !!self.formed );
+  _.assert( !!aggregator.formed );
+  _.assert( arguments.length === 1 );
+
+  o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
+
+  if( o.propertiesMaps === null || o.propertiesMaps.length === 0 )
+  {
+    o.propertiesMaps = _.dup( Object.create( null ), o.commands.length );
+  }
+  else
+  {
+    o.propertiesMaps = _.arrayFlatten( null, _.arrayAs( o.propertiesMaps ) );
+  }
+
+  _.assert( o.commands.length === o.propertiesMaps.length );
+  _.assert( o.commands.length !== 0, 'not tested' );
+
+  for( let c = 0 ; c < o.commands.length ; c++ )
+  {
+    let command = o.commands[ c ];
+    _.assert( command.trim() === command );
+    con.then( () => aggregator.instructionPerform
+    ({
+      command,
+      propertiesMap : o.propertiesMaps[ c ],
+    }));
+  }
+
+  return con.syncMaybe();
+}
+
+instructionsPerform.defaults =
+{
+  commands : null,
+  propertiesMaps : null,
+}
+
+//
+
+/**
+ * @summary Perfroms requested command.
+ * @param {Object} o Options map.
+ * @param {String} o.command Command to execute.
+ * @param {Array} o.propertiesMap Options for provided command.
+ * @function instructionPerform
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
+ */
+
+function instructionPerform( o )
+{
+  let aggregator = this;
+
+  if( _.strIs( o ) || _.arrayIs( o ) )
+  o = { command : o };
+
+  _.routine.options( instructionPerform, o );
+  _.assert( _.strIs( o.command ) );
+  _.assert( !!aggregator.formed );
+  _.assert( arguments.length === 1 );
+
+  let parsedCommand = aggregator.instructionParse( o );
+  let result = aggregator.instructionPerformParsedLooking( parsedCommand );
+  return result;
+}
+
+instructionPerform.defaults =
+{
+  command : null,
+  propertiesMap : null,
+}
+
+//
+
+/**
+ * @descriptionNeeded
+ * @param {Object} o Options map.
+ * @param {String} o.command Command to execute.
+ * @param {String} o.commandName
+ * @param {String} o.instructionArgument
+ * @param {Array} o.propertiesMap Options for provided command.
+ * @function instructionPerformParsedLooking
+ * @class wCommandsAggregator
+ * @namespace wTools
+ * @module Tools/mid/CommandsAggregator
+ */
+
+function instructionPerformParsedLooking( o )
+{
+  let aggregator = this;
+
+  _.routine.options( instructionPerformParsedLooking, o );
+  _.assert( _.strIs( o.command ) );
+  _.assert( _.strIs( o.commandName ) );
+  _.assert( _.strIs( o.instructionArgument ) );
+  _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
+  _.assert( _.instanceIs( aggregator ) );
+  _.assert( !!aggregator.formed );
+  _.assert( arguments.length === 1 );
+
+  o.propertiesMap = o.propertiesMap || Object.create( null );
+
+  let command = aggregator.commandLook({ commandName : o.commandName });
+  let o2 = _.mapExtend( null, o );
+  o2.phraseDescriptor = command;
+  return aggregator.instructionPerformParsedFound( o2 );
+}
+
+instructionPerformParsedLooking.defaults =
+{
+  command : null,
+  commandName : null,
+  instructionArgument : null,
+  propertiesMap : null,
+  subject : null,
+  parsedCommands : null,
+}
+
+//
+
+function instructionPerformParsedFound( o )
+{
+  let aggregator = this;
+  let result;
+
+  _.routine.options( instructionPerformParsedFound, o );
+  _.assert( _.strIs( o.command ) );
+  _.assert( _.strIs( o.commandName ) );
+  _.assert( _.strIs( o.instructionArgument ) );
+  _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
+  _.assert( _.instanceIs( aggregator ) );
+  _.assert( !!aggregator.formed );
+  _.assert( arguments.length === 1 );
+  _.assert( aggregator.commandIs( o.phraseDescriptor ) );
+
+  o.aggregator = o.aggregator || aggregator;
+  o.propertiesMap = o.propertiesMap || Object.create( null );
+
+  /* */
+
+  let phraseDescriptor = o.phraseDescriptor;
+  let routine = phraseDescriptor.routine;
+
+  _.assert( _.routineIs( routine ) );
+
+  if( phraseDescriptor.propertiesAliases )
+  {
+    let usedAliases = Object.create( null );
+    _.assert( _.objectIs( phraseDescriptor.propertiesAliases ) );
+    for( let propName in phraseDescriptor.propertiesAliases )
+    {
+      let aliases = _.arrayAs( phraseDescriptor.propertiesAliases[ propName ] );
+      _.assert( aliases.length >= 1 );
+      aliases.forEach( ( alias ) =>
+      {
+        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
+        if( o.propertiesMap[ alias ] === undefined )
+        return;
+        o.propertiesMap[ propName ] = o.propertiesMap[ alias ];
+        delete o.propertiesMap[ alias ];
+        usedAliases[ alias ] = 1;
+      })
+    }
+  }
+
+  if( _.routineIs( routine ) )
+  {
+    let o2 = o;
+    if( o.parsedCommands )
+    o2.parsedCommands = o.parsedCommands;
+    result = routine( o2 );
+  }
+  else
+  {
+    /* xxx : generate routine from this */
+    routine = _.path.nativize( routine );
+    let mapStr = _.strJoinMap({ src : o.propertiesMap });
+    let execPath = aggregator.commandPrefix + routine + ' ' + o.commandName + ' ' + o.instructionArgument + ' ' + mapStr;
+    let o2 = Object.create( null );
+    o2.execPath = execPath;
+    result = _.process.start( o2 );
+  }
+
+  if( result === undefined )
+  result = null;
+
+  return result;
+}
+
+instructionPerformParsedFound.defaults =
+{
+  ... instructionPerformParsedLooking.defaults,
+  phraseDescriptor : null,
+}
+
+// --
+// parse
+// --
+
+function instructionsParse( o )
+{
+  let aggregator = this;
+  let commands = [];
+
+  if( _.strIs( o ) || _.arrayIs( o ) )
+  o = { commands : o };
+
+  _.routine.options( instructionsParse, o );
+  _.assert( _.strIs( o.commands ) || _.arrayIs( o.commands ) );
+  _.assert( !!aggregator.formed );
   _.assert( arguments.length === 1 );
 
   if( o.commandsImplicitDelimiting === null )
-  o.commandsImplicitDelimiting = self.commandsImplicitDelimiting;
+  o.commandsImplicitDelimiting = aggregator.commandsImplicitDelimiting;
 
   if( o.commandsExplicitDelimiting === null )
-  o.commandsExplicitDelimiting = self.commandsExplicitDelimiting;
+  o.commandsExplicitDelimiting = aggregator.commandsExplicitDelimiting;
 
   o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
 
   commands = o.commands;
   commands = _.filter_( null, commands, ( command ) =>
   {
-    let result = _.strSplitNonPreserving( command, self.commandExplicitDelimeter );
+    let result = _.strSplitNonPreserving( command, aggregator.commandExplicitDelimeter );
     return _.unrollFrom( result );
   });
 
@@ -342,11 +475,7 @@ function commandsParse( o )
       let result = _.strSplit
       ({
         src : command,
-        delimeter : self.commandImplicitDelimeter,
-        // onDelimeter : ( del ) =>
-        // {
-        //   return [ del ];
-        // }
+        delimeter : aggregator.commandImplicitDelimeter,
       });
 
       result[ 0 ] = result[ 0 ].trim();
@@ -386,45 +515,45 @@ function commandsParse( o )
       severalValues : o.severalValues,
       subjectWinPathsMaybe : o.subjectWinPathsMaybe,
     };
-    parsedCommands.push ( self.commandParse( o2 ) );
+    parsedCommands.push ( aggregator.instructionParse( o2 ) );
   }
 
   return parsedCommands
 }
 
-commandsParse.defaults =
+instructionsParse.defaults =
 {
   commands : null,
   commandsImplicitDelimiting : null,
   commandsExplicitDelimiting : null,
   propertiesMapParsing : null,
   propertiesMaps : null,
-  severalValues : 1,
+  severalValues : null,
   subjectWinPathsMaybe : 0,
 }
 
 //
 
-function commandParse( o )
+function instructionParse( o )
 {
-  let self = this;
+  let aggregator = this;
 
   if( _.strIs( o ) || _.arrayIs( o ) )
   o = { command : o };
 
-  _.routineOptions( commandParse, o );
+  _.routine.options( instructionParse, o );
   _.assert( _.strIs( o.command ) );
-  _.assert( !!self.formed );
+  _.assert( !!aggregator.formed );
   _.assert( arguments.length === 1 );
 
   if( o.propertiesMapParsing === null )
-  o.propertiesMapParsing = self.propertiesMapParsing;
+  o.propertiesMapParsing = aggregator.propertiesMapParsing;
   if( o.severalValues === null )
-  o.severalValues = self.severalValues;
+  o.severalValues = aggregator.severalValues;
 
   let splits = _.strIsolateLeftOrAll( o.command, ' ' );
   let commandName = splits[ 0 ];
-  let commandArgument = splits[ 2 ];
+  let instructionArgument = splits[ 2 ];
 
   o.propertiesMap = o.propertiesMap || Object.create( null );
 
@@ -432,7 +561,7 @@ function commandParse( o )
   {
     command : o.command,
     commandName,
-    commandArgument,
+    instructionArgument,
     propertiesMap : o.propertiesMap,
   }
 
@@ -441,7 +570,7 @@ function commandParse( o )
 
     let request = _.strRequestParse
     ({
-      src : commandArgument,
+      src : instructionArgument,
       commandsDelimeter : false,
       severalValues : o.severalValues,
       subjectWinPathsMaybe : o.subjectWinPathsMaybe,
@@ -455,237 +584,338 @@ function commandParse( o )
   return parsed;
 }
 
-commandParse.defaults =
+instructionParse.defaults =
 {
   command : null,
   propertiesMap : null,
   propertiesMapParsing : null,
-  severalValues : 1,
+  severalValues : null,
   subjectWinPathsMaybe : 0,
 }
 
 //
 
 /**
- * @summary Perfroms requested command(s) one by one.
- * @description Multiple commands in one string should be separated by semicolon.
- * @param {Object} o Options map.
- * @param {Array|String} o.commands Command(s) to execute.
- * @param {Array} o.propertiesMaps Array of maps with options for commands.
- * @function commandsPerform
+ * @summary Separates second command from provided string.
+ * @param {String} command Commands string to parse.
+ * @function instructionIsolateSecondFromArgumentLeft
  * @class wCommandsAggregator
  * @namespace wTools
  * @module Tools/mid/CommandsAggregator
- */
+*/
 
-function commandsPerform( o )
+function instructionIsolateSecondFromArgumentLeft( instruction )
 {
-  let self = this;
-  let con = new _.Consequence().take( null );
-  let commands = [];
+  let aggregator = this;
+  let result = Object.create( null );
 
-  if( _.strIs( o ) || _.arrayIs( o ) )
-  o = { commands : o };
-
-  _.routineOptions( commandsPerform, o );
-  _.assert( _.strIs( o.commands ) || _.arrayIs( o.commands ) );
-  _.assert( !!self.formed );
   _.assert( arguments.length === 1 );
+  _.assert( _.strIs( instruction ) );
 
-  o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
+  let splits = _.strIsolateLeftOrAll( instruction, aggregator.commandImplicitDelimeter );
+  [ result.instructionArgument, result.secondInstructionName, result.secondInstructionArgument  ] = splits;
 
-  if( o.propertiesMaps === null || o.propertiesMaps.length === 0 )
+  if( result.secondInstructionName === undefined )
+  delete result.secondInstructionName;
+
+  result.instructionArgument = _.strUnquote( result.instructionArgument.trim() );
+  if( result.secondInstructionName )
+  result.secondInstructionName = result.secondInstructionName.trim();
+  if( result.secondInstructionArgument )
+  result.secondInstructionArgument = result.secondInstructionArgument.trim();
+
+  if( result.secondInstructionName )
   {
-    o.propertiesMaps = _.dup( Object.create( null ), o.commands.length );
+    result.secondInstructionName = result.secondInstructionName.trim();
+    result.secondInstruction = result.secondInstructionName + ' ' + result.secondInstructionArgument;
   }
-  else
-  {
-    o.propertiesMaps = _.arrayFlatten( null, _.arrayAs( o.propertiesMaps ) );
-  }
-
-  _.assert( o.commands.length === o.propertiesMaps.length );
-  _.assert( o.commands.length !== 0, 'not tested' );
-
-  for( let c = 0 ; c < o.commands.length ; c++ )
-  {
-    let command = o.commands[ c ];
-    _.assert( command.trim() === command );
-    con.then( () => self.commandPerform
-    ({
-      command,
-      propertiesMap : o.propertiesMaps[ c ],
-    }));
-  }
-
-  return con.syncMaybe();
-}
-
-commandsPerform.defaults =
-{
-  commands : null,
-  propertiesMaps : null,
-}
-
-//
-
-/**
- * @summary Perfroms requested command.
- * @param {Object} o Options map.
- * @param {String} o.command Command to execute.
- * @param {Array} o.propertiesMap Options for provided command.
- * @function commandPerform
- * @class wCommandsAggregator
- * @namespace wTools
- * @module Tools/mid/CommandsAggregator
- */
-
-function commandPerform( o )
-{
-  let self = this;
-
-  if( _.strIs( o ) || _.arrayIs( o ) )
-  o = { command : o };
-
-  _.routineOptions( commandPerform, o );
-  _.assert( _.strIs( o.command ) );
-  _.assert( !!self.formed );
-  _.assert( arguments.length === 1 );
-
-  let parsedCommand = self.commandParse( o );
-  let result = self.commandPerformParsed( parsedCommand );
-  return result;
-}
-
-commandPerform.defaults =
-{
-  command : null,
-  propertiesMap : null,
-}
-
-//
-
-/**
- * @descriptionNeeded
- * @param {Object} o Options map.
- * @param {String} o.command Command to execute.
- * @param {String} o.commandName
- * @param {String} o.commandArgument
- * @param {Array} o.propertiesMap Options for provided command.
- * @function commandPerformParsed
- * @class wCommandsAggregator
- * @namespace wTools
- * @module Tools/mid/CommandsAggregator
- */
-
-function commandPerformParsed( o )
-{
-  let self = this;
-  let result;
-
-  _.routineOptions( commandPerformParsed, o );
-  _.assert( _.strIs( o.command ) );
-  _.assert( _.strIs( o.commandName ) );
-  _.assert( _.strIs( o.commandArgument ) );
-  _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
-  _.assert( _.instanceIs( self ) );
-  _.assert( !!self.formed );
-  _.assert( arguments.length === 1 );
-
-  o.propertiesMap = o.propertiesMap || Object.create( null );
-
-  /* */
-
-  let subjectDescriptors = self.vocabulary.subjectDescriptorFor( o.commandName );
-  let filteredSubjectDescriptors;
-
-  /* */
-
-  if( !subjectDescriptors.length )
-  {
-    self.onUnknownCommandError( o );
-    return null;
-  }
-  else
-  {
-    filteredSubjectDescriptors = self.vocabulary.subjectsFilter( subjectDescriptors, { wholePhrase : o.commandName } );
-    if( filteredSubjectDescriptors.length !== 1 )
-    {
-      let e = _.mapExtend( null, o );
-      e.filteredSubjectDescriptors = filteredSubjectDescriptors;
-      self.onAmbiguity( e );
-    }
-    if( filteredSubjectDescriptors.length !== 1 )
-    return null;
-  }
-
-  /* */
-
-  let subjectDescriptor = filteredSubjectDescriptors[ 0 ];
-  let executable = subjectDescriptor.phraseDescriptor.executable;
-
-  if( executable.commandPropertiesAliases )
-  {
-    let usedAliases = Object.create( null );
-    _.assert( _.objectIs( executable.commandPropertiesAliases ) );
-    for( let propName in executable.commandPropertiesAliases )
-    {
-      let aliases = _.arrayAs( executable.commandPropertiesAliases[ propName ] );
-      _.assert( aliases.length >= 1 );
-      aliases.forEach( ( alias ) =>
-      {
-        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
-        if( o.propertiesMap[ alias ] === undefined )
-        return;
-        o.propertiesMap[ propName ] = o.propertiesMap[ alias ];
-        delete o.propertiesMap[ alias ];
-        usedAliases[ alias ] = 1;
-      })
-    }
-  }
-
-  if( _.routineIs( executable ) )
-  {
-    let o2 =
-    {
-      command : o.command,
-      commandName : o.commandName,
-      commandArgument : o.commandArgument,
-      subject : o.subject,
-      propertiesMap : o.propertiesMap,
-      ca : self,
-      subjectDescriptor,
-    };
-    if( o.parsedCommands )
-    o2.parsedCommands = o.parsedCommands;
-    result = executable( o2 );
-  }
-  else
-  {
-    executable = _.path.nativize( executable );
-    let mapStr = _.strJoinMap({ src : o.propertiesMap });
-    let execPath = self.commandPrefix + executable + ' ' + o.commandName + ' ' + o.commandArgument + ' ' + mapStr;
-    let o2 = Object.create( null );
-    o2.execPath = execPath;
-    result = _.process.start( o2 );
-  }
-
-  if( result === undefined )
-  result = null;
 
   return result;
 }
 
-commandPerformParsed.defaults =
+//
+
+function instructionIsolateSecondFromArgumentRight( instruction )
 {
-  command : null,
-  commandName : null,
-  commandArgument : null,
-  propertiesMap : null,
-  subject : null,
-  parsedCommands : null,
+  let aggregator = this;
+  let result = Object.create( null );
+
+  _.assert( arguments.length === 1 );
+  _.assert( _.strIs( instruction ) );
+
+  let splits = _.strIsolateRightOrAll( instruction, aggregator.commandImplicitDelimeter );
+  [ result.instructionArgument, result.secondInstructionName, result.secondInstructionArgument  ] = splits;
+
+  if( result.secondInstructionName === undefined )
+  delete result.secondInstructionName;
+
+  result.instructionArgument = _.strUnquote( result.instructionArgument.trim() );
+  if( result.secondInstructionName )
+  result.secondInstructionName = result.secondInstructionName.trim();
+  if( result.secondInstructionArgument )
+  result.secondInstructionArgument = result.secondInstructionArgument.trim();
+
+  if( result.secondInstructionName )
+  {
+    result.secondInstructionName = _.strUnquote( result.secondInstructionName.trim() );
+    result.secondInstruction = result.secondInstructionName + ' ' + result.secondInstructionArgument;
+  }
+
+  return result;
+}
+
+// --
+// etc
+// --
+
+function withSubphraseExport_head( routine, args )
+{
+  let self = this;
+
+  let o = args[ 0 ];
+
+  if( !_.objectIs( o ) )
+  o = { phrase : args[ 0 ] };
+
+  _.assert( arguments.length === 2 );
+  _.assert( args.length === 1 );
+  _.routineOptions( routine, o );
+
+  return o;
 }
 
 //
+
+function withSubphraseExportToStructure_body( o )
+{
+  let aggregator = this;
+
+  _.assert( arguments.length === 1 );
+
+  let o2 = _.mapOnly_( null, o, aggregator.vocabulary.withSubphrase.defaults );
+  let subphraseDescriptorArray = aggregator.vocabulary.withSubphrase( o2 );
+
+  _.assert( _.arrayIs( subphraseDescriptorArray ) );
+
+  if( !subphraseDescriptorArray.length )
+  return '';
+
+  let onDescriptorExportString = o.onDescriptorExportString
+  if( !onDescriptorExportString )
+  onDescriptorExportString = _.routine.join( aggregator, aggregator.commandExportString );
+  let part1 = subphraseDescriptorArray.map( ( e ) =>
+  {
+    let phraseDescriptor = aggregator.vocabulary.phraseMap[ e.phrase ];
+    _.assert( !!phraseDescriptor );
+    return phraseDescriptor.phrase;
+  });
+  debugger;
+  let part2 = subphraseDescriptorArray.map( ( e ) =>
+  {
+    let phraseDescriptor = aggregator.vocabulary.phraseMap[ e.phrase ];
+    _.assert( !!phraseDescriptor );
+    return onDescriptorExportString( phraseDescriptor );
+  });
+  let help = _.strJoin( [ _.ct.format( aggregator.vocabulary.defaultDelimeter, 'code' ), _.ct.format( part1, 'code' ), ' - ', part2 ] );
+
+  debugger;
+  return help;
+}
+
+var defaults = withSubphraseExportToStructure_body.defaults =
+{
+  phrase : null,
+  delimeter : null,
+  minimal : 0,
+  onDescriptorExportString : null,
+}
+
+let withSubphraseExportToStructure = _.routine.unite( withSubphraseExport_head, withSubphraseExportToStructure_body );
+
+//
+
+function withSubphraseExportToString_body( o )
+{
+  let aggregator = this;
+  let structure = aggregator.withSubphraseExportToStructure( o );
+  return _.entity.exportString( structure, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
+}
+
+withSubphraseExportToString_body.defaults = Object.create( withSubphraseExportToStructure.defaults );
+
+let withSubphraseExportToString = _.routine.unite( withSubphraseExport_head, withSubphraseExportToString_body );
+
+//
+
+function _help( o )
+{
+  let aggregator = this;
+  let logger = aggregator.logger || _global_.logger;
+
+  if( _.strIs( arguments[ 0 ] ) )
+  o = { argument : o }
+  _.assert( arguments.length === 0 || arguments.length === 1 );
+  _.routine.options( _help, o );
+
+  if( o.argument )
+  {
+    logger.log();
+    logger.log( aggregator.withSubphraseExportToString({ phrase : o.argument, minimal : 0 }) );
+    logger.up();
+
+    let command = aggregator.vocabulary.withPhrase({ phrase : o.argument });
+
+    if( command )
+    {
+      if( command.routine && command.properties )
+      logger.log( aggregator.commandPropertiesExportString( command ) );
+    }
+    else
+    {
+      logger.log( 'No command', o.argument );
+    }
+
+    logger.down();
+    logger.log();
+
+  }
+  else
+  {
+
+    logger.log();
+    logger.log( aggregator.withSubphraseExportToString( '' ) );
+    logger.log();
+
+  }
+
+  return this;
+}
+
+_help.defaults =
+{
+  argument : '',
+}
+
+// --
+// predefined commands
+// --
+
+/*
+  .help - Prints list of available commands with description
+  .help commandName
+    - Exact match - Prints description of command and properties.
+    - Partial match - Prints list of commands that have provided commandName.
+    - No match - Prints No command found.
+*/
+
+function _commandHelp( e )
+{
+  let aggregator = e.aggregator;
+  let logger = aggregator.logger || _global_.logger;
+  return aggregator._help({ argument : e.instructionArgument });
+}
+
+var command = _commandHelp.command = Object.create( null );
+command.hint = 'Get help.';
+
+// --
+// handler
+// --
+
+function onError( err )
+{
+  let aggregator = this;
+  /* qqq : cover the case. check appExitCode. test should be external ( launch process ) */
+  if( aggregator.changingExitCode )
+  _.process.exitCode( -1 );
+  throw _.err( err || 'Error' );
+}
+
+//
+
+function onSyntaxError( o )
+{
+  let aggregator = this;
+  let err = _.errBrief( 'Illformed command', _.ct.format( _.strQuote( o.command ), 'code' ) );
+  aggregator.logger.error( err );
+  aggregator.onGetHelp();
+  return aggregator.onError( err );
+}
+
+onSyntaxError.defaults =
+{
+  command : null,
+}
+
+//
+
+function onGetHelp()
+{
+  let aggregator = this;
+  _.assert( arguments.length === 0, 'Expects no arguments' );
+  if( aggregator.vocabulary.phraseMap.help )
+  {
+    aggregator.instructionPerform({ command : '.help' });
+  }
+  else
+  {
+    aggregator._help();
+  }
+}
+
+//
+
+function onAmbiguity( o )
+{
+  let aggregator = this;
+  let err = _.errBrief( 'Ambiguity', _.ct.format( _.strQuote( o.commandName ), 'code' ) );
+
+  aggregator.logger.log( 'Ambiguity. Did you mean?' );
+  aggregator.logger.log( aggregator.withSubphraseExportToString( o.commandName ) );
+  aggregator.logger.log( '' );
+
+  return aggregator.onError( err );
+}
+
+onAmbiguity.defaults =
+{
+  ... instructionPerformParsedLooking.defaults,
+  subphrasesDescriptorArray : null,
+}
+
+//
+
+function onUnknownCommandError( o )
+{
+  let aggregator = this;
+  let s = 'Unknown command ' + _.strQuote( o.commandName );
+  if( aggregator.vocabulary.phraseMap[ 'help' ] )
+  s += '\nTry ".help"';
+  return aggregator.onError( _.err( s ) );
+}
+
+onUnknownCommandError.defaults =
+{
+  ... instructionPerformParsedLooking.defaults,
+}
+
+//
+
+function onPrintCommands()
+{
+  let aggregator = this;
+
+  _.assert( arguments.length === 0, 'Expects no arguments' );
+
+  aggregator.logger.log();
+  aggregator.logger.log( aggregator.withSubphraseExportToString( '' ) );
+  aggregator.logger.log();
+
+}
+
+// --
+// command
+// --
 
 /**
  * @summary Adds commands to the vocabulary.
@@ -698,381 +928,329 @@ commandPerformParsed.defaults =
 
 function commandsAdd( commands )
 {
-  let self = this;
+  let aggregator = this;
 
-  _.assert( !self.formed );
+  _.assert( !aggregator.formed, 'Command aggregator is already formed' );
   _.assert( arguments.length === 1 );
 
-  if( !self.vocabulary )
-  self._formVocabulary();
+  if( !aggregator.vocabulary )
+  aggregator._formVocabulary();
 
-  self.vocabulary.phrasesAdd( commands );
+  commands = aggregator._commandMapFrom( commands );
+  aggregator._commandMapValidate( commands );
+  aggregator.vocabulary.phrasesAdd( commands );
 
-  return self;
+  return aggregator;
 }
 
 //
 
-/**
- * @summary Separates second command from provided string.
- * @param {String} command Commands string to parse.
- * @function commandIsolateSecondFromArgumentLeft
- * @class wCommandsAggregator
- * @namespace wTools
- * @module Tools/mid/CommandsAggregator
-*/
-
-function commandIsolateSecondFromArgumentLeft( command )
+function commandExportString( command )
 {
-  let ca = this;
-  let result = Object.create( null );
-
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( command ) );
-
-  let splits = _.strIsolateLeftOrAll( command, ca.commandImplicitDelimeter );
-  [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = splits;
-
-  if( result.secondCommandName === undefined )
-  delete result.secondCommandName;
-
-  result.commandArgument = _.strUnquote( result.commandArgument.trim() );
-  if( result.secondCommandName )
-  result.secondCommandName = result.secondCommandName.trim();
-  if( result.secondCommandArgument )
-  result.secondCommandArgument = result.secondCommandArgument.trim();
-
-  if( result.secondCommandName )
-  {
-    result.secondCommandName = result.secondCommandName.trim();
-    result.secondCommand = result.secondCommandName + ' ' + result.secondCommandArgument;
-  }
-
-  return result;
+  let aggregator = this;
+  _.assert( aggregator.commandIs( command ) );
+  return command.longHint || command.hint || _.strCapitalize( command.phrase + '.' );
 }
 
 //
 
-function commandIsolateSecondFromArgumentRight( command )
+function commandPropertiesExportString( command )
 {
-  let ca = this;
-  let result = Object.create( null );
+  let aggregator = this;
+  let routine = command.routine;
+  let properties = command.properties;
+  let keys = _.mapKeys( properties )
+  let hints = _.mapVals( properties );
 
-  _.assert( arguments.length === 1 );
-  _.assert( _.strIs( command ) );
-
-  let splits = _.strIsolateRightOrAll( command, ca.commandImplicitDelimeter );
-  [ result.commandArgument, result.secondCommandName, result.secondCommandArgument  ] = splits;
-
-  if( result.secondCommandName === undefined )
-  delete result.secondCommandName;
-
-  result.commandArgument = _.strUnquote( result.commandArgument.trim() );
-  if( result.secondCommandName )
-  result.secondCommandName = result.secondCommandName.trim();
-  if( result.secondCommandArgument )
-  result.secondCommandArgument = result.secondCommandArgument.trim();
-
-  if( result.secondCommandName )
+  if( command.propertiesAliases )
   {
-    result.secondCommandName = _.strUnquote( result.secondCommandName.trim() );
-    result.secondCommand = result.secondCommandName + ' ' + result.secondCommandArgument;
-  }
-
-  return result;
-}
-
-//
-
-/*
-  .help - Prints list of available commands with description
-  .help commandName
-    - Exact match - Prints description of command and properties.
-    - Partial match - Prints list of commands that have provided commandName.
-    - No match - Prints No command found.
-*/
-
-function _commandHelp( e )
-{
-  let self = this;
-  let ca = e.ca;
-  let logger = self.logger || ca.logger || _global_.logger;
-
-  if( e.commandArgument )
-  {
-    logger.log();
-    logger.log( e.ca.vocabulary.helpForSubjectAsString({ phrase : e.commandArgument, filter }) );
-    logger.up();
-
-    let subject = e.ca.vocabulary.subjectDescriptorFor({ phrase : e.commandArgument, exact : 1 });
-
-    if( !subject )
+    let usedAliases = Object.create( null );
+    _.assert( _.objectIs( command.propertiesAliases ) );
+    for( let propName in command.propertiesAliases )
     {
-      logger.log( 'No command', e.commandArgument );
+      let aliases = _.arrayAs( command.propertiesAliases[ propName ] );
+      _.assert( aliases.length >= 1 );
+      aliases.forEach( ( alias ) =>
+      {
+        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
+        let hint = properties[ propName ];
+        let propIndex = keys.indexOf( propName );
+        keys.splice( propIndex, 0, alias );
+        hints.splice( propIndex, 0, hint );
+        usedAliases[ alias ] = 1;
+      })
+    }
+  }
+
+  keys = _.ct.format( keys, 'path' );
+
+  let help = _.strJoin( [ keys, ' : ', hints ] );
+  return _.entity.exportString( help, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
+}
+
+//
+
+function commandFrom( src, phrase )
+{
+  let aggregator = this;
+  _.assert( arguments.length === 2 );
+  _.assert( phrase === null || phrase === src.phrase );
+  aggregator._commandValidate( src );
+  return src;
+}
+
+//
+
+function commandIs( src )
+{
+  if( !_.aux.is( src ) )
+  return false;
+  if( !_.strIs( src.phrase ) )
+  return false;
+  // if( !src.executable )
+  // return false;
+  return true;
+}
+
+// //
+//
+// function commandIs( command )
+// {
+//   if( !_.aux.is( command ) )
+//   return false;
+//   if( command.routine === undefined )
+//   return false;
+//   if( command.phrase === undefined )
+//   return false;
+//   return true;
+// }
+
+//
+
+function commandLook( o )
+{
+  let aggregator = this;
+
+  _.routine.options( commandLook, o );
+  _.assert( _.strIs( o.commandName ) );
+  _.assert( arguments.length === 1 );
+
+  /* */
+
+  let command = aggregator.vocabulary.withPhrase( o.commandName );
+
+  if( o.withHandlers )
+  if( !command )
+  {
+    let subphrasesDescriptorArray = aggregator.vocabulary.withSubphrase( o.commandName );
+    if( !subphrasesDescriptorArray.length )
+    {
+      aggregator.onUnknownCommandError( o );
+      return null;
     }
     else
     {
-      if( subject.phraseDescriptor.executable && subject.phraseDescriptor.executable.commandProperties )
-      logger.log( helpForOptionsMake( subject ) );
+      let e = _.mapExtend( null, o );
+      e.subphrasesDescriptorArray = subphrasesDescriptorArray;
+      aggregator.onAmbiguity( e );
+      return null;
     }
-
-    logger.down();
-    logger.log();
-
-  }
-  else
-  {
-
-    logger.log();
-    logger.log( e.ca.vocabulary.helpForSubjectAsString( '' ) );
-    logger.log();
-
   }
 
-  return self;
+  return command || null;
+}
 
-  /* */
+commandLook.defaults =
+{
+  commandName : null,
+  withHandlers : 1,
+}
 
-  function filter( e )
+//
+
+function _commandValidate( command )
+{
+  let aggregator = this;
+  _.assert( aggregator.commandIs( command ), 'Not a command' );
+  _.assert( _.routineIs( command.routine ) );
+  _.assert( command.routine.command === command );
+  _.assert( _.strDefined( command.phrase ) );
+  _.assert( command.aggregator === undefined || command.aggregator === aggregator );
+  if( _.routineIs( command.routine ) )
+  _.map.assertHasOnly( command.routine, aggregator.CommandRoutineFields, 'Command routine should not have redundant fields' );
+  _.map.assertHasOnly( command, aggregator.CommandNormalFields, 'Command should not have' );
+  return true;
+}
+
+//
+
+function _commandMapValidate( commandMap )
+{
+  let aggregator = this;
+  _.assert( _.mapIs( commandMap ) );
+  for( let k in commandMap )
   {
-    return e.phraseDescriptor.longHint || e.phraseDescriptor.hint || _.strCapitalize( e.phraseDescriptor.phrase + '.' );
+    let command = commandMap[ k ]
+    aggregator._commandValidate( command );
   }
+  return commandMap;
+}
 
-  /* */
+//
 
-  function helpForOptionsMake( subject )
+function _commandPreform( command, commandRoutine, commandPhrase )
+{
+  let aggregator = this;
+
+  if( commandRoutine === null )
+  commandRoutine = command.routine || command.e;
+  if( command === null )
+  command = commandRoutine.command || Object.create( null );
+
+  if( command.phrase )
+  command.phrase = aggregator.vocabulary.phraseNormalize( command.phrase );
+  if( commandPhrase )
+  commandPhrase = aggregator.vocabulary.phraseNormalize( commandPhrase );
+  commandPhrase = commandPhrase || command.phrase || ( commandRoutine.command ? commandRoutine.command.phrase : null ) || null;
+
+  if( commandRoutine && commandRoutine.command )
+  if( command !== commandRoutine.command )
   {
-    let executable = subject.phraseDescriptor.executable;
-    let properties = executable.commandProperties;
-
-    let options = _.mapKeys( properties )
-    let hints = _.mapVals( properties );
-
-    if( executable.commandPropertiesAliases )
+    _.assert( _.aux.is( commandRoutine.command ) );
+    if( commandRoutine.command.phrase )
+    commandRoutine.command.phrase = aggregator.vocabulary.phraseNormalize( commandRoutine.command.phrase );
+    for( let k in commandRoutine.command )
     {
-      let usedAliases = Object.create( null );
-      _.assert( _.objectIs( executable.commandPropertiesAliases ) );
-      for( let propName in executable.commandPropertiesAliases )
-      {
-        let aliases = _.arrayAs( executable.commandPropertiesAliases[ propName ] );
-        _.assert( aliases.length >= 1 );
-        aliases.forEach( ( alias ) =>
-        {
-          _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
-          let hint = executable.commandProperties[ propName ];
-          let propIndex = options.indexOf( propName );
-          options.splice( propIndex, 0, alias );
-          hints.splice( propIndex, 0, hint );
-          usedAliases[ alias ] = 1;
-        })
-      }
+      _.assert
+      (
+        !_.property.has( command, k ) || command[ k ] === commandRoutine.command[ k ]
+        , () => `Inconsistent field "${k}" of command "${commandPhrase}"`
+      );
+      command[ k ] = commandRoutine.command[ k ];
     }
-
-    options = _.ct.format( options, 'path' );
-
-    let help = _.strJoin( [ options, ' : ', hints ] );
-    return _.entity.exportString( help, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
-  }
-}
-
-_commandHelp.hint = 'Get help.';
-
-//
-
-function _commandVersion_functor( fop )
-{
-
-  _.routineOptions( _commandVersion_functor, arguments );
-  _.assert( _.strDefined( fop.packageJsonPath ) );
-  _.assert( _.strDefined( fop.packageName ) );
-
-  _commandVersion.hint = 'Get information about version.';
-  return _commandVersion;
-
-  function _commandVersion( e )
-  {
-    let cui = this;
-    return _.npm.versionLog
-    ({
-      localPath : fop.localPath,
-      remotePath : fop.remotePath,
-      logger : _.logger.relative( cui.logger, 1 ),
-    });
+    delete commandRoutine.command;
   }
 
-}
+  /* qqq : fill in asserts explanations */
+  _.assert
+  (
+    !command.aggregator,
+    () => `Command "${command.phrase}" already associated with a command aggregator.`
+    + ` Each Command should be used only once.`
+  );
+  _.assert( _.routine.is( commandRoutine ), `Command "${commandPhrase}" does not have defined routine.` );
+  _.assert( _.aux.is( command ) );
+  _.assert( !_.property.has( command, 'ro' ) || commandRoutine === command.ro ); /* xxx : rename e to ro? */
+  _.assert( !_.property.has( command, 'routine' ) || commandRoutine === command.routine );
+  _.assert
+  (
+    !_.property.has( command, 'phrase' ) || commandPhrase === command.phrase,
+    () => `Command ${commandPhrase} has phrases mismatch ${commandPhrase} <> ${command.phrase}`
+  );
+  _.assert( !_.property.own( commandRoutine, 'command' ) || commandRoutine.command === command );
+  _.map.assertHasOnly( command, aggregator.CommandAllFields );
 
-_commandVersion_functor.defaults =
-{
-  localPath : null,
-  remotePath : null,
-}
+  if( commandPhrase )
+  command.phrase = commandPhrase;
+  command.routine = commandRoutine;
+  commandRoutine.command = command;
+  aggregator._CommandShortFiledsToLongFields( command, command );
 
-//
-
-function onAmbiguity( o )
-{
-  let self = this;
-
-  /* qqq : cover the case. check appExitCode. test should be external ( launch process ) */
-  if( self.changingExitCode )
-  _.process.exitCode( -1 );
-
-  self.logger.log( 'Ambiguity. Did you mean?' );
-  self.logger.log( self.vocabulary.helpForSubjectAsString( o.commandName ) );
-  self.logger.log( '' );
-
-}
-
-onAmbiguity.defaults = Object.create( programPerform.defaults );
-
-//
-
-function onUnknownCommandError( o )
-{
-  let self = this;
-
-  /* qqq : cover the case. check appExitCode. test should be external ( launch process ) */
-  if( self.changingExitCode )
-  _.process.exitCode( -1 );
-
-  let s = 'Unknown command ' + _.strQuote( o.commandName );
-  if( self.vocabulary.descriptorMap[ 'help' ] )
-  s += '\nTry ".help"';
-  let err = _.errBrief( s );
-  debugger;
-  throw err;
-}
-
-onUnknownCommandError.defaults = Object.create( commandPerformParsed.defaults );
-
-//
-
-function onSyntaxError( o )
-{
-  let self = this;
-
-  /* qqq : cover the case. check appExitCode. test should be external ( launch process ) */
-  if( self.changingExitCode )
-  _.process.exitCode( -1 );
-
-  let err = _.errBrief( 'Illformed command', self.logger.colorFormat( _.strQuote( o.command ), 'code' ) );
-  self.logger.error( err );
-  self.onGetHelp();
-  throw err;
-}
-
-onSyntaxError.defaults =
-{
-  command : null,
-}
-
-// onSyntaxError.defaults = Object.create( appArgsPerform.defaults );
-
-//
-
-function onGetHelp()
-{
-  let self = this;
-
-  _.assert( arguments.length === 0, 'Expects no arguments' );
-
-  if( self.vocabulary.subjectDescriptorFor( '.help' ).length )
-  {
-    self.commandPerform({ command : '.help' });
-  }
-  else
-  {
-    self._commandHelp({ ca : self });
-  }
-
+  return command;
 }
 
 //
 
-function onPrintCommands()
+function _commandMapFrom( commandMap )
 {
-  let self = this;
-
-  _.assert( arguments.length === 0, 'Expects no arguments' );
-
-  self.logger.log();
-  self.logger.log( self.vocabulary.helpForSubjectAsString( '' ) );
-  self.logger.log();
-
-}
-
-//
-
-function _onPhraseDescriptorMake( src )
-{
-
-  _.assert(  _.strIs( src ) || _.arrayIs( src ) );
-  _.assert( arguments.length === 1 );
-
-  let self = this;
+  let aggregator = this;
   let result = Object.create( null );
-  let phrase = src;
-  let executable = null;
-  // let knownFields =
-  // {
-  //   hint : null,
-  //   defaults : null,
-  //   commandProperties : null,
-  // }
+  let visited = new Set();
 
-  if( phrase )
+  if( _.aux.is( commandMap ) )
   {
-    _.assert( phrase.length === 2 );
-    executable = phrase[ 1 ];
-    phrase = phrase[ 0 ];
-  }
-
-  let hint = phrase;
-  let longHint;
-
-  if( _.objectIs( executable ) )
-  {
-    // _.map.assertHasOnly( executable, { e : null, h : null } ); /* Dmytro : without longHint */
-    // hint = executable.h;
-    // executable = executable.e;
-
-    _.map.assertHasOnly( executable, { e : null, h : null, lh : null } );
-    hint = executable.h;
-    longHint = executable.lh;
-    executable = executable.e;
-  }
-
-  result.phrase = phrase;
-  result.hint = hint;
-  result.longHint = longHint;
-
-  if( _.routineIs( executable ) )
-  {
-    result.executable = executable;
-    if( executable.hint )
+    for( let k in commandMap )
     {
-      _.assert( result.hint === undefined || result.hint === null || result.hint === hint );
-      result.hint = executable.hint;
+      let command = commandMap[ k ];
+      let commandRoutine = command;
+
+      if( _.routine.is( commandRoutine ) )
+      command = null;
+      else
+      commandRoutine = command.ro || command.routine;
+
+      let commandPhrase = aggregator.vocabulary.phraseNormalize( k );
+      command = aggregator._commandPreform( command, commandRoutine, commandPhrase );
+      command.aggregator = aggregator;
+      aggregator._commandValidate( command );
+
+      _.assert
+      (
+        !visited.has( command.routine ),
+        `Duplication of command "${command.phrase}"`
+      );
+      visited.add( command.routine );
+
+      result[ command.phrase ] = command;
     }
-    if( executable.longHint )
-    {
-      _.assert( result.longHint === undefined || result.longHint === null || result.longHint === longHint );
-      result.longHint = executable.longHint;
-    }
-    _.map.assertHasOnly( executable, self.CommandRoutineFields, () => `Unknown field of command "${result.phrase}" :` );
-    // executable.commandDescriptor = result;
-    // if( executable.originalRoutine )
-    // executable.originalRoutine.commandDescriptor = result;
   }
-  else
+  else if( _.longIs( commandMap ) )
   {
-    _.assert( _.strIs( executable ) );
-    result.executable = _.path.resolve( self.basePath, executable );
-    _.sure( !!_.fileProvider.statResolvedRead( result.executable ), () => 'Application not found at ' + _.strQuote( result.executable ) );
+    for( let k = 0 ; k < commandMap.length ; k++ )
+    {
+      let command = commandMap[ k ];
+      let commandRoutine = command;
+      if( _.routine.is( commandRoutine ) )
+      command = null;
+      else
+      commandRoutine = command.ro || command.routine;
+
+      command = aggregator._commandPreform( command, commandRoutine );
+      command.aggregator = aggregator;
+      aggregator._commandValidate( command );
+
+      _.assert
+      (
+        !visited.has( command.routine ),
+        `Duplication of command "${command.phrase}"`
+      );
+      visited.add( command.routine );
+
+      result[ command.phrase ] = command;
+    }
   }
+  else _.assert( 0 );
+
+  _.assert( _.aux.is( result ) );
 
   return result;
+}
+
+//
+
+function _CommandShortFiledsToLongFields( dst, fields )
+{
+  _.assert( arguments.length === 2 );
+  let filter = Self.CommandShortToLongFields;
+  for( let k in fields )
+  {
+    if( _.property.has( filter, k ) )
+    {
+      _.assert
+      (
+        !_.property.has( dst, filter[ k ] ) || dst[ filter[ k ] ] === fields[ k ]
+        , () => `Inconsistent field "${k}" of command "${commandPhraseGet()}"`
+      );
+      _.assert( !_.property.has( dst, filter[ k ] ) || dst[ filter[ k ] ] === fields[ k ] );
+      dst[ filter[ k ] ] = fields[ k ];
+      delete fields[ k ];
+    }
+  }
+
+  function commandPhraseGet()
+  {
+    return dst.phrase || ( dst.command ? dst.command.phrase : null ) || null;
+  }
 }
 
 // --
@@ -1081,19 +1259,59 @@ function _onPhraseDescriptorMake( src )
 
 let CommandRoutineFields =
 {
+
   defaults : null,
+  command : null,
+
+  // hint : null,
+  // longHint : null,
+  // commandPhrase : null,
+  // commandSubjectHint : null,
+  // commandProperties : null,
+  // commandPropertiesAliases : null,
+  // routine : null,
+
+  // executable
+
+}
+
+let CommandNormalFields =
+{
   hint : null,
   longHint : null,
-  commandSubjectHint : null,
-  commandProperties : null,
-  commandPropertiesAliases : null,
+  phrase : null,
+  subjectHint : null,
+  properties : null,
+  propertiesAliases : null,
+  routine : null,
+  aggregator : null,
+}
+
+let CommandShortFields =
+{
+  ro : null,
+  h : null,
+  lh : null,
+}
+
+let CommandAllFields =
+{
+  ... CommandNormalFields,
+  ... CommandShortFields,
+}
+
+let CommandShortToLongFields =
+{
+  ro : 'routine',
+  h : 'hint',
+  lh : 'longHint',
 }
 
 let Composes =
 {
   basePath : null,
   commandPrefix : '',
-  addingDelimeter : ' ', /* qqq xxx : make it accessor */ /* qqq xxx : make possilbe both ":.command.postfix" and "command postfix" in definition of commands */
+  delimeter : _.define.own([ '.', ' ' ]),
   commandExplicitDelimeter : ';',
   commandImplicitDelimeter : _.define.own( /(\s|^)\.\w[\w\.]*[^ \\\/\*\?](\s|$)/ ),
   // commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]+))/ ),
@@ -1102,13 +1320,13 @@ let Composes =
   commandsImplicitDelimiting : 0,
   propertiesMapParsing : 0,
   severalValues : 1,
-  lookingDelimeter : _.define.own([ '.', ' ' ]), /* qqq xxx : make it accessor */
-  supplementingByHelp : 1,
+  withHelp : 1,
   changingExitCode : 1,
 }
 
 let Aggregates =
 {
+  onError,
   onSyntaxError,
   onAmbiguity,
   onUnknownCommandError,
@@ -1130,7 +1348,14 @@ let Restricts =
 
 let Statics =
 {
+  Exec,
+  // commandIs,
+  _CommandShortFiledsToLongFields,
   CommandRoutineFields,
+  CommandNormalFields,
+  CommandShortFields,
+  CommandAllFields,
+  CommandShortToLongFields,
 }
 
 let Forbids =
@@ -1153,36 +1378,63 @@ let Medials =
 let Extension =
 {
 
+  // inter
+
   init,
   form,
   _formVocabulary,
   exec,
+  Exec,
 
-  appArgsNormalize,
-  // appArgsPerform,
+  // run
 
   programPerform,
 
-  commandsParse,
-  commandParse,
-  commandsPerform,
-  commandPerform,
-  commandPerformParsed,
+  instructionsPerform,
+  instructionPerform,
+  instructionPerformParsedLooking,
+  instructionPerformParsedFound,
 
-  commandsAdd,
+  // parse
 
-  commandIsolateSecondFromArgument : commandIsolateSecondFromArgumentLeft,
-  commandIsolateSecondFromArgumentLeft,
-  commandIsolateSecondFromArgumentRight,
+  instructionsParse,
+  instructionParse,
+
+  instructionIsolateSecondFromArgument : instructionIsolateSecondFromArgumentLeft,
+  instructionIsolateSecondFromArgumentLeft,
+  instructionIsolateSecondFromArgumentRight,
+
+  // etc
+
+  withSubphraseExportToStructure,
+  withSubphraseExportToString,
+  _help,
+
+  // predefined commands
 
   _commandHelp,
-  _commandVersion_functor,
 
+  // handler
+
+  onError,
   onSyntaxError,
   onAmbiguity,
   onGetHelp,
   onPrintCommands,
-  _onPhraseDescriptorMake,
+
+  // command
+
+  commandsAdd,
+  commandExportString,
+  commandPropertiesExportString,
+  commandFrom,
+  commandIs,
+  commandLook,
+  _commandValidate,
+  _commandMapValidate,
+  _commandPreform,
+  _commandMapFrom,
+  _CommandShortFiledsToLongFields,
 
   //
 
@@ -1208,7 +1460,6 @@ _.classDeclare
 });
 
 _.Copyable.mixin( Self );
-// _.Verbal.mixin( Self );
 
 //
 
