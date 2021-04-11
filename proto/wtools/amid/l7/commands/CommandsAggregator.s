@@ -995,7 +995,7 @@ function commandFrom( src, phrase )
   let aggregator = this;
   _.assert( arguments.length === 2 );
   _.assert( phrase === null || phrase === src.phrase );
-  aggregator._commandValidate( src );
+  aggregator.commandValidate( src );
   return src;
 }
 
@@ -1068,7 +1068,7 @@ commandLook.defaults =
 
 //
 
-function _commandValidate( command )
+function commandValidate( command )
 {
   let aggregator = this;
   _.assert( aggregator.commandIs( command ), 'Not a command' );
@@ -1091,7 +1091,7 @@ function _commandMapValidate( commandMap )
   for( let k in commandMap )
   {
     let command = commandMap[ k ]
-    aggregator._commandValidate( command );
+    aggregator.commandValidate( command );
   }
   return commandMap;
 }
@@ -1182,7 +1182,7 @@ function _commandMapFrom( commandMap )
       let commandPhrase = aggregator.vocabulary.phraseNormalize( k );
       command = aggregator._commandPreform( command, commandRoutine, commandPhrase );
       command.aggregator = aggregator;
-      aggregator._commandValidate( command );
+      aggregator.commandValidate( command );
 
       _.assert
       (
@@ -1207,7 +1207,7 @@ function _commandMapFrom( commandMap )
 
       command = aggregator._commandPreform( command, commandRoutine );
       command.aggregator = aggregator;
-      aggregator._commandValidate( command );
+      aggregator.commandValidate( command );
 
       _.assert
       (
@@ -1430,7 +1430,7 @@ let Extension =
   commandFrom,
   commandIs,
   commandLook,
-  _commandValidate,
+  commandValidate,
   _commandMapValidate,
   _commandPreform,
   _commandMapFrom,
