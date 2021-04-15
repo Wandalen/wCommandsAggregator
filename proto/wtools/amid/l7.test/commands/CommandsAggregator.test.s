@@ -1152,7 +1152,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
     },
   ];
   test.identical( track, exp );
-  var exp = 'Command ".command1 /pro/builder/proto v:1 r:1 v:2"';
+  var exp = `Command ".command1 ${ subject } v:1 r:1 v:2"`;
   test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
@@ -1186,7 +1186,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
     },
   ];
   test.identical( track, exp );
-  var exp = 'Command ".command1 /pro/builder/proto v:1 r:1 v:2"';
+  var exp = `Command ".command1 ${ subject } v:1 r:1 v:2"`;
   test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
@@ -1220,7 +1220,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
     },
   ];
   test.identical( track, exp );
-  var exp = 'Command ".command1 /pro/builder/proto v:1 r:1 v:2"';
+  var exp = `Command ".command1 ${ subject } v:1 r:1 v:2"`;
   test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* */
@@ -1255,7 +1255,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
     },
   ];
   test.identical( track, exp );
-  var exp = 'Command ".command1 /pro/builder/proto v:1 r:1 v:2"';
+  var exp = `Command ".command1 ${ subject } v:1 r:1 v:2"`;
   test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
   /* - */
