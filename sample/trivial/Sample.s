@@ -1,6 +1,6 @@
 
-let _ = require( 'wTools' );
-_.include( 'wcommandsaggregator' );
+require( 'wcommandsaggregator' );
+let _ = wTools;
 
 /* */
 
