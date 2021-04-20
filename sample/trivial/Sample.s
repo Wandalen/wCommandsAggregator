@@ -1,8 +1,8 @@
 
 let _ = require( 'wTools' );
-require( 'wcommandsaggregator' );
+_.include( 'wcommandsaggregator' );
 
-/**/
+/* */
 
 function executable1( e )
 {
@@ -11,9 +11,8 @@ function executable1( e )
 
 var Commands =
 {
-  'action first' : { e : executable1, h : 'Some action' },
-  'action second' : 'Action2.s',
-}
+  'action' : { ro : executable1, h : 'Some action' },
+};
 
 var ca = _.CommandsAggregator
 ({
@@ -24,22 +23,6 @@ var ca = _.CommandsAggregator
 
 /* run first command */
 
-var appArgs = Object.create( null );
-appArgs.subject = '.action.first';
-appArgs.map = { 'action first' : true };
-appArgs.maps = [ appArgs.map ];
-appArgs.subjects = [ '.action.first' ];
-ca.appArgsPerform({ appArgs, allowingDotless : 0 });
+ca.programPerform( '.action' );
 /* log : executable1 */
-
-/* run second command */
-
-var appArgs = Object.create( null );
-appArgs.subject = '.action.second';
-ca.appArgsPerform({ appArgs, allowingDotless : 0 });
-/* log :
- > node /.../wCommandsAggregator/sample/Action2.s .action.second
-Action2
- */
-
 
