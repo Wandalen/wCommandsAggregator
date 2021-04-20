@@ -1036,6 +1036,484 @@ function programPerformOptionSubjectWinPathMaybe( test )
 
 //
 
+function instructionParse( test )
+{
+  var Commands = { 'with' : { ro : () => { console.log( 'Help' ); }, h : 'Log help' } };
+  var aggregator = _.CommandsAggregator({ commands : Commands }).form();
+
+  /* - */
+
+  test.open( 'default options, o - string command' );
+
+  test.case = 'command - empty string';
+  var got = aggregator.instructionParse( '' );
+  var exp =
+  {
+    command : '',
+    commandName : '',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - only command without dot';
+  var got = aggregator.instructionParse( 'help' );
+  var exp =
+  {
+    command : 'help',
+    commandName : 'help',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - only command with dot';
+  var got = aggregator.instructionParse( '.help' );
+  var exp =
+  {
+    command : '.help',
+    commandName : '.help',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - complex command with dot';
+  var got = aggregator.instructionParse( 'help.all' );
+  var exp =
+  {
+    command : 'help.all',
+    commandName : 'help.all',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - complex command with dot';
+  var got = aggregator.instructionParse( '.help.all' );
+  var exp =
+  {
+    command : '.help.all',
+    commandName : '.help.all',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with argument';
+  var got = aggregator.instructionParse( '.help with' );
+  var exp =
+  {
+    command : '.help with',
+    commandName : '.help',
+    instructionArgument : 'with',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with complex argument';
+  var got = aggregator.instructionParse( '.help with all' );
+  var exp =
+  {
+    command : '.help with all',
+    commandName : '.help',
+    instructionArgument : 'with all',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with complex argument with dot';
+  var got = aggregator.instructionParse( '.help with.all' );
+  var exp =
+  {
+    command : '.help with.all',
+    commandName : '.help',
+    instructionArgument : 'with.all',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with option';
+  var got = aggregator.instructionParse( '.help v:0' );
+  var exp =
+  {
+    command : '.help v:0',
+    commandName : '.help',
+    instructionArgument : 'v:0',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with several options';
+  var got = aggregator.instructionParse( '.help v:0 b:str c:[1,2]' );
+  var exp =
+  {
+    command : '.help v:0 b:str c:[1,2]',
+    commandName : '.help',
+    instructionArgument : 'v:0 b:str c:[1,2]',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with several options, argument has quotes';
+  var got = aggregator.instructionParse( '.help "v:0" b:str c:[1,2]' );
+  var exp =
+  {
+    command : '.help "v:0" b:str c:[1,2]',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:str c:[1,2]',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - complex command';
+  var got = aggregator.instructionParse( '.help with "v:0" b:str c:[1,2]' );
+  var exp =
+  {
+    command : '.help with "v:0" b:str c:[1,2]',
+    commandName : '.help',
+    instructionArgument : 'with "v:0" b:str c:[1,2]',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  test.close( 'default options, o - string command' );
+
+  /* - */
+
+  test.open( 'propertiesMapParsing - 1' );
+
+  test.case = 'command - empty string';
+  var got = aggregator.instructionParse({ command : '', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '',
+    subject : '',
+    commandName : '',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - only command without dot';
+  var got = aggregator.instructionParse({ command : 'help', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : 'help',
+    subject : '',
+    commandName : 'help',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - only command with dot';
+  var got = aggregator.instructionParse({ command : '.help', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - complex command with dot';
+  var got = aggregator.instructionParse({ command : 'help.all', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : 'help.all',
+    subject : '',
+    commandName : 'help.all',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - complex command with dot';
+  var got = aggregator.instructionParse({ command : '.help.all', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help.all',
+    subject : '',
+    commandName : '.help.all',
+    instructionArgument : '',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with argument';
+  var got = aggregator.instructionParse({ command : '.help with', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help with',
+    subject : 'with',
+    commandName : '.help',
+    instructionArgument : 'with',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with complex argument';
+  var got = aggregator.instructionParse({ command : '.help with all', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help with all',
+    subject : 'with all',
+    commandName : '.help',
+    instructionArgument : 'with all',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with complex argument with dot';
+  var got = aggregator.instructionParse({ command : '.help with.all', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help with.all',
+    subject : 'with.all',
+    commandName : '.help',
+    instructionArgument : 'with.all',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with option';
+  var got = aggregator.instructionParse({ command : '.help v:0', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help v:0',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : 'v:0',
+    propertiesMap : { v : 0 },
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with several options';
+  var got = aggregator.instructionParse({ command : '.help v:0 b:str c:[1,2]', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help v:0 b:str c:[1,2]',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : 'v:0 b:str c:[1,2]',
+    propertiesMap : { v : 0, b : 'str', c : [ 1, 2 ] },
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with several options, argument has quotes';
+  var got = aggregator.instructionParse({ command : '.help "v:0" b:str c:[1,2]', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help "v:0" b:str c:[1,2]',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:str c:[1,2]',
+    propertiesMap : { b : 'str', c : [ 1, 2 ] },
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - complex command';
+  var got = aggregator.instructionParse({ command : '.help with "v:0" b:str c:[1,2]', propertiesMapParsing : 1 });
+  var exp =
+  {
+    command : '.help with "v:0" b:str c:[1,2]',
+    subject : 'with "v:0"',
+    commandName : '.help',
+    instructionArgument : 'with "v:0" b:str c:[1,2]',
+    propertiesMap : { b : 'str', c : [ 1, 2 ] },
+  };
+  test.identical( got, exp );
+
+  test.close( 'propertiesMapParsing - 1' );
+
+  /* - */
+
+  test.case = 'command - complex command, unquoting - 0';
+  var got = aggregator.instructionParse({ command : '.help "v:0" b:str c:[1,2]', propertiesMapParsing : 1, unquoting : 0 });
+  var exp =
+  {
+    command : '.help "v:0" b:str c:[1,2]',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:str c:[1,2]',
+    propertiesMap : { b : 'str', c : [ 1, 2 ] },
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - complex command, unquoting - 1';
+  var got = aggregator.instructionParse({ command : '.help "v:0" b:str c:[1,2]', propertiesMapParsing : 1, unquoting : 1 });
+  var exp =
+  {
+    command : '.help "v:0" b:str c:[1,2]',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:str c:[1,2]',
+    propertiesMap : { b : 'str', c : [ 1, 2 ] },
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with quoted subject, unquoting - 0';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 1, unquoting : 0 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with quoted subject, unquoting - 1';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 1, unquoting : 1 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : { v : 0 },
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with options, propertiesMap - map';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help with v:0 b:str c:[1,2]',
+    propertiesMapParsing : 1,
+    propertiesMap : { predefined : 1 },
+  });
+  var exp =
+  {
+    command : '.help with v:0 b:str c:[1,2]',
+    subject : 'with',
+    commandName : '.help',
+    instructionArgument : 'with v:0 b:str c:[1,2]',
+    propertiesMap : { predefined : 1, v : 0, b : 'str', c : [ 1, 2 ] },
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with options, severalValues - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help with v:0 v:str v:[1,2]',
+    propertiesMapParsing : 1,
+    severalValues : 0,
+  });
+  var exp =
+  {
+    command : '.help with v:0 v:str v:[1,2]',
+    subject : 'with',
+    commandName : '.help',
+    instructionArgument : 'with v:0 v:str v:[1,2]',
+    propertiesMap : { v : [ 1, 2 ] },
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'command - command with options, severalValues - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help with v:0 v:str v:[1,2]',
+    propertiesMapParsing : 1,
+    severalValues : 1,
+  });
+  var exp =
+  {
+    command : '.help with v:0 v:str v:[1,2]',
+    subject : 'with',
+    commandName : '.help',
+    instructionArgument : 'with v:0 v:str v:[1,2]',
+    propertiesMap : { v : [ 0, 'str', 1, 2 ] },
+  };
+  test.identical( got, exp );
+
+  /* - */
+
+  if( !Config.debug )
+  return;
+
+  test.case = 'without arguments';
+  test.shouldThrowErrorSync( () => aggregator.instructionParse() );
+
+  test.case = 'extra arguments';
+  test.shouldThrowErrorSync( () => aggregator.instructionParse( 'help', 'help' ) );
+
+  test.case = 'wrong type of options map o';
+  test.shouldThrowErrorSync( () => aggregator.instructionParse([ 'help' ]) );
+
+  test.case = 'options map o has unknown option';
+  test.shouldThrowErrorSync( () => aggregator.instructionParse({ command : 'help', unknown : 1 }) );
+
+  test.case = 'wrong type of options map o.command';
+  test.shouldThrowErrorSync( () => aggregator.instructionParse({ command : [ 'help' ] }) );
+
+  test.case = 'aggregator is not formed';
+  var Commands = { 'with' : { ro : () => { console.log( 'Help' ); }, h : 'Log help' } };
+  var aggregator = _.CommandsAggregator({ commands : Commands });
+  test.shouldThrowErrorSync( () => aggregator.instructionParse({ command : [ 'help' ] }) );
+}
+
+//
+
 function instructionIsolateSecondFromArgument( test )
 {
 
@@ -1998,6 +2476,7 @@ const Proto =
     programPerformOptionSeveralValues,
     programPerformOptionSubjectWinPathMaybe,
 
+    instructionParse,
     instructionIsolateSecondFromArgument,
 
     help,
