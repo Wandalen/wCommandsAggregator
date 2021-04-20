@@ -539,13 +539,14 @@ function instructionParse( o )
 {
   let aggregator = this;
 
-  if( _.strIs( o ) || _.arrayIs( o ) )
+  // if( _.strIs( o ) || _.arrayIs( o ) ) /* Dmytro : routine should non parse commands in array, assertion below approve it */
+  if( _.strIs( o ) )
   o = { command : o };
 
+  _.assert( arguments.length === 1 );
   _.routine.options( instructionParse, o );
   _.assert( _.strIs( o.command ) );
   _.assert( !!aggregator.formed );
-  _.assert( arguments.length === 1 );
 
   if( o.propertiesMapParsing === null )
   o.propertiesMapParsing = aggregator.propertiesMapParsing;
@@ -564,22 +565,22 @@ function instructionParse( o )
     commandName,
     instructionArgument,
     propertiesMap : o.propertiesMap,
-  }
+  };
 
   if( o.propertiesMapParsing )
   {
-
     let request = _.strRequestParse
     ({
       src : instructionArgument,
       commandsDelimeter : false,
       severalValues : o.severalValues,
       subjectWinPathsMaybe : o.subjectWinPathsMaybe,
+      unquoting : o.unquoting,
     });
 
-    parsed.propertiesMap = _.mapExtend( parsed.propertiesMap || null, request.map );
+    // parsed.propertiesMap = _.mapExtend( parsed.propertiesMap || null, request.map ); /* Dmytro : parsed.propertiesMap can have some value or be empty pure map, see line 560 */
+    parsed.propertiesMap = _.mapExtend( parsed.propertiesMap, request.map );
     parsed.subject = request.subject
-
   }
 
   return parsed;
@@ -591,8 +592,9 @@ instructionParse.defaults =
   propertiesMap : null,
   propertiesMapParsing : null,
   severalValues : null,
+  unquoting : 0,
   subjectWinPathsMaybe : 0,
-}
+};
 
 //
 
