@@ -155,248 +155,6 @@ function perform( test )
 
 //
 
-function instructionIsolateSecondFromArgument( test )
-{
-
-  var Commands =
-  {
-  }
-
-  var aggregator = _.CommandsAggregator
-  ({
-    commands : Commands,
-  }).form();
-
-  test.case = 'with dot';
-  var expected =
-  {
-    'instructionArgument' : '',
-    'secondInstructionName' : '.module',
-    'secondInstructionArgument' : '.shell git status',
-    'secondInstruction' : '.module .shell git status',
-  }
-  var got = aggregator.instructionIsolateSecondFromArgument( '.module .shell git status' );
-  test.identical( got, expected );
-
-  test.case = 'no second';
-  var expected =
-  {
-    'instructionArgument' : 'module git status',
-    'secondInstructionArgument' : '',
-  };
-  var got = aggregator.instructionIsolateSecondFromArgument( 'module git status' );
-  test.identical( got, expected );
-
-  test.case = 'quoted doted instructionArgument';
-  var expected =
-  {
-    'instructionArgument' : '".module" git status',
-    'secondInstructionArgument' : '',
-  };
-  var got = aggregator.instructionIsolateSecondFromArgument( '".module" git status' );
-  test.identical( got, expected );
-
-  test.case = '"single with space/" .resources.list';
-  var expected =
-  {
-    'instructionArgument' : 'single with space/',
-    'secondInstructionName' : '.resources.list',
-    'secondInstructionArgument' : '',
-    'secondInstruction' : '.resources.list ',
-  }
-  var got = aggregator.instructionIsolateSecondFromArgument( '"single with space/" .resources.list' );
-  test.identical( got, expected );
-
-  test.case = 'some/path/Full.stxt .';
-  var expected =
-  {
-    'instructionArgument' : 'some/path/Full.stxt .',
-    'secondInstructionArgument' : '',
-  }
-  var got = aggregator.instructionIsolateSecondFromArgument( 'some/path/Full.stxt .' );
-  test.identical( got, expected );
-
-  test.case = 'some/path/Full.stxt ./';
-  var expected =
-  {
-    'instructionArgument' : 'some/path/Full.stxt ./',
-    'secondInstructionArgument' : '',
-  }
-  var got = aggregator.instructionIsolateSecondFromArgument( 'some/path/Full.stxt ./' );
-  test.identical( got, expected );
-
-}
-
-//
-
-function help( test )
-{
-  // let execCommand = () => {};
-  let commandHelp = ( e ) => e.aggregator._commandHelp( e );
-
-  var Commands =
-  {
-    'help' : { ro : commandHelp, h : 'Get help.' },
-    'action' : { ro : () => {}, h : 'action some!' },
-    'action first' : { ro : () => {}, h : 'This is action first' },
-  }
-
-  let logger2 = new _.LoggerToString();
-  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ], outputRaw : 1 });
-
-  var aggregator = _.CommandsAggregator
-  ({
-    commands : Commands,
-    logger : logger1,
-  }).form();
-
-  test.case = 'trivial help'
-  logger2.outputData = '';
-  aggregator.instructionPerform({ command : '.help' });
-  var expected =
-  `
-.help - Get help.
-.action - action some!
-.action.first - This is action first
-`
-  test.equivalent( logger2.outputData, expected );
-
-  test.case = 'exact dotless'
-  logger2.outputData = '';
-  aggregator.instructionPerform({ command : '.help action' });
-  var expected =
-`
-  .action - action some!
-  .action.first - This is action first
-`;
-  test.equivalent( logger2.outputData, expected );
-
-  test.case = 'exact with dot'
-  logger2.outputData = '';
-  aggregator.instructionPerform({ command : '.help action.' });
-  var expected =
-`
-  .action - action some!
-  .action.first - This is action first
-`;
-  test.equivalent( logger2.outputData, expected );
-
-  test.case = 'exact, two words, dotless'
-  logger2.outputData = '';
-  aggregator.instructionPerform({ command : '.help action first' });
-  var expected = '  .action.first - This is action first';
-  test.identical( logger2.outputData, expected );
-
-  test.case = 'exact, two words, with dot'
-  logger2.outputData = '';
-  aggregator.instructionPerform({ command : '.help .action.first' });
-  var expected = '  .action.first - This is action first';
-  test.identical( logger2.outputData, expected );
-
-  test.case = 'part of phrase, dotless'
-  logger2.outputData = '';
-  aggregator.instructionPerform({ command : '.help first' });
-  var expected = '  .action.first - This is action first\n  No command first';
-  test.identical( logger2.outputData, expected );
-
-  test.case = 'part of phrase, with dot'
-  logger2.outputData = '';
-  aggregator.instructionPerform({ command : '.help .first' });
-  var expected = '  .action.first - This is action first\n  No command .first';
-  test.identical( logger2.outputData, expected );
-
-}
-
-//
-
-function helpWithLongHint( test )
-{
-  /* init */
-
-  // let execCommand = () => {};
-  let commandHelp = ( e ) => e.aggregator._commandHelp( e );
-
-  var commands =
-  {
-    'help' :
-    {
-      ro : commandHelp,
-      h : 'Get help.',
-      lh : 'Get common help and help for separate command.',
-    },
-    'action' :
-    {
-      ro : () => {},
-      h : 'action',
-      lh : 'Use command action to execute some action.'
-    },
-    'action first' :
-    {
-      ro : () => {},
-      h : 'action first',
-      lh : 'Define actions which will be executed first.'
-    },
-  };
-
-  let loggerToString = new _.LoggerToString();
-  let logger = new _.Logger({ outputs : [ _global_.logger, loggerToString ], outputRaw : 1 });
-
-  var aggregator = _.CommandsAggregator
-  ({
-    commands,
-    logger,
-  }).form();
-
-  /* */
-
-  test.case = 'without subject'
-  loggerToString.outputData = '';
-  aggregator.instructionPerform({ command : '.help' });
-  var expected =
-`
-.help - Get common help and help for separate command.
-.action - Use command action to execute some action.
-.action.first - Define actions which will be executed first.
-`;
-  test.equivalent( loggerToString.outputData, expected );
-
-  test.case = 'dotless single word subject - single possible method';
-  loggerToString.outputData = '';
-  aggregator.instructionPerform({ command : '.help action' });
-  var expected =
-`
-  .action - Use command action to execute some action.
-  .action.first - Define actions which will be executed first.
-`;
-  test.equivalent( loggerToString.outputData, expected );
-
-  test.case = 'subject - two words, dotless'
-  loggerToString.outputData = '';
-  aggregator.instructionPerform({ command : '.help action first' });
-  var expected = '  .action.first - Define actions which will be executed first.';
-  test.identical( loggerToString.outputData, expected );
-
-  test.case = 'exact, two words, with dot'
-  loggerToString.outputData = '';
-  aggregator.instructionPerform({ command : '.help .action.first' });
-  var expected = '  .action.first - Define actions which will be executed first.';
-  test.identical( loggerToString.outputData, expected );
-
-  test.case = 'part of phrase, dotless'
-  loggerToString.outputData = '';
-  aggregator.instructionPerform({ command : '.help first' });
-  var expected = '  .action.first - Define actions which will be executed first.\n  No command first';
-  test.identical( loggerToString.outputData, expected );
-
-  test.case = 'part of phrase, with dot'
-  loggerToString.outputData = '';
-  aggregator.instructionPerform({ command : '.help .first' });
-  var expected = '  .action.first - Define actions which will be executed first.\n  No command .first';
-  test.identical( loggerToString.outputData, expected );
-}
-
-//
-
 function programPerform( test )
 {
   let track = [];
@@ -922,7 +680,6 @@ function programPerform( test )
     changingExitCode : 0,
   }).form();
 
-  debugger;
   test.shouldThrowErrorOfAnyKind
   (
     () => aggregator.programPerform({ program : 'notcommand .command1' }),
@@ -1275,6 +1032,345 @@ function programPerformOptionSubjectWinPathMaybe( test )
     track = [];
   }
 
+}
+
+//
+
+function instructionIsolateSecondFromArgument( test )
+{
+
+  var Commands =
+  {
+  }
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands : Commands,
+  }).form();
+
+  test.case = 'with dot';
+  var expected =
+  {
+    'instructionArgument' : '',
+    'secondInstructionName' : '.module',
+    'secondInstructionArgument' : '.shell git status',
+    'secondInstruction' : '.module .shell git status',
+  }
+  var got = aggregator.instructionIsolateSecondFromArgument( '.module .shell git status' );
+  test.identical( got, expected );
+
+  test.case = 'no second';
+  var expected =
+  {
+    'instructionArgument' : 'module git status',
+    'secondInstructionArgument' : '',
+  };
+  var got = aggregator.instructionIsolateSecondFromArgument( 'module git status' );
+  test.identical( got, expected );
+
+  test.case = 'quoted doted instructionArgument';
+  var expected =
+  {
+    'instructionArgument' : '".module" git status',
+    'secondInstructionArgument' : '',
+  };
+  var got = aggregator.instructionIsolateSecondFromArgument( '".module" git status' );
+  test.identical( got, expected );
+
+  test.case = '"single with space/" .resources.list';
+  var expected =
+  {
+    'instructionArgument' : 'single with space/',
+    'secondInstructionName' : '.resources.list',
+    'secondInstructionArgument' : '',
+    'secondInstruction' : '.resources.list ',
+  }
+  var got = aggregator.instructionIsolateSecondFromArgument( '"single with space/" .resources.list' );
+  test.identical( got, expected );
+
+  test.case = 'some/path/Full.stxt .';
+  var expected =
+  {
+    'instructionArgument' : 'some/path/Full.stxt .',
+    'secondInstructionArgument' : '',
+  }
+  var got = aggregator.instructionIsolateSecondFromArgument( 'some/path/Full.stxt .' );
+  test.identical( got, expected );
+
+  test.case = 'some/path/Full.stxt ./';
+  var expected =
+  {
+    'instructionArgument' : 'some/path/Full.stxt ./',
+    'secondInstructionArgument' : '',
+  }
+  var got = aggregator.instructionIsolateSecondFromArgument( 'some/path/Full.stxt ./' );
+  test.identical( got, expected );
+
+}
+
+//
+
+function help( test )
+{
+  // let execCommand = () => {};
+  let commandHelp = ( e ) => e.aggregator._commandHelp( e );
+
+  var Commands =
+  {
+    'help' : { ro : commandHelp, h : 'Get help.' },
+    'action' : { ro : () => {}, h : 'action some!' },
+    'action first' : { ro : () => {}, h : 'This is action first' },
+  }
+
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ], outputRaw : 1 });
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands : Commands,
+    logger : logger1,
+  }).form();
+
+  test.case = 'trivial help'
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help' });
+  var expected =
+  `
+.help - Get help.
+.action - action some!
+.action.first - This is action first
+`
+  test.equivalent( logger2.outputData, expected );
+
+  test.case = 'exact dotless'
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help action' });
+  var expected =
+`
+  .action - action some!
+  .action.first - This is action first
+`;
+  test.equivalent( logger2.outputData, expected );
+
+  test.case = 'exact with dot'
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help action.' });
+  var expected =
+`
+  .action - action some!
+  .action.first - This is action first
+`;
+  test.equivalent( logger2.outputData, expected );
+
+  test.case = 'exact, two words, dotless'
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help action first' });
+  var expected = '  .action.first - This is action first';
+  test.identical( logger2.outputData, expected );
+
+  test.case = 'exact, two words, with dot'
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help .action.first' });
+  var expected = '  .action.first - This is action first';
+  test.identical( logger2.outputData, expected );
+
+  test.case = 'part of phrase, dotless'
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help first' });
+  var expected = '  .action.first - This is action first\n  No command first';
+  test.identical( logger2.outputData, expected );
+
+  test.case = 'part of phrase, with dot'
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help .first' });
+  var expected = '  .action.first - This is action first\n  No command .first';
+  test.identical( logger2.outputData, expected );
+
+}
+
+//
+
+function helpWithLongHint( test )
+{
+  /* init */
+
+  // let execCommand = () => {};
+  let commandHelp = ( e ) => e.aggregator._commandHelp( e );
+
+  var commands =
+  {
+    'help' :
+    {
+      ro : commandHelp,
+      h : 'Get help.',
+      lh : 'Get common help and help for separate command.',
+    },
+    'action' :
+    {
+      ro : () => {},
+      h : 'action',
+      lh : 'Use command action to execute some action.'
+    },
+    'action first' :
+    {
+      ro : () => {},
+      h : 'action first',
+      lh : 'Define actions which will be executed first.'
+    },
+  };
+
+  let loggerToString = new _.LoggerToString();
+  let logger = new _.Logger({ outputs : [ _global_.logger, loggerToString ], outputRaw : 1 });
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands,
+    logger,
+  }).form();
+
+  /* */
+
+  test.case = 'without subject'
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help' });
+  var expected =
+`
+.help - Get common help and help for separate command.
+.action - Use command action to execute some action.
+.action.first - Define actions which will be executed first.
+`;
+  test.equivalent( loggerToString.outputData, expected );
+
+  test.case = 'dotless single word subject - single possible method';
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help action' });
+  var expected =
+`
+  .action - Use command action to execute some action.
+  .action.first - Define actions which will be executed first.
+`;
+  test.equivalent( loggerToString.outputData, expected );
+
+  test.case = 'subject - two words, dotless'
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help action first' });
+  var expected = '  .action.first - Define actions which will be executed first.';
+  test.identical( loggerToString.outputData, expected );
+
+  test.case = 'exact, two words, with dot'
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help .action.first' });
+  var expected = '  .action.first - Define actions which will be executed first.';
+  test.identical( loggerToString.outputData, expected );
+
+  test.case = 'part of phrase, dotless'
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help first' });
+  var expected = '  .action.first - Define actions which will be executed first.\n  No command first';
+  test.identical( loggerToString.outputData, expected );
+
+  test.case = 'part of phrase, with dot'
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help .first' });
+  var expected = '  .action.first - Define actions which will be executed first.\n  No command .first';
+  test.identical( loggerToString.outputData, expected );
+}
+
+//
+
+function helpForCommandWithAliases( test )
+{
+
+  let commandHelp = ( e ) => e.aggregator._commandHelp( e );
+
+  function command1( e )
+  {
+  }
+  var command = command1.command = Object.create( null );
+  command.propertiesAliases =
+  {
+    verbosity : [ 'v' ],
+    routine : [ 'r' ]
+  }
+  command.properties =
+  {
+    verbosity : 'verbosity',
+    routine : 'routine',
+  }
+
+  function commandEmptyAliasesArray( e )
+  {
+  }
+  var command = commandEmptyAliasesArray.command = Object.create( null );
+  command.propertiesAliases =
+  {
+    verbosity : [],
+  }
+  command.properties =
+  {
+    verbosity : 'verbosity',
+    routine : 'routine',
+  }
+
+  function commandAliasDuplicated( e )
+  {
+  }
+  var command = commandAliasDuplicated.command = Object.create( null );
+  command.propertiesAliases =
+  {
+    verbosity : [ 'v' ],
+    routine : [ 'v' ]
+  }
+  command.properties =
+  {
+    verbosity : 'verbosity',
+    routine : 'routine',
+  }
+
+  /* */
+
+  let Commands =
+  {
+    'help' : { ro : commandHelp, h : 'Get help.' },
+    'command' : { ro : command1, h : 'Test command' },
+    'command.aliases.array.empty' : { ro : commandEmptyAliasesArray, h : 'Test command' },
+    'command.alias.duplicated' : { ro : commandAliasDuplicated, h : 'Test command' },
+  }
+
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ], outputRaw : 1 });
+
+  let aggregator = _.CommandsAggregator
+  ({
+    commands : Commands,
+    logger : logger1,
+  }).form();
+
+  /* */
+
+  test.case = 'trivial'
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help command' });
+  var expected =
+`
+  .command - Test command
+  .command.aliases.array.empty - Test command
+  .command.alias.duplicated - Test command
+    v : verbosity
+    verbosity : verbosity
+    r : routine
+    routine : routine
+`
+  test.equivalent( logger2.outputData, expected );
+  console.log( logger2.outputData );
+
+  /* */
+
+  if( !Config.debug )
+  return;
+
+  test.shouldThrowErrorSync( () => aggregator.instructionPerform({ command : '.help command.aliases.array.empty' }) )
+  test.shouldThrowErrorSync( () => aggregator.instructionPerform({ command : '.help command.alias.duplicated' }) )
 }
 
 //
@@ -1882,104 +1978,7 @@ badCommandsErrors.description =
 `
   - error throwen if commands definitions has an problem
   - throwen error is descriptive
-`
-
-//
-
-function helpForCommandWithAliases( test )
-{
-
-  let commandHelp = ( e ) => e.aggregator._commandHelp( e );
-
-  function command1( e )
-  {
-  }
-  var command = command1.command = Object.create( null );
-  command.propertiesAliases =
-  {
-    verbosity : [ 'v' ],
-    routine : [ 'r' ]
-  }
-  command.properties =
-  {
-    verbosity : 'verbosity',
-    routine : 'routine',
-  }
-
-  function commandEmptyAliasesArray( e )
-  {
-  }
-  var command = commandEmptyAliasesArray.command = Object.create( null );
-  command.propertiesAliases =
-  {
-    verbosity : [],
-  }
-  command.properties =
-  {
-    verbosity : 'verbosity',
-    routine : 'routine',
-  }
-
-  function commandAliasDuplicated( e )
-  {
-  }
-  var command = commandAliasDuplicated.command = Object.create( null );
-  command.propertiesAliases =
-  {
-    verbosity : [ 'v' ],
-    routine : [ 'v' ]
-  }
-  command.properties =
-  {
-    verbosity : 'verbosity',
-    routine : 'routine',
-  }
-
-  /* */
-
-  let Commands =
-  {
-    'help' : { ro : commandHelp, h : 'Get help.' },
-    'command' : { ro : command1, h : 'Test command' },
-    'command.aliases.array.empty' : { ro : commandEmptyAliasesArray, h : 'Test command' },
-    'command.alias.duplicated' : { ro : commandAliasDuplicated, h : 'Test command' },
-  }
-
-  let logger2 = new _.LoggerToString();
-  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ], outputRaw : 1 });
-
-  let aggregator = _.CommandsAggregator
-  ({
-    commands : Commands,
-    logger : logger1,
-  }).form();
-
-  /* */
-
-  test.case = 'trivial'
-  logger2.outputData = '';
-  aggregator.instructionPerform({ command : '.help command' });
-  var expected =
-`
-  .command - Test command
-  .command.aliases.array.empty - Test command
-  .command.alias.duplicated - Test command
-    v : verbosity
-    verbosity : verbosity
-    r : routine
-    routine : routine
-`
-  test.equivalent( logger2.outputData, expected );
-  console.log( logger2.outputData );
-
-  /* */
-
-  if( !Config.debug )
-  return;
-
-  test.shouldThrowErrorSync( () => aggregator.instructionPerform({ command : '.help command.aliases.array.empty' }) )
-  test.shouldThrowErrorSync( () => aggregator.instructionPerform({ command : '.help command.alias.duplicated' }) )
-}
+`;
 
 // --
 // declare
@@ -1995,17 +1994,20 @@ const Proto =
   {
 
     perform,
-    instructionIsolateSecondFromArgument,
-    help,
-    helpWithLongHint,
     programPerform,
     programPerformOptionSeveralValues,
     programPerformOptionSubjectWinPathMaybe,
+
+    instructionIsolateSecondFromArgument,
+
+    help,
+    helpWithLongHint,
+    helpForCommandWithAliases,
+
     commandPropertiesAliases,
     formCommandsWithPhrases,
     customDelimeter,
     badCommandsErrors,
-    helpForCommandWithAliases
 
   }
 
