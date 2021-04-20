@@ -212,6 +212,7 @@ programPerform.defaults =
   withParsed : 0,
   severalValues : null,
   subjectWinPathsMaybe : 0, /* xxx : qqq : remove */
+  allowingDotless : 0,
 }
 
 //
