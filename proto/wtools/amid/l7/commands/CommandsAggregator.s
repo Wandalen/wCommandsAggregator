@@ -156,7 +156,7 @@ function programPerform( o )
 
   o.program = o.program.trim();
 
-  if( !o.allowingDotless )
+  // if( !o.allowingDotless )
   if
   (
     !_.strBegins( o.program, aggregator.vocabulary.defaultDelimeter )
@@ -212,7 +212,7 @@ programPerform.defaults =
   withParsed : 0,
   severalValues : null,
   subjectWinPathsMaybe : 0, /* xxx : qqq : remove */
-  allowingDotless : 0,
+  // allowingDotless : 0, /* Dmytro : option does not used in the utilities */
 }
 
 //
@@ -569,6 +569,8 @@ function instructionParse( o )
 
   if( o.propertiesMapParsing )
   {
+    if( instructionArgument === '"v:0" b:str c:[1,2]' )
+    debugger;
     let request = _.strRequestParse
     ({
       src : instructionArgument,
