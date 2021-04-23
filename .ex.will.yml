@@ -18,7 +18,7 @@ about :
   - 'Dmytro Kryvoruchko <dm.vict.kr@gmail.com>'
   npm.name : 'wcommandsaggregator'
   npm.scripts :
-    test : 'wtest .run proto/**'
+    test : 'wtest .run "proto/**" rapidity:-3'
     docgen : 'wdocgen .build proto'
 
 path :
