@@ -127,7 +127,6 @@ function perform( test )
 
     track = 1;
 
-    debugger;
     e.aggregator.instructionPerform
     ({
       command : isolated.secondInstruction,
@@ -683,7 +682,7 @@ function programPerform( test )
   test.shouldThrowErrorOfAnyKind
   (
     () => aggregator.programPerform({ program : 'notcommand .command1' }),
-    ( err ) => { debugger; test.identical( _.strCount( err.message, 'Illformed command' ), 1 ) },
+    ( err ) => { test.identical( _.strCount( err.message, 'Illformed command' ), 1 ) },
   );
 
   /* - */
@@ -1050,6 +1049,7 @@ function instructionParse( test )
   var exp =
   {
     command : '',
+    subject : '',
     commandName : '',
     instructionArgument : '',
     propertiesMap : {},
@@ -1063,6 +1063,7 @@ function instructionParse( test )
   var exp =
   {
     command : 'help',
+    subject : '',
     commandName : 'help',
     instructionArgument : '',
     propertiesMap : {},
@@ -1076,6 +1077,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help',
+    subject : '',
     commandName : '.help',
     instructionArgument : '',
     propertiesMap : {},
@@ -1089,6 +1091,7 @@ function instructionParse( test )
   var exp =
   {
     command : 'help.all',
+    subject : '',
     commandName : 'help.all',
     instructionArgument : '',
     propertiesMap : {},
@@ -1102,6 +1105,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help.all',
+    subject : '',
     commandName : '.help.all',
     instructionArgument : '',
     propertiesMap : {},
@@ -1115,6 +1119,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help with',
+    subject : 'with',
     commandName : '.help',
     instructionArgument : 'with',
     propertiesMap : {},
@@ -1128,6 +1133,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help with all',
+    subject : 'with all',
     commandName : '.help',
     instructionArgument : 'with all',
     propertiesMap : {},
@@ -1141,6 +1147,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help with.all',
+    subject : 'with.all',
     commandName : '.help',
     instructionArgument : 'with.all',
     propertiesMap : {},
@@ -1154,6 +1161,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help v:0',
+    subject : 'v:0',
     commandName : '.help',
     instructionArgument : 'v:0',
     propertiesMap : {},
@@ -1167,6 +1175,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help v:0 b:str c:[1,2]',
+    subject : 'v:0 b:str c:[1,2]',
     commandName : '.help',
     instructionArgument : 'v:0 b:str c:[1,2]',
     propertiesMap : {},
@@ -1180,6 +1189,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help "v:0" b:str c:[1,2]',
+    subject : '"v:0" b:str c:[1,2]',
     commandName : '.help',
     instructionArgument : '"v:0" b:str c:[1,2]',
     propertiesMap : {},
@@ -1193,6 +1203,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help with "v:0" b:str c:[1,2]',
+    subject : 'with "v:0" b:str c:[1,2]',
     commandName : '.help',
     instructionArgument : 'with "v:0" b:str c:[1,2]',
     propertiesMap : {},
@@ -1350,7 +1361,7 @@ function instructionParse( test )
   var exp =
   {
     command : '.help "v:0" b:str c:[1,2]',
-    subject : '"v:0"',
+    subject : 'v:0',
     commandName : '.help',
     instructionArgument : '"v:0" b:str c:[1,2]',
     propertiesMap : { b : 'str', c : [ 1, 2 ] },
@@ -1374,62 +1385,6 @@ function instructionParse( test )
   test.close( 'propertiesMapParsing - 1' );
 
   /* - */
-
-  test.case = 'command - complex command, unquoting - 0';
-  var got = aggregator.instructionParse({ command : '.help "v:0" b:str c:[1,2]', propertiesMapParsing : 1, unquoting : 0 });
-  var exp =
-  {
-    command : '.help "v:0" b:str c:[1,2]',
-    subject : '"v:0"',
-    commandName : '.help',
-    instructionArgument : '"v:0" b:str c:[1,2]',
-    propertiesMap : { b : 'str', c : [ 1, 2 ] },
-  };
-  test.identical( got, exp );
-
-  /* */
-
-  test.case = 'command - complex command, unquoting - 1';
-  var got = aggregator.instructionParse({ command : '.help "v:0" b:str c:[1,2]', propertiesMapParsing : 1, unquoting : 1 });
-  var exp =
-  {
-    command : '.help "v:0" b:str c:[1,2]',
-    subject : '"v:0"',
-    commandName : '.help',
-    instructionArgument : '"v:0" b:str c:[1,2]',
-    propertiesMap : { b : 'str', c : [ 1, 2 ] },
-  };
-  test.identical( got, exp );
-
-  /* */
-
-  test.case = 'command - command with quoted subject, unquoting - 0';
-  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 1, unquoting : 0 });
-  var exp =
-  {
-    command : '.help "v:0"',
-    subject : '"v:0"',
-    commandName : '.help',
-    instructionArgument : '"v:0"',
-    propertiesMap : {},
-  };
-  test.identical( got, exp );
-
-  /* */
-
-  test.case = 'command - command with quoted subject, unquoting - 1';
-  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 1, unquoting : 1 });
-  var exp =
-  {
-    command : '.help "v:0"',
-    subject : '',
-    commandName : '.help',
-    instructionArgument : '"v:0"',
-    propertiesMap : { v : 0 },
-  };
-  test.identical( got, exp );
-
-  /* */
 
   test.case = 'command - command with options, propertiesMap - map';
   var got = aggregator.instructionParse
@@ -1510,6 +1465,438 @@ function instructionParse( test )
   var Commands = { 'with' : { ro : () => { console.log( 'Help' ); }, h : 'Log help' } };
   var aggregator = _.CommandsAggregator({ commands : Commands });
   test.shouldThrowErrorSync( () => aggregator.instructionParse({ command : [ 'help' ] }) );
+}
+
+//
+
+function instructionParseWithOptionsQuotingAndUnqoting( test )
+{
+  var Commands = { 'with' : { ro : () => { console.log( 'Help' ); }, h : 'Log help' } };
+  var aggregator = _.CommandsAggregator({ commands : Commands }).form();
+
+  /* - */
+
+  test.open( 'quoting : 1, unqoting - 1' );
+
+  test.case = 'only quoted subject, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 1, quoting : 1, unquoting : 1 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : 'v:0',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  test.case = 'only quoted subject, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 0, quoting : 1, unquoting : 1 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : 'v:0',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'quoted subject and maps with assymmetrical quoting, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    quoting : 1,
+    unquoting : 1,
+    propertiesMapParsing : 1,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    subject : 'v:0',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 "d:0"',
+    propertiesMap : { b : 'k:0', c : '0 "d:0"' },
+  };
+  test.identical( got, exp );
+
+  test.case = 'quoted subject and maps with assymetrical quoting, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    quoting : 1,
+    unquoting : 1,
+    propertiesMapParsing : 0,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    subject : '"v:0" b:"k:0" c:0 "d:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 "d:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'quoted subject and maps with symmetrical quoting, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    quoting : 1,
+    unquoting : 1,
+    propertiesMapParsing : 1,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    subject : 'v:0',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 d:"d:0"',
+    propertiesMap : { b : 'k:0', c : 0, d : 'd:0' },
+  };
+  test.identical( got, exp );
+
+  test.case = 'quoted subject and maps with symmetrical quoting, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    quoting : 1,
+    unquoting : 1,
+    propertiesMapParsing : 0,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    subject : '"v:0" b:"k:0" c:0 d:"d:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 d:"d:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  test.close( 'quoting : 1, unqoting - 1' );
+
+  /* - */
+
+  test.open( 'quoting : 1, unqoting - 0' );
+
+  test.case = 'only quoted subject, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 1, quoting : 1, unquoting : 0 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  test.case = 'only quoted subject, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 0, quoting : 1, unquoting : 0 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'quoted subject and maps with assymmetrical quoting, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    quoting : 1,
+    unquoting : 0,
+    propertiesMapParsing : 1,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 "d:0"',
+    propertiesMap : { b : '"k:0"', c : '0 "d:0"' },
+  };
+  test.identical( got, exp );
+
+  test.case = 'quoted subject and maps with assymetrical quoting, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    quoting : 1,
+    unquoting : 0,
+    propertiesMapParsing : 0,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    subject : '"v:0" b:"k:0" c:0 "d:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 "d:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'quoted subject and maps with symmetrical quoting, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    quoting : 1,
+    unquoting : 0,
+    propertiesMapParsing : 1,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 d:"d:0"',
+    propertiesMap : { b : '"k:0"', c : 0, d : '"d:0"' },
+  };
+  test.identical( got, exp );
+
+  test.case = 'quoted subject and maps with symmetrical quoting, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    quoting : 1,
+    unquoting : 0,
+    propertiesMapParsing : 0,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    subject : '"v:0" b:"k:0" c:0 d:"d:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 d:"d:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  test.close( 'quoting : 1, unqoting - 0' );
+
+  /* - */
+
+  test.open( 'quoting : 0, unqoting - 1' );
+
+  test.case = 'only quoted subject, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 1, quoting : 0, unquoting : 1 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : { 'v' : 0 },
+  };
+  test.identical( got, exp );
+
+  test.case = 'only quoted subject, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 0, quoting : 0, unquoting : 1 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : 'v:0',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'quoted subject and maps with assymmetrical quoting, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    quoting : 0,
+    unquoting : 1,
+    propertiesMapParsing : 1,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 "d:0"',
+    propertiesMap : { 'v' : 0, 'b' : 'k:0', 'c' : 0, 'd' : 0 },
+  };
+  test.identical( got, exp );
+
+  test.case = 'quoted subject and maps with assymetrical quoting, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    quoting : 0,
+    unquoting : 1,
+    propertiesMapParsing : 0,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    subject : 'v:0 b:"k:0" c:0 d:0',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 "d:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'quoted subject and maps with symmetrical quoting, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    quoting : 0,
+    unquoting : 1,
+    propertiesMapParsing : 1,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 d:"d:0"',
+    propertiesMap : { 'v' : 0, 'b' : 'k:0', 'c' : 0, 'd' : 'd:0' },
+  };
+  test.identical( got, exp );
+
+  test.case = 'quoted subject and maps with symmetrical quoting, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    quoting : 0,
+    unquoting : 1,
+    propertiesMapParsing : 0,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    subject : 'v:0 b:"k:0" c:0 d:"d:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 d:"d:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  test.close( 'quoting : 0, unqoting - 1' );
+
+  /* - */
+
+  test.open( 'quoting : 0, unqoting - 0' );
+
+  test.case = 'only quoted subject, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 1, quoting : 0, unquoting : 0 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : { '"v' : '0"' },
+  };
+  test.identical( got, exp );
+
+  test.case = 'only quoted subject, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse({ command : '.help "v:0"', propertiesMapParsing : 0, quoting : 0, unquoting : 0 });
+  var exp =
+  {
+    command : '.help "v:0"',
+    subject : '"v:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'quoted subject and maps with assymmetrical quoting, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    quoting : 0,
+    unquoting : 0,
+    propertiesMapParsing : 1,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 "d:0"',
+    propertiesMap : { '"v' : '0"', 'b' : '"k:0"', 'c' : 0, '"d' : '0"' },
+  };
+  test.identical( got, exp );
+
+  test.case = 'quoted subject and maps with assymetrical quoting, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    quoting : 0,
+    unquoting : 0,
+    propertiesMapParsing : 0,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 "d:0"',
+    subject : '"v:0" b:"k:0" c:0 "d:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 "d:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  /* */
+
+  test.case = 'quoted subject and maps with symmetrical quoting, propertiesMapParsing - 1';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    quoting : 0,
+    unquoting : 0,
+    propertiesMapParsing : 1,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    subject : '',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 d:"d:0"',
+    propertiesMap : { '"v' : '0"', 'b' : '"k:0"', 'c' : 0, 'd' : '"d:0"' },
+  };
+  test.identical( got, exp );
+
+  test.case = 'quoted subject and maps with symmetrical quoting, propertiesMapParsing - 0';
+  var got = aggregator.instructionParse
+  ({
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    quoting : 0,
+    unquoting : 0,
+    propertiesMapParsing : 0,
+  });
+  var exp =
+  {
+    command : '.help "v:0" b:"k:0" c:0 d:"d:0"',
+    subject : '"v:0" b:"k:0" c:0 d:"d:0"',
+    commandName : '.help',
+    instructionArgument : '"v:0" b:"k:0" c:0 d:"d:0"',
+    propertiesMap : {},
+  };
+  test.identical( got, exp );
+
+  test.close( 'quoting : 0, unqoting - 0' );
 }
 
 //
@@ -2477,6 +2864,7 @@ const Proto =
     programPerformOptionSubjectWinPathMaybe,
 
     instructionParse,
+    instructionParseWithOptionsQuotingAndUnqoting,
     instructionIsolateSecondFromArgument,
 
     help,
