@@ -168,6 +168,7 @@ module:
           - ../proto/node_modules/Tools
           - ../proto/node_modules/wcommandsaggregator
           - ../proto/wtools
+          - ../proto/wtools/abase
           - ../proto/wtools/amid
           - ../proto/wtools/amid/l7
           - ../proto/wtools/amid/l7/commands
@@ -178,6 +179,7 @@ module:
           - ../proto/wtools/amid/l7.test/commands/_assets
           - ../proto/wtools/amid/l7.test/commands/_assets/Action2.s
           - ../proto/wtools/amid/l7.test/commands/_assets/Action3.s
+          - ../proto/wtools/atop
     submodule:
       wTools:
         path: 'npm:///wTools'
