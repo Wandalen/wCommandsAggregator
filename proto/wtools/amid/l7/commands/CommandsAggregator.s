@@ -892,7 +892,8 @@ function onUnknownCommandError( o )
   let s = 'Unknown command ' + _.strQuote( o.commandName );
   if( aggregator.vocabulary.phraseMap[ 'help' ] )
   s += '\nTry ".help"';
-  return aggregator.onError( _.err( s ) );
+  return aggregator.onError( _.errBrief( s ) );
+  // return aggregator.onError( _.err( s ) ); /* Dmytro : the behaviour of routine was changed in new code. Previous code : throw _.errBrief( s ); */
 }
 
 onUnknownCommandError.defaults =
