@@ -155,7 +155,8 @@ function programPerform( o )
 
   o.program = o.program.trim();
 
-  // if( !o.allowingDotless )
+  /* xxx : investigate option::allowingDotless */
+  if( !o.allowingDotless )
   if
   (
     !_.strBegins( o.program, aggregator.vocabulary.defaultDelimeter )
@@ -343,7 +344,7 @@ function instructionPerformParsedLooking( o )
   o.propertiesMap = o.propertiesMap || Object.create( null );
 
   let command = aggregator.commandLook({ commandName : o.commandName });
-  let o2 = _.mapExtend( null, o );
+  let o2 = _.props.extend( null, o );
   o2.phraseDescriptor = command;
   return aggregator.instructionPerformParsedFound( o2 );
 }
@@ -395,7 +396,7 @@ function instructionPerformParsedFound( o )
       _.assert( aliases.length >= 1 );
       aliases.forEach( ( alias ) =>
       {
-        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
+        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.` )
         if( o.propertiesMap[ alias ] === undefined )
         return;
         o.propertiesMap[ propName ] = o.propertiesMap[ alias ];
@@ -464,7 +465,7 @@ function instructionsParse( o )
   commands = _.filter_( null, commands, ( command ) =>
   {
     let result = _.strSplitNonPreserving( command, aggregator.commandExplicitDelimeter );
-    return _.unrollFrom( result );
+    return _.unroll.from( result );
   });
 
   if( o.commandsImplicitDelimiting )
@@ -494,7 +495,7 @@ function instructionsParse( o )
         result.splice( i+1, 1 );
       }
 
-      return _.unrollFrom( result );
+      return _.unroll.from( result );
     });
 
   }
@@ -822,7 +823,7 @@ function withSubphraseExport_head( routine, args )
 
   _.assert( arguments.length === 2 );
   _.assert( args.length === 1 );
-  _.routineOptions( routine, o );
+  _.routine.options_( routine, o );
 
   return o;
 }
@@ -837,6 +838,7 @@ function withSubphraseExportToStructure_body( o )
 
   let o2 = _.mapOnly_( null, o, aggregator.vocabulary.withSubphrase.defaults );
   let subphraseDescriptorArray = aggregator.vocabulary.withSubphrase( o2 );
+  subphraseDescriptorArray = [ ... subphraseDescriptorArray ];
 
   _.assert( _.arrayIs( subphraseDescriptorArray ) );
 
@@ -1101,8 +1103,8 @@ function commandPropertiesExportString( command )
   let aggregator = this;
   let routine = command.routine;
   let properties = command.properties;
-  let keys = _.mapKeys( properties )
-  let hints = _.mapVals( properties );
+  let keys = _.props.keys( properties )
+  let hints = _.props.vals( properties );
 
   if( command.propertiesAliases )
   {
@@ -1114,7 +1116,7 @@ function commandPropertiesExportString( command )
       _.assert( aliases.length >= 1 );
       aliases.forEach( ( alias ) =>
       {
-        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.`)
+        _.assert( !usedAliases[ alias ], `Alias ${alias} of property ${propName} is already in use.` )
         let hint = properties[ propName ];
         let propIndex = keys.indexOf( propName );
         keys.splice( propIndex, 0, alias );
@@ -1194,7 +1196,9 @@ function commandLook( o )
     }
     else
     {
-      aggregator.onUnknownCommandError( o );
+      let e = _.props.extend( null, o );
+      e.subphrasesDescriptorArray = subphrasesDescriptorArray;
+      aggregator.onAmbiguity( e );
       return null;
     }
     // if( !subphrasesDescriptorArray.length )
@@ -1277,7 +1281,7 @@ function _commandPreform( command, commandRoutine, commandPhrase )
     {
       _.assert
       (
-        !_.property.has( command, k ) || command[ k ] === commandRoutine.command[ k ]
+        !_.props.has( command, k ) || command[ k ] === commandRoutine.command[ k ]
         , () => `Inconsistent field "${k}" of command "${commandPhrase}"`
       );
       command[ k ] = commandRoutine.command[ k ];
@@ -1294,14 +1298,14 @@ function _commandPreform( command, commandRoutine, commandPhrase )
   );
   _.assert( _.routine.is( commandRoutine ), `Command "${commandPhrase}" does not have defined routine.` );
   _.assert( _.aux.is( command ) );
-  _.assert( !_.property.has( command, 'ro' ) || commandRoutine === command.ro ); /* xxx : rename e to ro? */
-  _.assert( !_.property.has( command, 'routine' ) || commandRoutine === command.routine );
+  _.assert( !_.props.has( command, 'ro' ) || commandRoutine === command.ro ); /* xxx : rename e to ro? */
+  _.assert( !_.props.has( command, 'routine' ) || commandRoutine === command.routine );
   _.assert
   (
-    !_.property.has( command, 'phrase' ) || commandPhrase === command.phrase,
+    !_.props.has( command, 'phrase' ) || commandPhrase === command.phrase,
     () => `Command ${commandPhrase} has phrases mismatch ${commandPhrase} <> ${command.phrase}`
   );
-  _.assert( !_.property.own( commandRoutine, 'command' ) || commandRoutine.command === command );
+  _.assert( !_.props.own( commandRoutine, 'command' ) || commandRoutine.command === command );
   _.map.assertHasOnly( command, aggregator.CommandAllFields );
 
   if( commandPhrase )
@@ -1388,14 +1392,14 @@ function _CommandShortFiledsToLongFields( dst, fields )
   let filter = Self.CommandShortToLongFields;
   for( let k in fields )
   {
-    if( _.property.has( filter, k ) )
+    if( _.props.has( filter, k ) )
     {
       _.assert
       (
-        !_.property.has( dst, filter[ k ] ) || dst[ filter[ k ] ] === fields[ k ]
+        !_.props.has( dst, filter[ k ] ) || dst[ filter[ k ] ] === fields[ k ]
         , () => `Inconsistent field "${k}" of command "${commandPhraseGet()}"`
       );
-      _.assert( !_.property.has( dst, filter[ k ] ) || dst[ filter[ k ] ] === fields[ k ] );
+      _.assert( !_.props.has( dst, filter[ k ] ) || dst[ filter[ k ] ] === fields[ k ] );
       dst[ filter[ k ] ] = fields[ k ];
       delete fields[ k ];
     }
