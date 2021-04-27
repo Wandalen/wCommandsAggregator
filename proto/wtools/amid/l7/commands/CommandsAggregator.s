@@ -121,7 +121,6 @@ function exec()
 {
   let aggregator = this;
   let appArgs = _.process.input();
-  debugger;
   return aggregator.programPerform({ program : appArgs.original });
   // return aggregator.appArgsPerform({ appArgs });
 }
@@ -213,6 +212,7 @@ programPerform.defaults =
   withParsed : 0,
   severalValues : null,
   subjectWinPathsMaybe : 0, /* xxx : qqq : remove */
+  // allowingDotless : 0, /* Dmytro : option does not used in the utilities */
 }
 
 //
@@ -539,18 +539,25 @@ function instructionParse( o )
 {
   let aggregator = this;
 
-  if( _.strIs( o ) || _.arrayIs( o ) )
+  if( _.strIs( o ) )
   o = { command : o };
 
+  _.assert( arguments.length === 1 );
   _.routine.options( instructionParse, o );
   _.assert( _.strIs( o.command ) );
   _.assert( !!aggregator.formed );
-  _.assert( arguments.length === 1 );
 
+  let quote = [ '"', '`', '\'' ];
   if( o.propertiesMapParsing === null )
   o.propertiesMapParsing = aggregator.propertiesMapParsing;
   if( o.severalValues === null )
   o.severalValues = aggregator.severalValues;
+  if( _.boolLikeTrue( o.quoting ) )
+  o.quoting = quote;
+  if( o.unquoting === null )
+  o.unquoting = o.quoting ? 1 : 0;
+
+  /* */
 
   let splits = _.strIsolateLeftOrAll( o.command, ' ' );
   let commandName = splits[ 0 ];
@@ -564,25 +571,98 @@ function instructionParse( o )
     commandName,
     instructionArgument,
     propertiesMap : o.propertiesMap,
+  };
+
+  let request = Object.create( null );
+  if( o.quoting )
+  {
+    let isolated = _.strIsolateLeftOrAll
+    ({
+      src : instructionArgument,
+      delimeter : ' ',
+      quote : _.arrayAppendArray( null, o.quoting ),
+    });
+
+    if( isolated[ 0 ] === instructionArgument )
+    {
+      if( !_.strHas( instructionArgument, ':' ) )
+      request.subject = instructionArgument;
+
+      if( o.unquoting )
+      {
+        let inside = _.strInsideOf_({ src : instructionArgument, begin : o.quoting, end : o.quoting });
+        if( inside[ 1 ] !== undefined )
+        request.subject = inside[ 1 ];
+      }
+
+      if( request.subject )
+      return parsedExtend();
+    }
+
+    if( o.propertiesMapParsing && o.unquoting )
+    instructionArgument = `'${ instructionArgument }'`;
+  }
+  else
+  {
+    if( o.unquoting )
+    instructionArgument = unquoteInstructionArgument();
   }
 
   if( o.propertiesMapParsing )
-  {
+  request = requestParse( instructionArgument );
+  else
+  request.subject = instructionArgument;
 
-    let request = _.strRequestParse
+  return parsedExtend();
+
+  /* */
+
+  function requestParse( src )
+  {
+    return _.strRequestParse
     ({
-      src : instructionArgument,
+      src,
       commandsDelimeter : false,
       severalValues : o.severalValues,
       subjectWinPathsMaybe : o.subjectWinPathsMaybe,
+      quoting : o.quoting,
+      unquoting : o.unquoting,
     });
-
-    parsed.propertiesMap = _.props.extend( parsed.propertiesMap || null, request.map );
-    parsed.subject = request.subject
-
   }
 
-  return parsed;
+  /* */
+
+  function parsedExtend()
+  {
+    if( request.map )
+    parsed.propertiesMap = _.mapExtend( parsed.propertiesMap, request.map );
+    if( request.subject !== undefined )
+    parsed.subject = request.subject;
+    return parsed;
+  }
+
+  /* */
+
+  function unquoteInstructionArgument()
+  {
+    let args = [];
+    let src = instructionArgument;
+    let isolated;
+    do
+    {
+      isolated = _.strIsolateLeftOrAll
+      ({
+        src,
+        delimeter : ' ',
+        quote,
+      });
+      src = isolated[ 2 ];
+      args.push( _.strUnquote( isolated[ 0 ] ) )
+    }
+    while( isolated[ 2 ] )
+
+    return args.join( ' ' );
+  }
 }
 
 instructionParse.defaults =
@@ -591,8 +671,71 @@ instructionParse.defaults =
   propertiesMap : null,
   propertiesMapParsing : null,
   severalValues : null,
+  quoting : 1,
+  unquoting : null,
   subjectWinPathsMaybe : 0,
 }
+
+// function instructionParse( o )
+// {
+//   let aggregator = this;
+//
+//   // if( _.strIs( o ) || _.arrayIs( o ) ) /* Dmytro : routine should non parse commands in array, assertion below approve it */
+//   if( _.strIs( o ) )
+//   o = { command : o };
+//
+//   _.assert( arguments.length === 1 );
+//   _.routine.options( instructionParse, o );
+//   _.assert( _.strIs( o.command ) );
+//   _.assert( !!aggregator.formed );
+//
+//   if( o.propertiesMapParsing === null )
+//   o.propertiesMapParsing = aggregator.propertiesMapParsing;
+//   if( o.severalValues === null )
+//   o.severalValues = aggregator.severalValues;
+//
+//   let splits = _.strIsolateLeftOrAll( o.command, ' ' );
+//   let commandName = splits[ 0 ];
+//   let instructionArgument = splits[ 2 ];
+//
+//   o.propertiesMap = o.propertiesMap || Object.create( null );
+//
+//   let parsed =
+//   {
+//     command : o.command,
+//     commandName,
+//     instructionArgument,
+//     propertiesMap : o.propertiesMap,
+//   };
+//
+//   if( o.propertiesMapParsing )
+//   {
+//     let request = _.strRequestParse
+//     ({
+//       src : instructionArgument,
+//       commandsDelimeter : false,
+//       severalValues : o.severalValues,
+//       subjectWinPathsMaybe : o.subjectWinPathsMaybe,
+//       unquoting : o.unquoting,
+//     });
+//
+//     // parsed.propertiesMap = _.mapExtend( parsed.propertiesMap || null, request.map ); /* Dmytro : parsed.propertiesMap can have some value or be empty pure map, see line 560 */
+//     parsed.propertiesMap = _.mapExtend( parsed.propertiesMap, request.map );
+//     parsed.subject = request.subject
+//   }
+//
+//   return parsed;
+// }
+//
+// instructionParse.defaults =
+// {
+//   command : null,
+//   propertiesMap : null,
+//   propertiesMapParsing : null,
+//   severalValues : null,
+//   unquoting : 0,
+//   subjectWinPathsMaybe : 0,
+// };
 
 //
 
@@ -614,7 +757,7 @@ function instructionIsolateSecondFromArgumentLeft( instruction )
   _.assert( _.strIs( instruction ) );
 
   let splits = _.strIsolateLeftOrAll( instruction, aggregator.commandImplicitDelimeter );
-  [ result.instructionArgument, result.secondInstructionName, result.secondInstructionArgument  ] = splits;
+  [ result.instructionArgument, result.secondInstructionName, result.secondInstructionArgument ] = splits;
 
   if( result.secondInstructionName === undefined )
   delete result.secondInstructionName;
@@ -645,7 +788,7 @@ function instructionIsolateSecondFromArgumentRight( instruction )
   _.assert( _.strIs( instruction ) );
 
   let splits = _.strIsolateRightOrAll( instruction, aggregator.commandImplicitDelimeter );
-  [ result.instructionArgument, result.secondInstructionName, result.secondInstructionArgument  ] = splits;
+  [ result.instructionArgument, result.secondInstructionName, result.secondInstructionArgument ] = splits;
 
   if( result.secondInstructionName === undefined )
   delete result.secondInstructionName;
@@ -695,6 +838,7 @@ function withSubphraseExportToStructure_body( o )
 
   let o2 = _.mapOnly_( null, o, aggregator.vocabulary.withSubphrase.defaults );
   let subphraseDescriptorArray = aggregator.vocabulary.withSubphrase( o2 );
+  subphraseDescriptorArray = [ ... subphraseDescriptorArray ];
 
   _.assert( _.arrayIs( subphraseDescriptorArray ) );
 
@@ -710,7 +854,6 @@ function withSubphraseExportToStructure_body( o )
     _.assert( !!phraseDescriptor );
     return phraseDescriptor.phrase;
   });
-  debugger;
   let part2 = subphraseDescriptorArray.map( ( e ) =>
   {
     let phraseDescriptor = aggregator.vocabulary.phraseMap[ e.phrase ];
@@ -719,7 +862,6 @@ function withSubphraseExportToStructure_body( o )
   });
   let help = _.strJoin( [ _.ct.format( aggregator.vocabulary.defaultDelimeter, 'code' ), _.ct.format( part1, 'code' ), ' - ', part2 ] );
 
-  debugger;
   return help;
 }
 
@@ -1045,9 +1187,11 @@ function commandLook( o )
   if( !command )
   {
     let subphrasesDescriptorArray = aggregator.vocabulary.withSubphrase( o.commandName );
-    if( !subphrasesDescriptorArray.length )
+    if( subphrasesDescriptorArray.length )
     {
-      aggregator.onUnknownCommandError( o );
+      let e = _.mapExtend( null, o );
+      e.subphrasesDescriptorArray = subphrasesDescriptorArray;
+      aggregator.onAmbiguity( e );
       return null;
     }
     else
@@ -1057,6 +1201,18 @@ function commandLook( o )
       aggregator.onAmbiguity( e );
       return null;
     }
+    // if( !subphrasesDescriptorArray.length )
+    // {
+    //   aggregator.onUnknownCommandError( o );
+    //   return null;
+    // }
+    // else
+    // {
+    //   let e = _.mapExtend( null, o );
+    //   e.subphrasesDescriptorArray = subphrasesDescriptorArray;
+    //   aggregator.onAmbiguity( e );
+    //   return null;
+    // }
   }
 
   return command || null;
