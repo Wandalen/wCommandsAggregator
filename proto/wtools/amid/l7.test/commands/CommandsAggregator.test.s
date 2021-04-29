@@ -115,7 +115,7 @@ function perform( test )
     test.identical( e.commandName, '.with' );
     test.identical( e.instructionArgument, 'path to dir .list all' );
     test.true( e.aggregator === aggregator );
-    test.true( _.objectIs( e.phraseDescriptor ) );
+    test.true( _.object.isBasic( e.phraseDescriptor ) );
     test.identical( e.phraseDescriptor.phrase, 'with' );
 
     test.description = 'second command';
@@ -144,7 +144,7 @@ function perform( test )
     test.identical( e.commandName, '.list' );
     test.identical( e.instructionArgument, 'all' );
     test.true( e.aggregator === aggregator );
-    test.true( _.objectIs( e.phraseDescriptor ) );
+    test.true( _.object.isBasic( e.phraseDescriptor ) );
     test.identical( e.phraseDescriptor.phrase, 'list' );
 
     track = 2;

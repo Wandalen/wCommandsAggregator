@@ -71,7 +71,7 @@ function form()
   let aggregator = this;
 
   _.assert( !aggregator.formed );
-  _.assert( _.objectIs( aggregator.commands ) || _.longIs( aggregator.commands ) );
+  _.assert( _.object.isBasic( aggregator.commands ) || _.longIs( aggregator.commands ) );
   _.assert( arguments.length === 0, 'Expects no arguments' );
 
   aggregator.basePath = _.path.resolve( aggregator.basePath );
@@ -336,7 +336,7 @@ function instructionPerformParsedLooking( o )
   _.assert( _.strIs( o.command ) );
   _.assert( _.strIs( o.commandName ) );
   _.assert( _.strIs( o.instructionArgument ) );
-  _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
+  _.assert( o.propertiesMap === null || _.object.isBasic( o.propertiesMap ) );
   _.assert( _.instanceIs( aggregator ) );
   _.assert( !!aggregator.formed );
   _.assert( arguments.length === 1 );
@@ -370,7 +370,7 @@ function instructionPerformParsedFound( o )
   _.assert( _.strIs( o.command ) );
   _.assert( _.strIs( o.commandName ) );
   _.assert( _.strIs( o.instructionArgument ) );
-  _.assert( o.propertiesMap === null || _.objectIs( o.propertiesMap ) );
+  _.assert( o.propertiesMap === null || _.object.isBasic( o.propertiesMap ) );
   _.assert( _.instanceIs( aggregator ) );
   _.assert( !!aggregator.formed );
   _.assert( arguments.length === 1 );
@@ -389,7 +389,7 @@ function instructionPerformParsedFound( o )
   if( phraseDescriptor.propertiesAliases )
   {
     let usedAliases = Object.create( null );
-    _.assert( _.objectIs( phraseDescriptor.propertiesAliases ) );
+    _.assert( _.object.isBasic( phraseDescriptor.propertiesAliases ) );
     for( let propName in phraseDescriptor.propertiesAliases )
     {
       let aliases = _.arrayAs( phraseDescriptor.propertiesAliases[ propName ] );
@@ -818,7 +818,7 @@ function withSubphraseExport_head( routine, args )
 
   let o = args[ 0 ];
 
-  if( !_.objectIs( o ) )
+  if( !_.object.isBasic( o ) )
   o = { phrase : args[ 0 ] };
 
   _.assert( arguments.length === 2 );
@@ -1109,7 +1109,7 @@ function commandPropertiesExportString( command )
   if( command.propertiesAliases )
   {
     let usedAliases = Object.create( null );
-    _.assert( _.objectIs( command.propertiesAliases ) );
+    _.assert( _.object.isBasic( command.propertiesAliases ) );
     for( let propName in command.propertiesAliases )
     {
       let aliases = _.arrayAs( command.propertiesAliases[ propName ] );
