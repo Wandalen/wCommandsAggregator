@@ -182,22 +182,13 @@ function programPerform( o )
     parsedCommands = aggregator.instructionsParse( o2 );
   }
 
-  if( o.withParsed )
+  for( let c = 0 ; c < parsedCommands.length ; c++ )
   {
-    for( let c = 0 ; c < parsedCommands.length ; c++ )
-    {
-      let parsedCommand = parsedCommands[ c ];
-      parsedCommand.parsedCommands = parsedCommands;
-      con.then( () => aggregator.instructionPerformParsedLooking( parsedCommand ) );
-    }
-  }
-  else
-  {
-    for( let c = 0 ; c < parsedCommands.length ; c++ )
-    {
-      let parsedCommand = parsedCommands[ c ];
-      con.then( () => aggregator.instructionPerformParsedLooking( parsedCommand ) );
-    }
+    let parsedCommand = parsedCommands[ c ];
+    if( o.withParsed )
+    parsedCommand.parsedCommands = parsedCommands;
+    parsedCommand.index = c;
+    con.then( () => aggregator.instructionPerformParsedLooking( parsedCommand ) );
   }
 
   return con;
@@ -357,6 +348,7 @@ instructionPerformParsedLooking.defaults =
   propertiesMap : null,
   subject : null,
   parsedCommands : null,
+  index : null,
 }
 
 //
