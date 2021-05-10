@@ -1,5 +1,5 @@
 
-# module::CommandsAggregator [![status](https://github.com/Wandalen/wCommandsAggregator/workflows/publish/badge.svg)](https://github.com/Wandalen/wCommandsAggregator/actions?query=workflow%3Apublish) [![stability-stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)](https://github.com/emersion/stability-badges#stable)
+# module::CommandsAggregator [![status](https://github.com/Wandalen/wCommandsAggregator/actions/workflows/StandardPublish.yml/badge.svg)](https://github.com/Wandalen/wCommandsAggregator/actions/workflows/StandardPublish.yml) [![stability-stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)](https://github.com/emersion/stability-badges#stable)
 
 Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.
 
@@ -11,7 +11,7 @@ npm install
 node sample/trivial/Sample.s
 ```
 
-## To add to your project
+### To add to your project
 ```
 npm add 'wcommandsaggregator@alpha'
 ```
