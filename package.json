@@ -1,6 +1,6 @@
 {
   "name" : "wcommandsaggregator",
-  "version" : "0.3.310",
+  "version" : "0.3.311",
   "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
   "author" : "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors" :
@@ -23,14 +23,14 @@
   },
   "dependencies" :
   {
-    "wTools" : "gamma",
-    "wCopyable" : "gamma",
-    "wFiles" : "gamma",
-    "wvocabulary" : "gamma",
-    "wpathbasic" : "gamma",
-    "wprocess" : "gamma",
-    "wverbal" : "gamma"
+    "wTools" : "",
+    "wCopyable" : "",
+    "wFiles" : "",
+    "wvocabulary" : "",
+    "wpathbasic" : "",
+    "wprocess" : "",
+    "wverbal" : ""
   },
-  "devDependencies" : { "eslint" : "7.1.0", "wTesting" : "gamma" },
+  "devDependencies" : { "wTesting" : "", "eslint" : "7.1.0" },
   "keywords" : [ "wTools" ]
 }
