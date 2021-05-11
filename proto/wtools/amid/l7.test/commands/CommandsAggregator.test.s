@@ -195,6 +195,7 @@ function programPerform( test )
       'subject' : 'arg1 arg2 .command2 arg3',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -234,6 +235,7 @@ function programPerform( test )
       'subject' : 'arg1 arg2',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 0
     },
     {
       'command' : '.command2 arg3',
@@ -242,6 +244,7 @@ function programPerform( test )
       'subject' : 'arg3',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 1
     }
   ];
   test.identical( track, exp );
@@ -281,6 +284,7 @@ function programPerform( test )
       'subject' : 'arg1 arg2',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 0
     },
     {
       'command' : '.command2 arg3',
@@ -289,6 +293,8 @@ function programPerform( test )
       'subject' : 'arg3',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 1
+
     }
   ];
   test.identical( track, exp );
@@ -328,6 +334,7 @@ function programPerform( test )
       'subject' : 'arg1 "arg2 .command2 arg3"',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 0
     },
     {
       'command' : '.command2 "arg4 arg5" arg6',
@@ -336,6 +343,7 @@ function programPerform( test )
       'subject' : '"arg4 arg5" arg6',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 1
     },
   ];
   test.identical( track, exp );
@@ -375,6 +383,7 @@ function programPerform( test )
       'subject' : 'arg1 "arg2 .command2 arg3"',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 0
     },
     {
       'command' : '.command2 "arg4 ; arg5" arg6',
@@ -383,6 +392,7 @@ function programPerform( test )
       'subject' : '"arg4 ; arg5" arg6',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 1
     },
     {
       'command' : '.command1 key:val',
@@ -391,6 +401,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : { 'key' : 'val' },
       'parsedCommands' : null,
+      'index' : 2
     },
   ];
   test.identical( track, exp );
@@ -430,6 +441,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 0
     },
     {
       'command' : '.command2',
@@ -438,6 +450,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 1
     },
     {
       'command' : '.command1',
@@ -446,6 +459,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 2
     },
   ];
   test.identical( track, exp );
@@ -485,6 +499,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : { 'filePath' : 'before/**', 'ins' : 'line', 'sub' : 'abc' },
       'parsedCommands' : null,
+      'index' : 0
     },
     {
       'command' : '.command2',
@@ -493,6 +508,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 1
     },
     {
       'command' : '.command1',
@@ -501,6 +517,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 2
     }
   ];
   test.identical( track, exp );
@@ -540,6 +557,7 @@ function programPerform( test )
       'subject' : 'some subject ',
       'propertiesMap' : { 'filePath' : 'before/**', 'ins' : 'line', 'sub' : 'abc' },
       'parsedCommands' : null,
+      'index' : 0
     },
     {
       'command' : '.command2',
@@ -548,6 +566,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 1
     },
     {
       'command' : '.command1',
@@ -556,6 +575,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : {},
       'parsedCommands' : null,
+      'index' : 2
     }
   ];
   test.identical( track, exp );
@@ -599,6 +619,7 @@ function programPerform( test )
         'b' : 2,
       },
       'parsedCommands' : null,
+      'index' : 0
     },
     {
       'command' : '.command2 a:4 a:a',
@@ -610,6 +631,7 @@ function programPerform( test )
         'a' : [ 4, 'a' ],
       },
       'parsedCommands' : null,
+      'index' : 1
     }
   ];
   test.identical( track, exp );
@@ -649,6 +671,7 @@ function programPerform( test )
       'subject' : '',
       'propertiesMap' : { 'path/key 2' : 'val2', 'path/key 1' : 'val1', 'path/key3' : 'val3' },
       'parsedCommands' : null,
+      'index' : 0
     }
   ];
   test.identical( track, exp );
@@ -741,6 +764,7 @@ function programPerformOptionSeveralValues( test )
       'subject' : 'arg1',
       'propertiesMap' : { 'v' : [ 1, 2 ], 'r' : 1 },
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -775,6 +799,7 @@ function programPerformOptionSeveralValues( test )
       'subject' : 'arg1',
       'propertiesMap' : { 'v' : 2, 'r' : 1 },
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -808,6 +833,7 @@ function programPerformOptionSeveralValues( test )
       'subject' : 'arg1',
       'propertiesMap' : { 'v' : [ 1, 2 ], 'r' : 1 },
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -842,6 +868,7 @@ function programPerformOptionSeveralValues( test )
       'subject' : 'arg1',
       'propertiesMap' : { 'v' : 2, 'r' : 1 },
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -905,6 +932,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
       'subject' : `${ subject }`,
       'propertiesMap' : { 'v' : [ 1, 2 ], 'r' : 1 },
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -939,6 +967,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
       'subject' : `${ subject }`,
       'propertiesMap' : { 'v' : 2, 'r' : 1 },
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -973,6 +1002,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
       'subject' : `${ subject }`,
       'propertiesMap' : { 'v' : [ 1, 2 ], 'r' : 1 },
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -1008,6 +1038,7 @@ function programPerformOptionSubjectWinPathMaybe( test )
       'subject' : `${ subject }`,
       'propertiesMap' : { 'v' : 2, 'r' : 1 },
       'parsedCommands' : null,
+      'index' : 0
     },
   ];
   test.identical( track, exp );
@@ -1028,6 +1059,57 @@ function programPerformOptionSubjectWinPathMaybe( test )
   function clean()
   {
     logger2.outputData = '';
+    track = [];
+  }
+
+}
+
+//
+
+function programPerformUsingCommandIndex( test )
+{
+  let track = [];
+  let command1 = ( e ) => { commandHandle( e ) };
+  let command2 = ( e ) => { commandHandle( e ) };
+
+  /* - */
+
+  test.case = 'severalValues - 1, commandsImplicitDelimiting - 0';
+
+  clean();
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands :
+    {
+      'command1' : { ro : command1 },
+      'command2' : { ro : command2 },
+    },
+    commandsImplicitDelimiting : 1,
+    propertiesMapParsing : 1,
+  }).form();
+
+  aggregator.programPerform({ program : `.command1 .command2`, withParsed : 1 });
+
+  var exp =
+  [
+    '.command1-0',
+    '.command2-1',
+    '.command2-last-command',
+  ]
+  test.identical( track, exp );
+
+  /* - */
+
+  function commandHandle( e )
+  {
+    track.push( `${e.command}-${e.index}` )
+    if( e.index === e.parsedCommands.length - 1 )
+    track.push( `${e.command}-last-command` )
+  }
+
+  function clean()
+  {
     track = [];
   }
 
@@ -2862,6 +2944,7 @@ const Proto =
     programPerform,
     programPerformOptionSeveralValues,
     programPerformOptionSubjectWinPathMaybe,
+    programPerformUsingCommandIndex,
 
     instructionParse,
     instructionParseWithOptionsQuotingAndUnqoting,
