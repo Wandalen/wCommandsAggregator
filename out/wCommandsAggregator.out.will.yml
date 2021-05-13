@@ -2,12 +2,9 @@ format: outwillfile-2.0
 root:
   - wCommandsAggregator.out
 consistency:
-  ../.ex.will.yml: &ref_0
-    hash: c2a49b595a13e2353a6d094bb3bec3dc
-    size: 1922
-  ../.im.will.yml: &ref_1
-    hash: b2ffc771c7f0c9a71c0630eedadd749a
-    size: 5374
+  ../will.yml: &ref_0
+    hash: af9b0bfac3f2854a8b3932e848df644c
+    size: 7068
 module:
   wCommandsAggregator.out:
     about:
@@ -19,19 +16,19 @@ module:
         CLI.
       enabled: 1
       version: 0.4.0
-      interpreters: &ref_2
+      license: MIT
+      npm.name: wcommandsaggregator
+      author: Kostiantyn Wandalen <wanalen@01.school>
+      keywords: &ref_1
+        - wTools
+      contributors: &ref_2
+        - Kostiantyn Wandalen <wanalen@01.school>
+        - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
+      interpreters: &ref_3
         - njs >= 10.0.0
         - chrome >= 60.0.0
         - firefox >= 60.0.0
-      keywords: &ref_3
-        - wTools
-      license: MIT
-      author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: &ref_4
-        - Kostiantyn Wandalen <wanalen@01.school>
-        - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
-      npm.name: wcommandsaggregator
-      npm.scripts: &ref_5
+      npm.scripts: &ref_4
         test: 'wtest .run "proto/**" rapidity:-3'
         docgen: wdocgen .build proto
     path:
@@ -46,15 +43,11 @@ module:
       module.original.willfiles:
         criterion:
           predefined: 1
-        path:
-          - ../.ex.will.yml
-          - ../.im.will.yml
+        path: ../will.yml
       module.peer.willfiles:
         criterion:
           predefined: 1
-        path:
-          - ../.ex.will.yml
-          - ../.im.will.yml
+        path: ../will.yml
       module.peer.in:
         criterion:
           predefined: 1
@@ -190,19 +183,19 @@ module:
         path: 'npm:///wFiles'
         autoExporting: 0
         enabled: 0
-      wVerbal:
+      wverbal:
         path: 'npm:///wverbal'
         autoExporting: 0
         enabled: 0
-      wVocabulary:
+      wvocabulary:
         path: 'npm:///wvocabulary'
         autoExporting: 0
         enabled: 0
-      wPathBasic:
+      wpathbasic:
         path: 'npm:///wpathbasic'
         autoExporting: 0
         enabled: 0
-      wProcess:
+      wprocess:
         path: 'npm:///wprocess'
         autoExporting: 0
         enabled: 0
@@ -217,7 +210,7 @@ module:
         autoExporting: 0
         enabled: 0
         criterion:
-          debug: 1
+          development: 1
       wTesting:
         path: 'npm:///wTesting'
         autoExporting: 0
@@ -819,8 +812,7 @@ module:
           content: proto
           export: 1
     consistency:
-      ../.ex.will.yml: *ref_0
-      ../.im.will.yml: *ref_1
+      ../will.yml: *ref_0
   ../:
     about:
       name: wCommandsAggregator
@@ -831,26 +823,22 @@ module:
         CLI.
       enabled: 1
       version: 0.4.0
-      interpreters: *ref_2
-      keywords: *ref_3
       license: MIT
-      author: Kostiantyn Wandalen <wanalen@01.school>
-      contributors: *ref_4
       npm.name: wcommandsaggregator
-      npm.scripts: *ref_5
+      author: Kostiantyn Wandalen <wanalen@01.school>
+      keywords: *ref_1
+      contributors: *ref_2
+      interpreters: *ref_3
+      npm.scripts: *ref_4
     path:
       module.willfiles:
         criterion:
           predefined: 1
-        path:
-          - .ex.will.yml
-          - .im.will.yml
+        path: will.yml
       module.original.willfiles:
         criterion:
           predefined: 1
-        path:
-          - .ex.will.yml
-          - .im.will.yml
+        path: will.yml
       module.peer.willfiles:
         criterion:
           predefined: 1
@@ -964,19 +952,19 @@ module:
         path: 'npm:///wFiles'
         autoExporting: 0
         enabled: 0
-      wVerbal:
+      wverbal:
         path: 'npm:///wverbal'
         autoExporting: 0
         enabled: 0
-      wVocabulary:
+      wvocabulary:
         path: 'npm:///wvocabulary'
         autoExporting: 0
         enabled: 0
-      wPathBasic:
+      wpathbasic:
         path: 'npm:///wpathbasic'
         autoExporting: 0
         enabled: 0
-      wProcess:
+      wprocess:
         path: 'npm:///wprocess'
         autoExporting: 0
         enabled: 0
@@ -991,7 +979,7 @@ module:
         autoExporting: 0
         enabled: 0
         criterion:
-          debug: 1
+          development: 1
       wTesting:
         path: 'npm:///wTesting'
         autoExporting: 0
@@ -1529,9 +1517,6 @@ module:
           - 'build::release'
           - 'build::npm'
     consistency:
-      ../.ex.will.yml:
-        hash: c2a49b595a13e2353a6d094bb3bec3dc
-        size: 1922
-      ../.im.will.yml:
-        hash: b2ffc771c7f0c9a71c0630eedadd749a
-        size: 5374
+      ../will.yml:
+        hash: af9b0bfac3f2854a8b3932e848df644c
+        size: 7068
