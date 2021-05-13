@@ -846,17 +846,18 @@ function withSubphraseExportToStructure_body( o )
     _.assert( !!phraseDescriptor );
     return phraseDescriptor.phrase;
   });
+
+  let longHint = !( o.phrase === '' || o.phrase === '.' );
   let part2 = subphraseDescriptorArray.map( ( e ) =>
   {
     let phraseDescriptor = aggregator.vocabulary.phraseMap[ e.phrase ];
     _.assert( !!phraseDescriptor );
-    return onDescriptorExportString( phraseDescriptor );
+    return onDescriptorExportString( phraseDescriptor, longHint );
   });
   let help = _.strJoin( [ _.ct.format( aggregator.vocabulary.defaultDelimeter, 'code' ), _.ct.format( part1, 'code' ), ' - ', part2 ] );
 
   return help;
 }
-
 var defaults = withSubphraseExportToStructure_body.defaults =
 {
   phrase : null,
@@ -1081,11 +1082,14 @@ function commandsAdd( commands )
 
 //
 
-function commandExportString( command )
+function commandExportString( command, longHint )
 {
   let aggregator = this;
   _.assert( aggregator.commandIs( command ) );
-  return command.longHint || command.hint || _.strCapitalize( command.phrase + '.' );
+
+  if( longHint && command.longHint )
+  return command.longHint;
+  return command.hint || command.longHint || _.strCapitalize( command.phrase + '.' );
 }
 
 //
