@@ -1122,7 +1122,7 @@ function commandPropertiesExportString( command )
     }
   }
 
-  keys = _.ct.format( keys, 'path' );
+  keys = _.ct.format( keys, 'code' );
 
   let help = _.strJoin( [ keys, ' : ', hints ] );
   return _.entity.exportString( help, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
