@@ -1089,7 +1089,7 @@ function commandExportString( command, longHint )
 
   if( longHint && command.longHint )
   return command.longHint;
-  return command.hint || _.strCapitalize( command.phrase + '.' );
+  return command.hint || command.longHint || _.strCapitalize( command.phrase + '.' );
 }
 
 //

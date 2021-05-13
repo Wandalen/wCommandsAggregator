@@ -2163,6 +2163,16 @@ function helpWithLongHint( test )
       h : 'action first',
       lh : 'Define actions which will be executed first.'
     },
+    'short' :
+    {
+      ro : () => {},
+      h : 'Command with only hint.'
+    },
+    'long' :
+    {
+      ro : () => {},
+      lh : 'Command with only long hint.'
+    },
   };
 
   let loggerToString = new _.LoggerToString();
@@ -2174,9 +2184,9 @@ function helpWithLongHint( test )
     logger,
   }).form();
 
-  /* */
+  /* - */
 
-  test.case = 'without subject'
+  test.case = 'without subject';
   loggerToString.outputData = '';
   aggregator.instructionPerform({ command : '.help' });
   var expected =
@@ -2184,12 +2194,14 @@ function helpWithLongHint( test )
 .help - Get help.
 .action - action
 .action.first - action first
+.short - Command with only hint.
+.long - Command with only long hint.
 `;
   test.equivalent( loggerToString.outputData, expected );
 
   /* */
 
-  test.case = 'subject - dot'
+  test.case = 'subject - dot';
   loggerToString.outputData = '';
   aggregator.instructionPerform({ command : '.help .' });
   var expected =
@@ -2197,9 +2209,13 @@ function helpWithLongHint( test )
 .help - Get help.
 .action - action
 .action.first - action first
+.short - Command with only hint.
+.long - Command with only long hint.
 No command .
 `;
   test.equivalent( loggerToString.outputData, expected );
+
+  /* */
 
   test.case = 'dotless single word subject - single possible method';
   loggerToString.outputData = '';
@@ -2211,28 +2227,60 @@ No command .
 `;
   test.equivalent( loggerToString.outputData, expected );
 
-  test.case = 'subject - two words, dotless'
+  /* */
+
+  test.case = 'subject - two words, dotless';
   loggerToString.outputData = '';
   aggregator.instructionPerform({ command : '.help action first' });
   var expected = '  .action.first - Define actions which will be executed first.';
   test.identical( loggerToString.outputData, expected );
 
-  test.case = 'exact, two words, with dot'
+  /* */
+
+  test.case = 'exact, two words, with dot';
   loggerToString.outputData = '';
   aggregator.instructionPerform({ command : '.help .action.first' });
   var expected = '  .action.first - Define actions which will be executed first.';
   test.identical( loggerToString.outputData, expected );
 
-  test.case = 'part of phrase, dotless'
+  /* */
+
+  test.case = 'part of phrase, dotless';
   loggerToString.outputData = '';
   aggregator.instructionPerform({ command : '.help first' });
   var expected = '  .action.first - Define actions which will be executed first.\n  No command first';
   test.identical( loggerToString.outputData, expected );
 
-  test.case = 'part of phrase, with dot'
+  /* */
+
+  test.case = 'part of phrase, with dot';
   loggerToString.outputData = '';
   aggregator.instructionPerform({ command : '.help .first' });
   var expected = '  .action.first - Define actions which will be executed first.\n  No command .first';
+  test.identical( loggerToString.outputData, expected );
+
+  /* */
+
+  test.case = 'part of phrase, with dot';
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help .first' });
+  var expected = '  .action.first - Define actions which will be executed first.\n  No command .first';
+  test.identical( loggerToString.outputData, expected );
+
+  /* */
+
+  test.case = 'help about command with only hint';
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help short' });
+  var expected = '  .short - Command with only hint.';
+  test.identical( loggerToString.outputData, expected );
+
+  /* */
+
+  test.case = 'help about command with only long hint';
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help long' });
+  var expected = '  .long - Command with only long hint.';
   test.identical( loggerToString.outputData, expected );
 }
 
