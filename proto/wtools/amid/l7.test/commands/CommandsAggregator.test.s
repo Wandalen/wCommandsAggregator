@@ -2141,7 +2141,6 @@ function helpWithLongHint( test )
 {
   /* init */
 
-  // let execCommand = () => {};
   let commandHelp = ( e ) => e.aggregator._commandHelp( e );
 
   var commands =
@@ -2182,9 +2181,23 @@ function helpWithLongHint( test )
   aggregator.instructionPerform({ command : '.help' });
   var expected =
 `
-.help - Get common help and help for separate command.
-.action - Use command action to execute some action.
-.action.first - Define actions which will be executed first.
+.help - Get help.
+.action - action
+.action.first - action first
+`;
+  test.equivalent( loggerToString.outputData, expected );
+
+  /* */
+
+  test.case = 'subject - dot'
+  loggerToString.outputData = '';
+  aggregator.instructionPerform({ command : '.help .' });
+  var expected =
+`
+.help - Get help.
+.action - action
+.action.first - action first
+No command .
 `;
   test.equivalent( loggerToString.outputData, expected );
 
