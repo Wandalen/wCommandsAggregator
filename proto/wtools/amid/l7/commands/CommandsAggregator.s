@@ -234,7 +234,7 @@ function instructionsPerform( o )
   _.assert( !!aggregator.formed );
   _.assert( arguments.length === 1 );
 
-  o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
+  o.commands = _.arrayFlatten( null, _.array.as( o.commands ) );
 
   if( o.propertiesMaps === null || o.propertiesMaps.length === 0 )
   {
@@ -242,7 +242,7 @@ function instructionsPerform( o )
   }
   else
   {
-    o.propertiesMaps = _.arrayFlatten( null, _.arrayAs( o.propertiesMaps ) );
+    o.propertiesMaps = _.arrayFlatten( null, _.array.as( o.propertiesMaps ) );
   }
 
   _.assert( o.commands.length === o.propertiesMaps.length );
@@ -384,7 +384,7 @@ function instructionPerformParsedFound( o )
     _.assert( _.object.isBasic( phraseDescriptor.propertiesAliases ) );
     for( let propName in phraseDescriptor.propertiesAliases )
     {
-      let aliases = _.arrayAs( phraseDescriptor.propertiesAliases[ propName ] );
+      let aliases = _.array.as( phraseDescriptor.propertiesAliases[ propName ] );
       _.assert( aliases.length >= 1 );
       aliases.forEach( ( alias ) =>
       {
@@ -451,7 +451,7 @@ function instructionsParse( o )
   if( o.commandsExplicitDelimiting === null )
   o.commandsExplicitDelimiting = aggregator.commandsExplicitDelimiting;
 
-  o.commands = _.arrayFlatten( null, _.arrayAs( o.commands ) );
+  o.commands = _.arrayFlatten( null, _.array.as( o.commands ) );
 
   commands = o.commands;
   commands = _.filter_( null, commands, ( command ) =>
@@ -1108,7 +1108,7 @@ function commandPropertiesExportString( command )
     _.assert( _.object.isBasic( command.propertiesAliases ) );
     for( let propName in command.propertiesAliases )
     {
-      let aliases = _.arrayAs( command.propertiesAliases[ propName ] );
+      let aliases = _.array.as( command.propertiesAliases[ propName ] );
       _.assert( aliases.length >= 1 );
       aliases.forEach( ( alias ) =>
       {
