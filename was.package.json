@@ -10,7 +10,7 @@
   ],
   "license" : "MIT",
   "main" : "proto/node_modules/wcommandsaggregator",
-  "files" : [ "proto/wtools/amid/l7", "out", "proto/node_modules" ],
+  "files" : [ "proto/wtools/amid/l7", "out", "proto/node_modules", "proto/node_modules/Tools", "proto/node_modules/wcommandsaggregator" ],
   "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen proto" },
   "repository" :
   {
