@@ -2988,6 +2988,81 @@ badCommandsErrors.description =
   - throwen error is descriptive
 `;
 
+
+//
+
+function onUnknownCommandError( test )
+{
+  const logger2 = new _.LoggerToString();
+  const logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ] });
+
+  /* */
+
+  test.case = 'wrong command without help';
+  clean();
+  var commands = { 'command1' : { ro : ( e ) => { console.log( 'command1' ); } } };
+  var onError = ( err ) =>
+  {
+    _.error.attend( err );
+    test.identical( err.message, `Unknown command ".wrong"` );
+    test.identical( err.originalMessage, `Unknown command ".wrong"` );
+    return err
+  };
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
+    onError,
+    withHelp : 0,
+  }).form();
+
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.wrong' }) );
+  var exp = `Command ".wrong"`;
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
+
+  /* */
+
+  test.case = 'wrong command with help';
+  clean();
+  var commandHelp = ( e ) => e.aggregator._commandHelp( e );
+  var commands =
+  {
+    'help' : { ro : commandHelp, h : 'Get help about commands.' },
+    'command1' : { ro : ( e ) => { track.push( e ) } },
+  };
+  var onError = ( err ) =>
+  {
+    _.error.attend( err );
+    test.identical( err.message, `Unknown command ".wrong"\nTry ".help"` );
+    test.identical( err.originalMessage, `Unknown command ".wrong"\nTry ".help"` );
+    return err
+  };
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
+    onError,
+    withHelp : 0,
+  }).form();
+
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.wrong' }) );
+  var exp = `Command ".wrong"`;
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
+
+  /* - */
+
+  function clean()
+  {
+    logger2.outputData = '';
+  }
+
+}
 // --
 // declare
 // --
@@ -3019,6 +3094,8 @@ const Proto =
     formCommandsWithPhrases,
     customDelimeter,
     badCommandsErrors,
+
+    onUnknownCommandError,
 
   }
 

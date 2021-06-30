@@ -1192,9 +1192,7 @@ function commandLook( o )
     }
     else
     {
-      let e = _.props.extend( null, o );
-      e.subphrasesDescriptorArray = subphrasesDescriptorArray;
-      aggregator.onAmbiguity( e );
+      aggregator.onUnknownCommandError( o );
       return null;
     }
     // if( !subphrasesDescriptorArray.length )
