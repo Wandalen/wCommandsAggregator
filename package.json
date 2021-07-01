@@ -1,36 +1,46 @@
 {
-  "name" : "wcommandsaggregator",
-  "version" : "0.3.323",
-  "description" : "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
-  "author" : "Kostiantyn Wandalen <wanalen@01.school>",
-  "contributors" :
-  [
+  "name": "wcommandsaggregator",
+  "version": "0.3.324",
+  "description": "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
+  "author": "Kostiantyn Wandalen <wanalen@01.school>",
+  "contributors": [
     "Kostiantyn Wandalen <wanalen@01.school>",
     "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>"
   ],
-  "license" : "MIT",
-  "main" : "proto/node_modules/wcommandsaggregator",
-  "files" : [ "proto/wtools/amid/l7", "out", "proto/node_modules", "proto/node_modules/Tools", "proto/node_modules/wcommandsaggregator" ],
-  "scripts" : { "test" : "wtest .run 'proto/**' rapidity:-3", "docgen" : "wdocgen proto" },
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/Wandalen/wCommandsAggregator.git"
+  "license": "MIT",
+  "main": "proto/node_modules/wcommandsaggregator",
+  "files": [
+    "proto/wtools/amid/l7",
+    "out",
+    "proto/node_modules",
+    "proto/node_modules/Tools",
+    "proto/node_modules/wcommandsaggregator"
+  ],
+  "scripts": {
+    "test": "wtest .run 'proto/**' rapidity:-3",
+    "docgen": "wdocgen proto"
   },
-  "bugs" :
-  {
-    "url" : "https://github.com/Wandalen/wCommandsAggregator/issues"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wCommandsAggregator.git"
   },
-  "dependencies" :
-  {
-    "wTools" : "gamma",
-    "wCopyable" : "gamma",
-    "wFiles" : "gamma",
-    "wvocabulary" : "gamma",
-    "wpathbasic" : "gamma",
-    "wprocess" : "gamma",
-    "wverbal" : "gamma"
+  "bugs": {
+    "url": "https://github.com/Wandalen/wCommandsAggregator/issues"
   },
-  "devDependencies" : { "eslint" : "7.1.0", "wTesting" : "gamma" },
-  "keywords" : [ "wTools" ]
+  "dependencies": {
+    "wvocabulary": "gamma",
+    "wverbal": "gamma",
+    "wTools": "gamma",
+    "wprocess": "gamma",
+    "wpathbasic": "gamma",
+    "wFiles": "gamma",
+    "wCopyable": "gamma"
+  },
+  "devDependencies": {
+    "wTesting": "gamma",
+    "eslint": "7.1.0"
+  },
+  "keywords": [
+    "wTools"
+  ]
 }
