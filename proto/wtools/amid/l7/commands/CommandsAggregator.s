@@ -1182,11 +1182,11 @@ function commandLook( o )
   if( o.withHandlers )
   if( !command )
   {
-    let subphrasesDescriptorArray = aggregator.vocabulary.withSubphrase( o.commandName );
-    if( subphrasesDescriptorArray.length )
+    let subphrasesDescriptorSet = aggregator.vocabulary.withSubphrase( o.commandName );
+    if( subphrasesDescriptorSet.size )
     {
       let e = _.mapExtend( null, o );
-      e.subphrasesDescriptorArray = subphrasesDescriptorArray;
+      e.subphrasesDescriptorArray = subphrasesDescriptorSet;
       aggregator.onAmbiguity( e );
       return null;
     }
@@ -1195,6 +1195,19 @@ function commandLook( o )
       aggregator.onUnknownCommandError( o );
       return null;
     }
+    // let subphrasesDescriptorArray = aggregator.vocabulary.withSubphrase( o.commandName );
+    // if( subphrasesDescriptorArray.length )
+    // {
+    //   let e = _.mapExtend( null, o );
+    //   e.subphrasesDescriptorArray = subphrasesDescriptorArray;
+    //   aggregator.onAmbiguity( e );
+    //   return null;
+    // }
+    // else
+    // {
+    //   aggregator.onUnknownCommandError( o );
+    //   return null;
+    // }
     // if( !subphrasesDescriptorArray.length )
     // {
     //   aggregator.onUnknownCommandError( o );
