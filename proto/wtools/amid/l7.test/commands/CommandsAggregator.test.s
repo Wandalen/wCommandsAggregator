@@ -2988,7 +2988,6 @@ badCommandsErrors.description =
   - throwen error is descriptive
 `;
 
-
 //
 
 function onUnknownCommandError( test )
@@ -3055,14 +3054,95 @@ function onUnknownCommandError( test )
   var exp = `Command ".wrong"`;
   test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
 
-  /* - */
+  /* */
 
   function clean()
   {
     logger2.outputData = '';
   }
-
 }
+
+//
+
+function onUnknownCommandErrorWithSubphrase( test )
+{
+  const logger2 = new _.LoggerToString();
+  const logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ] });
+
+  /* */
+
+  test.case = 'wrong command without help, with matched subphrase';
+  clean();
+  var commands =
+  {
+    'command.one' : { ro : ( e ) => { console.log( 'command.one' ); } },
+    'command.two' : { ro : ( e ) => { console.log( 'command.two' ); } },
+    'another' : { ro : ( e ) => { console.log( 'another' ); } },
+  };
+  var onError = ( err ) =>
+  {
+    _.error.attend( err );
+    test.identical( _.strCount( err.message, /Ambiguity.*\"\.one\".*/ ), 1 );
+    test.identical( _.strCount( err.originalMessage, /Ambiguity.*\"\.one\".*/ ), 1 );
+    return err
+  };
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
+    onError,
+    withHelp : 0,
+  }).form();
+
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.one' }) );
+  var exp = `Command ".one"\nAmbiguity. Did you mean?\n  .command.one - Command.one.\n`;
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
+
+  /* */
+
+  test.case = 'wrong command with help, with matched subphrase';
+  clean();
+  var commandHelp = ( e ) => e.aggregator._commandHelp( e );
+  var commands =
+  {
+    'help' : { ro : commandHelp, h : 'Get help about commands.' },
+    'command.one' : { ro : ( e ) => { console.log( 'command.one' ); } },
+    'command.two' : { ro : ( e ) => { console.log( 'command.two' ); } },
+    'another' : { ro : ( e ) => { console.log( 'another' ); } },
+  };
+  var onError = ( err ) =>
+  {
+    _.error.attend( err );
+    test.identical( _.strCount( err.message, /Ambiguity.*\"\.one\".*/ ), 1 );
+    test.identical( _.strCount( err.originalMessage, /Ambiguity.*\"\.one\".*/ ), 1 );
+    return err
+  };
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands,
+    logger : logger1,
+    commandsImplicitDelimiting : 0,
+    propertiesMapParsing : 1,
+    onError,
+    withHelp : 0,
+  }).form();
+
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.one' }) );
+  var exp = `Command ".one"\nAmbiguity. Did you mean?\n  .command.one - Command.one.\n`;
+  test.identical( _.ct.stripAnsi( logger2.outputData ), exp );
+
+  /* */
+
+  function clean()
+  {
+    logger2.outputData = '';
+  }
+}
+
 // --
 // declare
 // --
@@ -3096,6 +3176,7 @@ const Proto =
     badCommandsErrors,
 
     onUnknownCommandError,
+    onUnknownCommandErrorWithSubphrase,
 
   }
 
