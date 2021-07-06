@@ -2383,6 +2383,85 @@ function helpForCommandWithAliases( test )
 
 //
 
+function helpForCommandEndsWithDot( test )
+{
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ], outputRaw : 1 });
+
+  /* - */
+
+  test.case = 'help for all common commands'
+  logger2.outputData = '';
+  var onError = ( err ) =>
+  {
+    _.error.attend( err );
+    test.identical( _.strCount( err.message, /Ambiguity.*\"\.action\.\"/ ), 1 );
+    console.log( err.message );
+    test.identical( _.strCount( err.originalMessage, /Ambiguity.*\"\.action\.\"/ ), 1 );
+    return err
+  };
+  var Commands =
+  {
+    'help' : { ro : () => {}, h : 'Get help.' },
+    'action' : { ro : () => {}, h : 'action some!' },
+    'action first' : { ro : () => {}, h : 'This is action first' },
+    'action second' : { ro : () => {}, h : 'This is action second' },
+    'third action' : { ro : () => {}, h : 'This is third action' },
+  };
+  var aggregator = _.CommandsAggregator
+  ({
+    commands : _.map.extend( null, Commands ),
+    logger : logger1,
+    onError,
+  }).form();
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.action.' }) );
+  var exp =
+`Command ".action."
+Ambiguity. Did you mean?
+.action - action some!
+.action.first - This is action first
+.action.second - This is action second
+.third.action - This is third action
+`;
+  test.equivalent( logger2.outputData, exp );
+
+  /* */
+
+  test.case = 'help for single command'
+  logger2.outputData = '';
+  var onError = ( err ) =>
+  {
+    _.error.attend( err );
+    test.identical( _.strCount( err.message, /Ambiguity.*\"\.action\.first\.\"/ ), 1 );
+    console.log( err.message );
+    test.identical( _.strCount( err.originalMessage, /Ambiguity.*\"\.action\.first\.\"/ ), 1 );
+    return err
+  };
+  var Commands =
+  {
+    'help' : { ro : () => {}, h : 'Get help.' },
+    'action' : { ro : () => {}, h : 'action some!' },
+    'action first' : { ro : () => {}, h : 'This is action first' },
+    'action second' : { ro : () => {}, h : 'This is action second' },
+    'third action' : { ro : () => {}, h : 'This is third action' },
+  };
+  var aggregator = _.CommandsAggregator
+  ({
+    commands : _.map.extend( null, Commands ),
+    logger : logger1,
+    onError,
+  }).form();
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.action.first.' }) );
+  var exp =
+`Command ".action.first."
+Ambiguity. Did you mean?
+.action.first - This is action first
+`;
+  test.equivalent( logger2.outputData, exp );
+}
+
+//
+
 function commandPropertiesAliases( test )
 {
   let descriptor = null;
@@ -3169,6 +3248,7 @@ const Proto =
     help,
     helpWithLongHint,
     helpForCommandWithAliases,
+    helpForCommandEndsWithDot,
 
     commandPropertiesAliases,
     formCommandsWithPhrases,
