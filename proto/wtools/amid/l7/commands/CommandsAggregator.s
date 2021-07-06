@@ -1177,7 +1177,12 @@ function commandLook( o )
 
   /* */
 
-  let command = aggregator.vocabulary.withPhrase( o.commandName );
+  let command = aggregator.vocabulary.withPhrase
+  ({
+    phrase : _.strRemoveBegin( o.commandName, aggregator.delimeter || '' ),
+    normalize : 1
+  });
+  // let command = aggregator.vocabulary.withPhrase( o.commandName );
 
   if( o.withHandlers )
   if( !command )
