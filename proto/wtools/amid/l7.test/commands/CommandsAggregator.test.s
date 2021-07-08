@@ -152,6 +152,8 @@ function perform( test )
 
 }
 
+perform.timeOut = 10000;
+
 //
 
 function programPerform( test )
