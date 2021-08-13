@@ -2097,7 +2097,6 @@ function help( test )
   var expected =
 `
   .action - action some!
-  .action.first - This is action first
 `;
   test.equivalent( logger2.outputData, expected );
 
@@ -2225,7 +2224,6 @@ No command .
   var expected =
 `
   .action - Use command action to execute some action.
-  .action.first - Define actions which will be executed first.
 `;
   test.equivalent( loggerToString.outputData, expected );
 
@@ -2364,8 +2362,6 @@ function helpForCommandWithAliases( test )
   var expected =
 `
   .command - Test command
-  .command.aliases.array.empty - Test command
-  .command.alias.duplicated - Test command
     v : verbosity
     verbosity : verbosity
     r : routine
