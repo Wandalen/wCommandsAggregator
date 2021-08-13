@@ -2097,7 +2097,6 @@ function help( test )
   var expected =
 `
   .action - action some!
-  .action.first - This is action first
 `;
   test.equivalent( logger2.outputData, expected );
 
@@ -2225,7 +2224,6 @@ No command .
   var expected =
 `
   .action - Use command action to execute some action.
-  .action.first - Define actions which will be executed first.
 `;
   test.equivalent( loggerToString.outputData, expected );
 
@@ -2364,8 +2362,6 @@ function helpForCommandWithAliases( test )
   var expected =
 `
   .command - Test command
-  .command.aliases.array.empty - Test command
-  .command.alias.duplicated - Test command
     v : verbosity
     verbosity : verbosity
     r : routine
@@ -2460,6 +2456,121 @@ Ambiguity. Did you mean?
 .action.first - This is action first
 `;
   test.equivalent( logger2.outputData, exp );
+}
+
+//
+
+function helpForCommandsWithSimilarSubphrases( test )
+{
+  let commandHelp = ( e ) => e.aggregator._commandHelp( e );
+  var Commands =
+  {
+    'help' : { ro : commandHelp, h : 'Get help.' },
+    'action' : { ro : () => {}, h : 'simple action' },
+    'action one' : { ro : () => {}, h : 'action one' },
+    'action one alternative' : { ro : () => {}, h : 'action one alternative' },
+    'comm action one' : { ro : () => {}, h : 'another action one' },
+    'comm action one action one' : { ro : () => {}, h : 'more complicated' },
+  };
+
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ], outputRaw : 1 });
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands : Commands,
+    logger : logger1,
+  }).form();
+
+  /* */
+
+  test.case = 'help action - without dot at the end, exact match';
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help action' });
+  var expected =
+  `
+.action - simple action
+`;
+  test.equivalent( logger2.outputData, expected );
+
+  /* */
+
+  test.case = 'help action. - with dot at the end';
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help action.' });
+  var expected =
+  `
+.action - simple action
+.action.one - action one
+.action.one.alternative - action one alternative
+.comm.action.one - another action one
+.comm.action.one.action.one - more complicated
+`;
+  test.equivalent( logger2.outputData, expected );
+
+  /* */
+
+  test.case = 'help action.one - without dot at the end, exact match';
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help action.one' });
+  var expected =
+  `
+.action.one - action one
+`;
+  test.equivalent( logger2.outputData, expected );
+
+  /* */
+
+  test.case = 'help action.one - with dot at the end';
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help action.one.' });
+  var expected =
+  `
+.action.one - action one
+.action.one.alternative - action one alternative
+.comm.action.one - another action one
+.comm.action.one.action.one - more complicated
+`;
+  test.equivalent( logger2.outputData, expected );
+
+  /* */
+
+  test.case = 'help one - without dot at the end, not exact match';
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help one' });
+  var expected =
+  `
+.action.one - action one
+.action.one.alternative - action one alternative
+.comm.action.one - another action one
+.comm.action.one.action.one - more complicated
+No command one
+`;
+  test.equivalent( logger2.outputData, expected );
+
+  /* */
+
+  test.case = 'help comm.action - without dot at the end, partial match';
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help comm.action' });
+  var expected =
+  `
+.comm.action.one - another action one
+.comm.action.one.action.one - more complicated
+No command comm.action
+`;
+  test.equivalent( logger2.outputData, expected );
+
+  /* */
+
+  test.case = 'help comm.action.one - without dot at the end, partial match';
+  logger2.outputData = '';
+  aggregator.instructionPerform({ command : '.help comm.action.one' });
+  var expected =
+  `
+.comm.action.one - another action one
+`;
+  test.equivalent( logger2.outputData, expected );
 }
 
 //
@@ -3251,6 +3362,7 @@ const Proto =
     helpWithLongHint,
     helpForCommandWithAliases,
     helpForCommandEndsWithDot,
+    helpForCommandsWithSimilarSubphrases,
 
     commandPropertiesAliases,
     formCommandsWithPhrases,

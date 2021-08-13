@@ -828,9 +828,17 @@ function withSubphraseExportToStructure_body( o )
 
   _.assert( arguments.length === 1 );
 
-  let o2 = _.mapOnly_( null, o, aggregator.vocabulary.withSubphrase.defaults );
-  let subphraseDescriptorArray = aggregator.vocabulary.withSubphrase( o2 );
-  subphraseDescriptorArray = [ ... subphraseDescriptorArray ];
+  let subphraseDescriptorArray;
+  if( _.strEnds( o.phrase, '.' ) )
+  {
+    subphraseDescriptorArray = commandsWithSubphraseGet();
+  }
+  else
+  {
+    subphraseDescriptorArray = commandsWithPhraseGet();
+    if( !subphraseDescriptorArray )
+    subphraseDescriptorArray = commandsWithSubphraseGet();
+  }
 
   _.assert( _.arrayIs( subphraseDescriptorArray ) );
 
@@ -857,14 +865,34 @@ function withSubphraseExportToStructure_body( o )
   let help = _.strJoin( [ _.ct.format( aggregator.vocabulary.defaultDelimeter, 'code' ), _.ct.format( part1, 'code' ), ' - ', part2 ] );
 
   return help;
+
+  /* */
+
+  function commandsWithSubphraseGet()
+  {
+    const o2 = _.mapOnly_( null, o, aggregator.vocabulary.withSubphrase.defaults );
+    const subphraseDescriptorArray = aggregator.vocabulary.withSubphrase( o2 );
+    return [ ... subphraseDescriptorArray ];
+  }
+
+  /* */
+
+  function commandsWithPhraseGet()
+  {
+    const o2 = _.mapOnly_( null, o, aggregator.vocabulary.withPhrase.defaults );
+    const phraseDescriptorArray = aggregator.vocabulary.withPhrase( o2 );
+    if( phraseDescriptorArray )
+    return _.array.as( phraseDescriptorArray );
+  }
 }
-var defaults = withSubphraseExportToStructure_body.defaults =
+
+withSubphraseExportToStructure_body.defaults =
 {
   phrase : null,
   delimeter : null,
   minimal : 0,
   onDescriptorExportString : null,
-}
+};
 
 let withSubphraseExportToStructure = _.routine.unite( withSubphraseExport_head, withSubphraseExportToStructure_body );
 
