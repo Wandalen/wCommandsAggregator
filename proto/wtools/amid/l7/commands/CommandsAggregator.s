@@ -150,7 +150,7 @@ function programPerform( o )
 
   _.routine.options( programPerform, o );
   _.assert( _.strIs( o.program ) );
-  _.assert( !!aggregator.formed );
+  _.assert( !!aggregator.formed, 'Commands aggregator is not formed' );
   _.assert( arguments.length === 1 );
 
   o.program = o.program.trim();
@@ -483,7 +483,7 @@ function instructionsParse( o )
 
       for( let i = 0 ; i < result.length-1 ; i += 1 )
       {
-        result[ i ] = ( result[ i ].trim() + ' ' + result[ i+1 ].trim() ).trim();
+        result[ i ] = ( result[ i ].trim() + ' ' + result[ i+1 ].trim() ).trim(); /* xxx : qqq : ? */
         result.splice( i+1, 1 );
       }
 
@@ -1515,7 +1515,7 @@ let Composes =
   // commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]+))/ ),
   // commandImplicitDelimeter : _.define.own( /(\s|^)\.(?:(?:\w[^ ]*)|$)/ ), /* yyy */
   commandsExplicitDelimiting : 1,
-  commandsImplicitDelimiting : 0,
+  commandsImplicitDelimiting : 0, /* xxx : qqq : for Dmytro : ask. set to 1 by default */
   propertiesMapParsing : 0,
   severalValues : 1,
   withHelp : 1,
