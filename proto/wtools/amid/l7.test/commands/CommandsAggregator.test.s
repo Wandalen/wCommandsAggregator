@@ -2575,6 +2575,54 @@ No command comm.action
 
 //
 
+function helpForCommandsWithSimilarSubphrasesAndProperties( test )
+{
+  let commandHelp = ( e ) => e.aggregator._commandHelp( e );
+  const r1 = () => {};
+  r1.command = Object.create( null );
+  r1.command.properties = { one : 'one', v : 'v' };
+  const r2 = () => {};
+  r2.command = Object.create( null );
+  r2.command.properties = { two : 'two' };
+  const r3 = () => {};
+  r3.command = Object.create( null );
+  r3.command.properties = { three : 'three' };
+  var Commands =
+  {
+    'help' : { ro : commandHelp, h : 'Get help.' },
+    'action' : { ro : r1, h : 'simple action', lh : 'simple action - long description' },
+    'action one' : { ro : r2, h : 'action one', lh : 'action one - long description' },
+    'action one alternative' : { ro : r3, h : 'action one alternative', lh : 'action one alternative - long description' },
+  };
+
+  let logger2 = new _.LoggerToString();
+  let logger1 = new _.Logger({ outputs : [ _global_.logger, logger2 ], outputRaw : 1 });
+
+  var aggregator = _.CommandsAggregator
+  ({
+    commands : Commands,
+    logger : logger1,
+  }).form();
+
+  /* */
+
+  test.case = 'help action - without dot at the end, exact match';
+  logger2.outputData = '';
+  aggregator.programPerform({ program : '.help action.' });
+  var exp =
+    'Command ".help action."\n'
+  + '  .action - simple action - long description\n'
+  + '    one : one \n'
+  + '    v : v \n'
+  + '  .action.one - action one - long description\n'
+  + '    two : two \n'
+  + '  .action.one.alternative - action one alternative - long description\n'
+  + '    three : three';
+  test.identical( logger2.outputData, exp );
+}
+
+//
+
 function commandPropertiesAliases( test )
 {
   let descriptor = null;
@@ -3363,6 +3411,7 @@ const Proto =
     helpForCommandWithAliases,
     helpForCommandEndsWithDot,
     helpForCommandsWithSimilarSubphrases,
+    helpForCommandsWithSimilarSubphrasesAndProperties,
 
     commandPropertiesAliases,
     formCommandsWithPhrases,

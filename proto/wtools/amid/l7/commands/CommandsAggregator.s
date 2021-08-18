@@ -900,9 +900,19 @@ let withSubphraseExportToStructure = _.routine.unite( withSubphraseExport_head, 
 
 function withSubphraseExportToString_body( o )
 {
-  let aggregator = this;
-  let structure = aggregator.withSubphraseExportToStructure( o );
-  return _.entity.exportString( structure, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
+  const aggregator = this;
+  const structure = aggregator.withSubphraseExportToStructure( o );
+  const options =
+  {
+    levels : 2,
+    wrap : 0,
+    stringWrapper : '',
+    multiline : 1,
+    tab : '',
+    dtab : ''
+  };
+  const exportString =  _.entity.exportString( structure, options );
+  return `  ${ _.strLinesIndentation( exportString, '  ' ) }`;
 }
 
 withSubphraseExportToString_body.defaults = Object.create( withSubphraseExportToStructure.defaults );
@@ -924,17 +934,18 @@ function _help( o )
   if( o.argument )
   {
     logger.log();
-    logger.log( aggregator.withSubphraseExportToString({ phrase : o.argument, minimal : 0 }) );
+    logger.log( aggregator.withSubphraseExportToString({ phrase : o.argument, minimal : 0, onDescriptorExportString }) );
     logger.up();
 
     let command = aggregator.vocabulary.withPhrase({ phrase : o.argument });
 
-    if( command )
-    {
-      if( command.routine && command.properties )
-      logger.log( aggregator.commandPropertiesExportString( command ) );
-    }
-    else
+    // if( command )
+    // {
+    //   if( command.routine && command.properties )
+    //   logger.log( aggregator.commandPropertiesExportString( command ) );
+    // }
+    // else
+    if( !command )
     {
       logger.log( 'No command', o.argument );
     }
@@ -953,12 +964,23 @@ function _help( o )
   }
 
   return this;
+
+  /* */
+
+  function onDescriptorExportString( command, longHint )
+  {
+    let commandDescription = aggregator.commandExportString( command, longHint );
+    let commandPropertiesDescription = '';
+    if( command.routine && command.properties )
+    commandPropertiesDescription = aggregator.commandPropertiesExportString( command );
+    return _.strJoin( [ commandDescription, commandPropertiesDescription ], commandPropertiesDescription ? '\n' : '' );
+  };
 }
 
 _help.defaults =
 {
   argument : '',
-}
+};
 
 // --
 // predefined commands
