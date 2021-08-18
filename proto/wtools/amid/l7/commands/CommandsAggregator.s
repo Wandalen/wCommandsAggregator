@@ -900,11 +900,20 @@ let withSubphraseExportToStructure = _.routine.unite( withSubphraseExport_head, 
 
 function withSubphraseExportToString_body( o )
 {
-  let aggregator = this;
-  let structure = aggregator.withSubphraseExportToStructure( o );
-  return _.entity.exportString( structure, { levels : 2, wrap : 0, stringWrapper : '', multiline : 1 } );
+  const aggregator = this;
+  const structure = aggregator.withSubphraseExportToStructure( o );
+  const options =
+  {
+    levels : 2,
+    wrap : 0,
+    stringWrapper : '',
+    multiline : 1,
+    tab : '',
+    dtab : ''
+  };
+  const exportString =  _.entity.exportString( structure, options );
+  return `  ${ _.strLinesIndentation( exportString, '  ' ) }`;
 }
-
 withSubphraseExportToString_body.defaults = Object.create( withSubphraseExportToStructure.defaults );
 
 let withSubphraseExportToString = _.routine.unite( withSubphraseExport_head, withSubphraseExportToString_body );
