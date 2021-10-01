@@ -11,8 +11,8 @@ homepage = "https://github.com/wCommandsAggregator"
 description = """
 The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.
 """
-categories = [ "algorithms" ]
-keywords = [ "wtools", "CLI", "command-line-interface", "CUI", "commands user interface", "user interface" ]
+categories = [ "command-line-interface", "command-line-utilities" ]
+keywords = [ "wtools", "CLI", "command-line-interface", "CUI", "commands-user-interface", "user interface" ]
 
 include = [
   "/rust",
