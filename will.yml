@@ -1,8 +1,7 @@
 about:
   name: wCommandsAggregator
   description: >-
-    Class aggregating several applications into single CLI. It can aggregate
-    external binary applications as well as JS functions. Use it to expose CLI.
+    The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.
   version: 0.4.0
   enabled: 1
   license: MIT

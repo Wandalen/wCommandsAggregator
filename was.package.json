@@ -1,7 +1,7 @@
 {
   "name": "wcommandsaggregator",
   "version": "0.3.345",
-  "description": "Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.",
+  "description": "The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.",
   "author": "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors": [
     "Kostiantyn Wandalen <wanalen@01.school>",

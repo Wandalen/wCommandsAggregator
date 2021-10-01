@@ -4,7 +4,7 @@
 'use strict';
 
 /**
- * Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.
+ * The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.
   @module Tools/mid/CommandsAggregator
 */
 
@@ -508,7 +508,7 @@ function instructionsParse( o )
       severalValues : o.severalValues,
       subjectWinPathsMaybe : o.subjectWinPathsMaybe,
     };
-    parsedCommands.push ( aggregator.instructionParse( o2 ) );
+    parsedCommands.push( aggregator.instructionParse( o2 ) );
   }
 
   return parsedCommands
@@ -516,13 +516,13 @@ function instructionsParse( o )
 
 instructionsParse.defaults =
 {
-  commands : null,
+  commands : null, /* xxx : rename to instructions */
   commandsImplicitDelimiting : null,
   commandsExplicitDelimiting : null,
   propertiesMapParsing : null,
   propertiesMaps : null,
   severalValues : null,
-  subjectWinPathsMaybe : 0,
+  subjectWinPathsMaybe : 0, /* xxx : qqq : what for? remove by callback isSubject? */
 }
 
 //

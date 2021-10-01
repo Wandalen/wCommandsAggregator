@@ -1,7 +1,7 @@
 
 # module::CommandsAggregator [![status](https://github.com/Wandalen/wCommandsAggregator/actions/workflows/StandardPublish.yml/badge.svg)](https://github.com/Wandalen/wCommandsAggregator/actions/workflows/StandardPublish.yml) [![stability-stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)](https://github.com/emersion/stability-badges#stable)
 
-Class aggregating several applications into single CLI. It can aggregate external binary applications as well as JS functions. Use it to expose CLI.
+The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.
 
 ### Try out from the repository
 
@@ -21,4 +21,3 @@ npm add 'wcommandsaggregator@stable'
 ```
 
 `Willbe` is not required to use the module in your project as submodule.
-
