@@ -3,17 +3,17 @@ root:
   - wCommandsAggregator.out
 consistency:
   ../will.yml: &ref_0
-    hash: af9b0bfac3f2854a8b3932e848df644c
-    size: 7068
+    hash: acd5c4cc9786a5f66c47ee40e6064687
+    size: 7077
 module:
   wCommandsAggregator.out:
     about:
       name: wCommandsAggregator
       org: noorg
       description: >-
-        Class aggregating several applications into single CLI. It can aggregate
-        external binary applications as well as JS functions. Use it to expose
-        CLI.
+        The tool to make CLI ( commands user interface ). It is able to
+        aggregate external binary applications, as well as functions, which are
+        written in your language.
       enabled: 1
       version: 0.4.0
       license: MIT
@@ -818,9 +818,9 @@ module:
       name: wCommandsAggregator
       org: noorg
       description: >-
-        Class aggregating several applications into single CLI. It can aggregate
-        external binary applications as well as JS functions. Use it to expose
-        CLI.
+        The tool to make CLI ( commands user interface ). It is able to
+        aggregate external binary applications, as well as functions, which are
+        written in your language.
       enabled: 1
       version: 0.4.0
       license: MIT
@@ -1518,5 +1518,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: af9b0bfac3f2854a8b3932e848df644c
-        size: 7068
+        hash: acd5c4cc9786a5f66c47ee40e6064687
+        size: 7077
