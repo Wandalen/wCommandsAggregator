@@ -3,8 +3,8 @@ root:
   - wCommandsAggregator.out
 consistency:
   ../will.yml: &ref_0
-    hash: acd5c4cc9786a5f66c47ee40e6064687
-    size: 7077
+    hash: ffd0089886ff8884b6e88c16c1e16121
+    size: 6944
 module:
   wCommandsAggregator.out:
     about:
@@ -398,9 +398,6 @@ module:
           content: npm
         inherit:
           - module.export
-      npm.publish:
-        opts:
-          shell: npm publish
       npm.generate.debug.raw:
         opts:
           entryPath: 'path::entry.out.*=1'
@@ -736,12 +733,6 @@ module:
           - 'step::doc.export'
         criterion:
           content: doc
-          export: 1
-      npm.export:
-        steps:
-          - 'step::npm.publish'
-        criterion:
-          content: npm
           export: 1
       export:
         steps:
@@ -1116,9 +1107,6 @@ module:
           content: npm
         inherit:
           - module.export
-      npm.publish:
-        opts:
-          shell: npm publish
       npm.generate.debug.raw:
         opts:
           entryPath: 'path::entry.out.*=1'
@@ -1455,12 +1443,6 @@ module:
         criterion:
           content: doc
           export: 1
-      npm.export:
-        steps:
-          - 'step::npm.publish'
-        criterion:
-          content: npm
-          export: 1
       export:
         steps:
           - 'build::proto.export'
@@ -1518,5 +1500,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: acd5c4cc9786a5f66c47ee40e6064687
-        size: 7077
+        hash: ffd0089886ff8884b6e88c16c1e16121
+        size: 6944
