@@ -1,7 +1,9 @@
 about:
   name: wCommandsAggregator
   description: >-
-    The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.
+    The tool to make CLI ( commands user interface ). It is able to aggregate
+    external binary applications, as well as functions, which are written in
+    your language.
   version: 0.4.0
   enabled: 1
   license: MIT
@@ -32,12 +34,6 @@ build:
       export: 1
     steps:
       - 'step::doc.export'
-  npm.export:
-    criterion:
-      content: npm
-      export: 1
-    steps:
-      - 'step::npm.publish'
   export:
     criterion:
       default: 1
@@ -236,8 +232,6 @@ step:
     tar: 0
     criterion:
       content: npm
-  npm.publish:
-    shell: npm publish
   npm.generate:
     inherit: npm.generate
     entryPath: 'path::entry.out.*=1'
