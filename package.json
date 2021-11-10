@@ -1,6 +1,6 @@
 {
   "name": "wcommandsaggregator",
-  "version": "0.3.353",
+  "version": "0.3.354",
   "description": "The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.",
   "author": "Kostiantyn Wandalen <wanalen@01.school>",
   "contributors": [
@@ -28,16 +28,16 @@
     "url": "https://github.com/Wandalen/wCommandsAggregator/issues"
   },
   "dependencies": {
-    "wvocabulary": "latest",
-    "wverbal": "latest",
-    "wTools": "latest",
-    "wprocess": "latest",
-    "wpathbasic": "latest",
-    "wFiles": "latest",
-    "wCopyable": "latest"
+    "wvocabulary": "alpha",
+    "wverbal": "alpha",
+    "wTools": "alpha",
+    "wprocess": "alpha",
+    "wpathbasic": "alpha",
+    "wFiles": "alpha",
+    "wCopyable": "alpha"
   },
   "devDependencies": {
-    "wTesting": "latest",
+    "wTesting": "alpha",
     "eslint": "7.32.0"
   },
   "keywords": [
