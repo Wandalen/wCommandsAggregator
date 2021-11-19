@@ -5,7 +5,7 @@
 
 /**
  * The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.
-  @module Tools/mid/CommandsAggregator
+ * @module Tools/mid/CommandsAggregator
 */
 
 if( typeof module !== 'undefined' )
@@ -106,6 +106,57 @@ function _formVocabulary()
   aggregator.vocabulary.preform();
 
 }
+
+//
+
+function aggregatorExtend_functor( routine )
+{
+  return function aggregatorExtend( o )
+  {
+    if( !o.dst )
+    o.dst = this;
+
+    _.routine.options( aggregatorExtend, o );
+    _.assert( _.instanceIs( o.src ) );
+    _.assert( _.instanceIs( o.dst ) );
+
+    let extensionMap = Object.create( null );
+    if( o.only )
+    _.mapOnly_( extensionMap, o.src.vocabulary.phraseMap, o.only );
+    else
+    _.object.extend( extensionMap, o.src.vocabulary.phraseMap );
+
+    if( o.but )
+    _.mapBut_( extensionMap, extensionMap, o.but );
+
+    routine( o.dst.vocabulary.phraseMap, extensionMap );
+    for( let key in extensionMap )
+    extensionMap[ key ] = [ extensionMap[ key ] ];
+    routine( o.dst.vocabulary.wordMap, extensionMap );
+
+    o.dst.vocabulary.descriptorSet = _.set.make( [] );
+    for( let key in o.dst.vocabulary.phraseMap )
+    o.dst.vocabulary.descriptorSet.add( o.dst.vocabulary.phraseMap[ key ] );
+
+    return o.dst;
+  }
+}
+
+//
+
+const extend = aggregatorExtend_functor( _.object.extend.bind( _.object ) );
+extend.defaults =
+{
+  src : null,
+  dst : null,
+  but : null,
+  only : null,
+};
+
+//
+
+const supplement = aggregatorExtend_functor( _.object.supplement.bind( _.object ) );
+supplement.defaults = extend.defaults;
 
 //
 
@@ -1603,6 +1654,8 @@ let Extension =
   init,
   form,
   _formVocabulary,
+  extend,
+  supplement,
   exec,
   Exec,
 
