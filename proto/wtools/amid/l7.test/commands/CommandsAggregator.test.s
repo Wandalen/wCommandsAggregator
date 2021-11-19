@@ -184,6 +184,172 @@ function extend( test )
 
 //
 
+function supplement( test )
+{
+  test.case = 'different commands, no only, no but';
+  var track = [];
+  var commands1 =
+  {
+    'with' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'With' },
+    'list' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'List' },
+  };
+  var commands2 =
+  {
+    'imply' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Imply' },
+    'each' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Each' },
+  };
+
+  var aggregator1 = _.CommandsAggregator({ commands : commands1, onError }).form();
+  var aggregator2 = _.CommandsAggregator({ commands : commands2, onError }).form();
+
+  var aggregator = aggregator2.supplement({ src : aggregator1 });
+  test.true( aggregator === aggregator2 );
+  aggregator.programPerform({ program : '.with' });
+  aggregator.programPerform({ program : '.list' });
+  aggregator.programPerform({ program : '.imply' });
+  aggregator.programPerform({ program : '.each' });
+  test.identical( track, [ '.with1', '.list1', '.imply2', '.each2' ] );
+
+  /* */
+
+  test.case = 'partially matched, no only, no but';
+  var track = [];
+  var commands1 =
+  {
+    'with' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'With' },
+    'list' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'List' },
+  };
+  var commands2 =
+  {
+    'with' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'With2' },
+    'each' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Each' },
+  };
+
+  var aggregator1 = _.CommandsAggregator({ commands : commands1, onError }).form();
+  var aggregator2 = _.CommandsAggregator({ commands : commands2, onError }).form();
+
+  var aggregator = aggregator2.supplement({ src : aggregator1 });
+  test.true( aggregator === aggregator2 );
+  aggregator.programPerform({ program : '.with' });
+  aggregator.programPerform({ program : '.list' });
+  aggregator.programPerform({ program : '.each' });
+  test.identical( track, [ '.with2', '.list1', '.each2' ] );
+
+  /* */
+
+  test.case = 'full matched, no only, no but';
+  var track = [];
+  var commands1 =
+  {
+    'with' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'With' },
+    'list' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'List' },
+  };
+  var commands2 =
+  {
+    'with' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'With2' },
+    'list' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'List2' },
+  };
+
+  var aggregator1 = _.CommandsAggregator({ commands : commands1, onError }).form();
+  var aggregator2 = _.CommandsAggregator({ commands : commands2, onError }).form();
+
+  var aggregator = aggregator2.supplement({ src : aggregator1 });
+  test.true( aggregator === aggregator2 );
+  aggregator.programPerform({ program : '.with' });
+  aggregator.programPerform({ program : '.list' });
+  test.identical( track, [ '.with2', '.list2' ] );
+
+  /* */
+
+  test.case = 'different commands, with only, no but';
+  var track = [];
+  var commands1 =
+  {
+    'with' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'With' },
+    'list' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'List' },
+  };
+  var commands2 =
+  {
+    'imply' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Imply' },
+    'each' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Each' },
+  };
+
+  var aggregator1 = _.CommandsAggregator({ commands : commands1, onError }).form();
+  var aggregator2 = _.CommandsAggregator({ commands : commands2, onError }).form();
+
+  var aggregator = aggregator2.supplement({ src : aggregator1, only : { 'with' : null } });
+  test.true( aggregator === aggregator2 );
+  aggregator.programPerform({ program : '.with' });
+  aggregator.programPerform({ program : '.imply' });
+  aggregator.programPerform({ program : '.each' });
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.list' }) );
+  test.identical( track, [ '.with1', '.imply2', '.each2' ] );
+
+  /* */
+
+  test.case = 'different commands, no only, with but';
+  var track = [];
+  var commands1 =
+  {
+    'with' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'With' },
+    'list' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'List' },
+  };
+  var commands2 =
+  {
+    'imply' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Imply' },
+    'each' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Each' },
+  };
+
+  var aggregator1 = _.CommandsAggregator({ commands : commands1, onError }).form();
+  var aggregator2 = _.CommandsAggregator({ commands : commands2, onError }).form();
+
+  var aggregator = aggregator2.supplement({ src : aggregator1, but : { 'with' : null } });
+  test.true( aggregator === aggregator2 );
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.with' }) );
+  aggregator.programPerform({ program : '.list' });
+  aggregator.programPerform({ program : '.imply' });
+  aggregator.programPerform({ program : '.each' });
+  test.identical( track, [ '.list1', '.imply2', '.each2' ] );
+
+  /* */
+
+  test.case = 'different commands, with only, with but';
+  var track = [];
+  var commands1 =
+  {
+    'with' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'With' },
+    'list' : { ro : ( e ) => track.push( e.commandName + 1 ), h : 'List' },
+  };
+  var commands2 =
+  {
+    'imply' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Imply' },
+    'each' : { ro : ( e ) => track.push( e.commandName + 2 ), h : 'Each' },
+  };
+
+  var aggregator1 = _.CommandsAggregator({ commands : commands1, onError }).form();
+  var aggregator2 = _.CommandsAggregator({ commands : commands2, onError }).form();
+
+  var aggregator = aggregator2.supplement({ src : aggregator1, but : { 'with' : null }, only : [ 'with', 'list' ] });
+  test.true( aggregator === aggregator2 );
+  test.shouldThrowErrorAsync( () => aggregator.programPerform({ program : '.with' }) );
+  aggregator.programPerform({ program : '.list' });
+  aggregator.programPerform({ program : '.imply' });
+  aggregator.programPerform({ program : '.each' });
+  test.identical( track, [ '.list1', '.imply2', '.each2' ] );
+
+  /* */
+
+  function onError( err )
+  {
+    _.error.attend( err );
+    test.identical( _.strCount( err.originalMessage, /Unknown command \".*\"/ ), 1 );
+    return err;
+  };
+
+}
+
+//
+
 function perform( test )
 {
 
@@ -3561,6 +3727,7 @@ const Proto =
   tests :
   {
     extend,
+    supplement,
 
     perform,
     programPerform,
