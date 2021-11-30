@@ -3,8 +3,8 @@ root:
   - wCommandsAggregator.out
 consistency:
   ../will.yml: &ref_0
-    hash: ffd0089886ff8884b6e88c16c1e16121
-    size: 6944
+    hash: 07db91248c88ba20e06a7fbdd52efbb0
+    size: 6952
 module:
   wCommandsAggregator.out:
     about:
@@ -1500,5 +1500,5 @@ module:
           - 'build::npm'
     consistency:
       ../will.yml:
-        hash: ffd0089886ff8884b6e88c16c1e16121
-        size: 6944
+        hash: 07db91248c88ba20e06a7fbdd52efbb0
+        size: 6952
