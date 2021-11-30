@@ -2,7 +2,7 @@
 name = "wca"
 version = "0.1.0"
 edition = "2018"
-authors = ["Kostiantyn Wandalen <wanalen@01.school>", "Volodymyr M. <volodymyr.migdal@gmail.com>", "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>" ]
+authors = ["Kostiantyn Wandalen <wandalen@obox.systems>", "Volodymyr M. <volodymyr.migdal@gmail.com>", "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>" ]
 license = "MIT"
 readme = "Readme.md"
 documentation = "https://docs.rs/wca"

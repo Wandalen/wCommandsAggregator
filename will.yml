@@ -8,11 +8,11 @@ about:
   enabled: 1
   license: MIT
   npm.name: wcommandsaggregator
-  author: Kostiantyn Wandalen <wanalen@01.school>
+  author: Kostiantyn Wandalen <wandalen@obox.systems>
   keywords:
     - wTools
   contributors:
-    - Kostiantyn Wandalen <wanalen@01.school>
+    - Kostiantyn Wandalen <wandalen@obox.systems>
     - Dmytro Kryvoruchko <dm.vict.kr@gmail.com>
   interpreters:
     - njs >= 10.0.0
