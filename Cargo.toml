@@ -1,37 +1,15 @@
-[package]
-name = "wca"
-version = "0.1.0"
-edition = "2018"
-authors = ["Kostiantyn Wandalen <wandalen@obox.systems>", "Volodymyr M. <volodymyr.migdal@gmail.com>", "Dmytro Kryvoruchko <dm.vict.kr@gmail.com>" ]
-license = "MIT"
-readme = "Readme.md"
-documentation = "https://docs.rs/wca"
-repository = "https://github.com/wCommandsAggregator"
-homepage = "https://github.com/wCommandsAggregator"
-description = """
-The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.
-"""
-categories = [ "command-line-interface", "command-line-utilities" ]
-keywords = [ "wtools", "CLI", "CUI", "user-interface" ]
-
-include = [
-  "/rust",
-  "/Cargo.toml",
-  "/Readme.md",
+[workspace]
+resolver = "2"
+members = [
+  "module/rust/*",
+  "sample/rust/*",
 ]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[lib]
-name = "wca"
-path = "rust/wtools/ca/mod.rs"
-
-[[test]]
-name = "wca_test"
-path = "rust/wtools/ca/test/mod.rs"
-
-[dependencies]
-wtools = "0.1.0"
-maplit = "1.0.2"
-# regex = "1.5.4"
-# chrono = "0.4.19"
+exclude = [
+  "*",
+  # "module/rust/-*",
+  # "sample/rust/-*",
+  # "module/rust/_*",
+  # "sample/rust/_*",
+  # "sample/rust/_select_matching",
+]
+# default-members = [ "module/rust/wtools" ]
