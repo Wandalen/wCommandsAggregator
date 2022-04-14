@@ -31,9 +31,9 @@ path = "rust/test/ca/mod.rs"
 
 [dependencies]
 wtools = "0.1.0"
-wstring_tools = { git = "https://github.com/dmvict/wTools", branch = "parse" }
+former = { git = "https://github.com/dmvict/wTools", branch = "parse" } # replace by registry crate after publish
+wstring_tools = { git = "https://github.com/dmvict/wTools", branch = "parse" } # replace by registry crate after publish
 maplit = "1.0.2"
-anyhow = "1.0.56"
 
 [dev-dependencies]
 wtest_basic = "~0.1"
