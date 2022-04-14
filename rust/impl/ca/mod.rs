@@ -26,4 +26,3 @@ pub mod instruction;
 //
 
 pub use command::*;
-pub use instruction::*;
