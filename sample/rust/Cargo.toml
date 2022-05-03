@@ -1,0 +1,11 @@
+[package]
+name = "wca-examples"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+structopt = "0.3.25"
+
+[[example]]
+name = "structopt-example"
+path = "structopt-example.rs"
