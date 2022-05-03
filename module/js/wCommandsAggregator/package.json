@@ -1,0 +1,39 @@
+{
+  "name": "wselector",
+  "version": "0.3.327",
+  "description": "Collection of cross-platform routines to select a sub-structure from a complex data structure. Use the module to transform a data structure with the help of a short query string.",
+  "author": "Kostiantyn Wandalen <wandalen@obox.systems>",
+  "license": "MIT",
+  "main": "proto/node_modules/wselector",
+  "files": [
+    "proto/wtools/abase/l5",
+    "out",
+    "proto/node_modules",
+    "proto/node_modules/Tools",
+    "proto/node_modules/wselector"
+  ],
+  "scripts": {
+    "test": "wtest .run 'proto/**' rapidity:-3",
+    "docgen": "wdocgen proto"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wandalen/wSelector.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Wandalen/wSelector/issues"
+  },
+  "dependencies": {
+    "wTools": "alpha",
+    "wreplicator": "alpha",
+    "wpathtools": "alpha",
+    "wlooker": "alpha"
+  },
+  "devDependencies": {
+    "wTesting": "alpha",
+    "eslint": "7.32.0"
+  },
+  "keywords": [
+    "wTools"
+  ]
+}
