@@ -1,6 +1,6 @@
 {
   "name": "wcommandsaggregator",
-  "version": "0.3.363",
+  "version": "0.3.364",
   "description": "The tool to make CLI ( commands user interface ). It is able to aggregate external binary applications, as well as functions, which are written in your language.",
   "author": "Kostiantyn Wandalen <wandalen@obox.systems>",
   "contributors": [
